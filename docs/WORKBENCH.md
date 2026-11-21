@@ -18,11 +18,36 @@ For a different local port:
 recursivecal serve --port 8766
 ```
 
-Opening `recursivecal_lab/web/index.html` directly provides an import-only viewer. Computation buttons remain disabled when the local API is unavailable. Existing run and experiment files can still be imported, inspected and exported. Static mode never substitutes invented results for an unavailable backend.
+The root page is the physical workspace. A static HTTPS preview can replay the bundled synthetic evidence and import compatible JSON reports. Computation buttons remain disabled when the local API is unavailable. Integrity checks require a secure browser context such as HTTPS or localhost. Static mode never substitutes invented results for an unavailable backend.
 
-The release also includes **Load recorded example** and **Load recorded benchmark**. These buttons open the saved physical trace and experiment summary bundled with that release, including their recorded provenance. They work in the static viewer and are explicitly labelled as recorded results. They do not execute a new simulation or train a policy. The browser calls the computation API only from a loopback address.
+## The physical workspace
 
-## Run a physical scenario
+| Tab | What it shows |
+| --- | --- |
+| Rig & data | Mechanism, selected actuator, illustrated internal assembly, simulation signals and events |
+| Investigate | Test sequence, pre-test candidate predictions, instrument traces, acquired samples and posterior updates |
+| Calibrate | Nominal, inferred and committed parameter values, conditional model-bank uncertainty and commitment reason |
+| Verify | Baseline/candidate motion, every motion acceptance limit, passive support, power loss and hardware evidence |
+
+Click **Configure** to choose the next simulation or investigation, then run it. The local investigation endpoint streams real stage events: test selected, test completed, belief updated, committed and verification complete. It does not stream an invented per-frame solver progress percentage. Monitor callbacks receive detached public observations; hidden plant truth is retained until the sealed report. Candidate predictions are saved before the corresponding experiment runs.
+
+Once a trace is available, one clock drives the rig pose, actuator extension, plots, sample markers and numeric readouts. Drag the timeline, click a plot, step between recorded samples, or play at the selected speed. Numeric channels interpolate at the recorded timestamps. Discrete power states are held between samples and ended runs are not extrapolated. **Replaying** means saved motion, while **Computing** means the local backend is working. Source labels distinguish recorded examples, locally computed results and imported evidence.
+
+The investigation view uses the sensor angle and combined strut-force signal, even when a loaded sealed report also contains evaluator truth. The verifier view uses the evaluator trace after commitment. Agent acquisition samples are marked separately from the denser instrument replay. The three candidate paths are the highest-weight model predictions before the selected test, not fitted curves drawn after observing it. Older reports without saved predictions remain usable and do not receive fabricated prediction paths.
+
+The actuator cutaway is illustrative, not manufacturing CAD. Its translating nut and rod follow geometric extension. Motor rotation, current and temperature remain unmodeled. The two struts share one actuator force state. The 3D assembly uses the standard mount geometry; a run with incompatible imported mounts keeps its trace and readouts but does not display a misleading standard assembly.
+
+The calibration table separates inferred estimates from the frozen commitment. When the investigator abstains, the committed values remain nominal. Uncertainty is conditional on the finite model bank, not a hardware confidence guarantee. Motion verification requires completion, tracking RMSE no greater than 3 degrees, absolute final error no greater than 2 degrees, peak speed no greater than 1.15 rad/s and saturation fraction no greater than 0.35 for every profile. Passive support, power loss and hardware validation are shown separately.
+
+**Export** retains the complete original report. **CSV** exports the selected displayed trace. Investigation imports validate the report digest and the committed observation-history digest; changed evidence is rejected while the previous report remains available. These hashes detect changes, not authorship. Python `recursivecal verify-inquiry` also checks the report protocol and acceptance result.
+
+**Open recorded example** restores the bundled physics-2 simulation or investigation. This does not execute a new simulation or train a policy. Use **Measurement tools** to open `data.html` for the extended settings, fitting and historical benchmark workflows below. That page retains **Load recorded example** and **Load recorded benchmark** with their original provenance, including archived physics-1 evidence.
+
+## Extended simulation and measurement tools
+
+The following controls are on `data.html`, opened from **Measurement tools** in the workspace.
+
+### Run a physical scenario
 
 1. Choose **Open and hold**, **Close**, **Passive hold**, or **Power loss during opening**.
 2. Set the plant assumptions, duration and numerical time step. The extended settings expose friction, actuator lag, force limits, sensor errors and the initial state.
@@ -107,12 +132,15 @@ Pure contract checks, without a browser:
 
 ```bash
 node tests/workbench_contracts.cjs
+node tests/workspace_contracts.cjs
 ```
 
 End-to-end checks, with Playwright and Chromium installed:
 
 ```bash
 python tests/workbench_smoke.py
+python tests/workspace_smoke.py
 ```
 
-The test starts a managed local server, exercises real simulation and measurement endpoints, checks exports, compares runs, verifies a speed-limit stop, checks imported text handling and import-only mode, and checks all views at mobile, tablet and desktop widths. It writes screenshots and a JSON report to `artifacts/workbench/` and closes both server and browser on completion or failure. It does not control the user's computer.
+The tests start temporary local servers and close them with the browsers on completion or failure. The workbench test covers measurement fitting, comparison and archived evidence at `data.html`. The workspace test checks timestamp interpolation against exported trace data, synchronized pose and extension, recorded predictions, all four tabs at mobile/tablet/desktop widths, a real power-loss simulation, a real streamed investigation that fails verification, tampered evidence rejection and static recorded mode. It saves actual screenshots and a JSON report to `artifacts/workspace/`; the CI compatibility entry point `tests/inquiry_smoke.py` uses `artifacts/inquiry-browser/`. These tests do not control the user's computer.
+

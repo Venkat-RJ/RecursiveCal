@@ -35,21 +35,23 @@ recursivecal serve
 
 Open `http://127.0.0.1:8765`. The server runs in the current terminal; Ctrl+C stops it. NumPy is the only required third-party runtime dependency. The new suite needs no GPU, API key, paid service, or CAD installation.
 
-For the complete physical investigation, open **`http://127.0.0.1:8765/inquiry.html`**, or run:
+The root page opens the physical workspace with **Rig & data**, **Investigate**, **Calibrate**, and **Verify**. The rig, actuator extension, traces and readouts share one replay clock. The actuator cutaway illustrates the internal assembly; electrical current, rotor speed and temperature are not modeled. The older `inquiry.html` address redirects to the investigation tab.
+
+To run the physical investigation from the terminal:
 
 ```bash
 recursivecal inquire --case weak_motor --seed 7 --output runs/physical-inquiry.json
 recursivecal verify-inquiry runs/physical-inquiry.json
 ```
 
-The workbench shows the actual diagnostic sequence, belief updates, a sealed calibration, before/after CAD motion and four independent motion checks. A correct diagnosis can still produce a rejected calibration. A model mismatch can trigger a fixture check and abstention. Full reports retain sensor readings, source hashes and evaluator-only truth.
+The workspace streams actual experiment-selection, observation and belief-update events while the local engine computes. Saved motion is explicitly labelled as replay. It shows predictions recorded before each test, nominal/inferred/committed parameter values, and before/after motion with every verification limit. A correct diagnosis can still produce a rejected calibration. A model mismatch can trigger a fixture check and abstention. Full reports retain sensor readings, source hashes and evaluator-only truth. Measurement fitting and the archived benchmark viewer remain available through **Measurement tools** at `data.html`.
 
 ## What you can use now
 
 | Capability | Implemented behavior |
 | --- | --- |
 | Physical inquiry | Persistent SI plant, observation-only session, adaptive Bayesian tests, fixed/no-probe comparisons, calibration commitment and independent verification |
-| CAD investigation view | Authored assembly driven by actual saved traces, decision journal, parameter belief, limits, report import/export and explicit recorded mode |
+| Physical workspace | Four connected views, articulated CAD, actuator cutaway, synchronized replay, pre-test model predictions, sealed estimates and exact verification limits |
 | SI liftgate simulation | Explicit geometry, gravity, force lag, gas assistance, friction and stiction, stops, sensor assumptions, power loss, and holding architecture |
 | Workbench | Configure and run the model, inspect signals, replay time, pin comparisons, import results, export complete JSON and CSV |
 | Force fitting | Read SI CSVs with provenance, fit training rows, report held-out residuals, apply a curve only within its measured-length support |

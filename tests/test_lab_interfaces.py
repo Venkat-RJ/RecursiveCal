@@ -13,6 +13,7 @@ import unittest
 
 from recursivecal_lab.api import capabilities, dispatch
 from recursivecal_lab.io import loads, write_json
+from recursivecal_lab.inquiry import verify_report
 from recursivecal_lab.server import Handler, WorkbenchServer
 
 
@@ -123,6 +124,20 @@ class HTTPTests(unittest.TestCase):
             self.assertEqual(status, 400, raw)
         status, _, _ = self.request("POST", "/api/simulate", '{}', {"Content-Type": "text/plain"})
         self.assertEqual(status, 415)
+
+    def test_investigation_stream_and_input_boundary(self):
+        headers = {"Content-Type": "application/json"}
+        for body in ('[]', '{"unknown":1}', '{"case":"missing"}', '{"seed":true}'):
+            status, _, raw = self.request("POST", "/api/inquiry/stream", body, headers)
+            self.assertEqual(status, 400, raw)
+        status, response_headers, raw = self.request(
+            "POST", "/api/inquiry/stream", '{"policy":"no_probe"}', headers)
+        self.assertEqual(status, 200, raw)
+        self.assertIn("application/x-ndjson", response_headers["Content-Type"])
+        events = [json.loads(line) for line in raw.splitlines()]
+        self.assertEqual([event["type"] for event in events], ["started", "committed", "complete"])
+        self.assertNotIn("evaluator_only_truth", json.dumps(events[:-1]))
+        self.assertTrue(verify_report(events[-1]["report"])["valid"])
 
 
 if __name__ == "__main__":

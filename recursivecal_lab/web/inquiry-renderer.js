@@ -86,7 +86,8 @@ function compile(gl,t,src){let s=gl.createShader(t);gl.shaderSource(s,src);gl.co
 function makeProgram(gl){let p=gl.createProgram();gl.attachShader(p,compile(gl,gl.VERTEX_SHADER,VS));gl.attachShader(p,compile(gl,gl.FRAGMENT_SHADER,FS));gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(p));return p;}
 function gpuGeometry(gl,obj){const vao=gl.createVertexArray();gl.bindVertexArray(vao);for(const [name,data] of [['position',obj.positions],['normal',obj.normals]]){let b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(data),gl.STATIC_DRAW);let i=name==='position'?0:1;gl.enableVertexAttribArray(i);gl.vertexAttribPointer(i,3,gl.FLOAT,false,0,0);}gl.bindVertexArray(null);return {vao,count:obj.positions.length/3};}
 class PhysicalRenderer {
- constructor(canvas){
+ constructor(canvas,options={}){
+  this.light=options.theme==='light';this.selected='left';this.trailAngle=null;
   this.canvas=canvas;this.gl=canvas.getContext('webgl2',{alpha:false,antialias:true,depth:true,preserveDrawingBuffer:true,powerPreference:'high-performance'});
   this.software=!this.gl;
   if(this.software){this.ctx=canvas.getContext('2d',{alpha:false});}
@@ -114,10 +115,10 @@ class PhysicalRenderer {
   // All vehicle/hatch triangle meshes are tessellated from the STEP CAD source.
   // Strut cylinders use the exact CAD outer diameters and CAD mount points with
   // length/orientation recomputed from the hinge angle for every simulation frame.
-  this.box([-.15,0,.423],[3.1,3.1,.02],{c:'#1a2730',metal:.1},'floor');
+  this.box([-.15,0,.423],[3.1,3.1,.02],{c:this.light?'#e4e5de':'#1a2730',metal:.1},'floor');
   for(let i=-10;i<=10;i++){
-   this.box([i*.15,0,.435],[.0015,2.75,.001],{c:'#415563',a:.22},'floorLine');
-   this.box([-.15,i*.14,.435],[2.9,.0015,.001],{c:'#415563',a:.22},'floorLine');
+   this.box([i*.15,0,.435],[.0015,2.75,.001],{c:this.light?'#aeb4a5':'#415563',a:.22},'floorLine');
+   this.box([-.15,i*.14,.435],[2.9,.0015,.001],{c:this.light?'#aeb4a5':'#415563',a:.22},'floorLine');
   }
   for(const part of CAD.parts){
    const model=part.group==='hatch'?((q)=>M.mul(M.translate(0,0,CAD.hinge_z),M.ry(-q))):M.id();
@@ -131,7 +132,7 @@ class PhysicalRenderer {
    const a=[CAD.body_anchor[0],sign*CAD.strut_y,CAD.body_anchor[1]];
    const b=(q)=>{const p=P.geometry(q);return[p.hatch_point_x_m,sign*CAD.strut_y,p.hatch_point_z_m]};
    const point=(q,at)=>{const B=b(q),d=V.norm(V.sub(B,a));return V.add(a,V.mul(d,at));};
-   const cyl=(from,to,r,material)=>this.add('cylinder',(q)=>M.between(point(q,from),point(q,typeof to==='function'?to(len(q)):to),r),material,'mechanism');
+   const cyl=(from,to,r,material)=>this.add('cylinder',(q)=>M.between(point(q,from),point(q,typeof to==='function'?to(len(q)):to),r),material,'mechanism',{side:sign===1?'left':'right'});
    cyl(.035,.155,.038,{c:'#3c5260',metal:.63}); // motor
    cyl(.140,.402,.031,{c:'#3c5260',metal:.72}); // outer housing
    cyl(.391,.421,.035,{c:'#bdccd7',metal:.91}); // gland
@@ -154,21 +155,22 @@ class PhysicalRenderer {
  }
  setFocus(mode){if(mode==='mechanism'){this.mechanics=true;this.target=[-.18,0,1.32];this.radius=2.75;this.yaw=.78;this.elev=.25;}
   else{this.mechanics=false;this.target=[-.12,0,1.27];this.radius=3.45;this.yaw=.73;this.elev=.34;}this.draw();}
- resize(){let w=this.canvas.clientWidth,h=this.canvas.clientHeight,dpr=Math.min(devicePixelRatio||1,1.8);let W=Math.max(1,Math.floor(w*dpr)),H=Math.max(1,Math.floor(h*dpr));if(this.canvas.width!==W||this.canvas.height!==H){this.canvas.width=W;this.canvas.height=H;}this.draw();}
+ resize(){let w=this.canvas.clientWidth,h=this.canvas.clientHeight;if(w<2||h<2)return;let dpr=Math.min(devicePixelRatio||1,1.8);let W=Math.max(1,Math.floor(w*dpr)),H=Math.max(1,Math.floor(h*dpr));if(this.canvas.width!==W||this.canvas.height!==H){this.canvas.width=W;this.canvas.height=H;}this.draw();}
  eye(){return [this.target[0]+this.radius*Math.cos(this.elev)*Math.cos(this.yaw),this.target[1]+this.radius*Math.cos(this.elev)*Math.sin(this.yaw),this.target[2]+this.radius*Math.sin(this.elev)];}
  draw(q=this.q,q2=this.q2,compare=this.compare){
   this.q=q;this.q2=q2;this.compare=compare;
   if(this.software){this.drawSoftware(q,q2,compare);return;}
   const gl=this.gl;
   if(!gl)return;
-  gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.clearColor(.047,.067,.091,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+  const background=this.light?[.946,.949,.925,1]:[.047,.067,.091,1];
+  gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.clearColor(...background);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
   const eye=this.eye();gl.useProgram(this.p);
-  gl.uniform3fv(this.u.uEye,new Float32Array(eye));gl.uniform1f(this.u.uFog,1);
+  gl.uniform3fv(this.u.uEye,new Float32Array(eye));gl.uniform1f(this.u.uFog,this.light?0:1);
   let views=compare?[{left:0,width:Math.floor(this.canvas.width/2),q},{left:Math.floor(this.canvas.width/2),width:this.canvas.width-Math.floor(this.canvas.width/2),q:q2}]:[{left:0,width:this.canvas.width,q}];
   gl.enable(gl.SCISSOR_TEST);
   for(const view of views){
    gl.viewport(view.left,0,view.width,this.canvas.height);gl.scissor(view.left,0,view.width,this.canvas.height);
-   gl.clearColor(.047,.067,.091,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+   gl.clearColor(...background);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
    const proj=M.persp((compare?47:43)*PI/180,view.width/this.canvas.height,.06,55);
    const pv=M.mul(proj,M.lookAt(eye,this.target));
    gl.uniformMatrix4fv(this.u.uPV,false,new Float32Array(pv));
@@ -186,12 +188,25 @@ class PhysicalRenderer {
     const geom=typeof part.geo==='string'?this.G[part.geo]:part.geo;
     gl.bindVertexArray(geom.vao);
     gl.uniformMatrix4fv(this.u.uModel,false,new Float32Array(mat));
-    gl.uniform4fv(this.u.uColor,new Float32Array([...color(part.material.c),alpha]));
+    const selected=this.light&&part.side===this.selected&&part.material.metal<.8;
+    gl.uniform4fv(this.u.uColor,new Float32Array([...color(selected?'#db782e':part.material.c),alpha]));
     gl.uniform1f(this.u.uMetal,part.material.metal||0);
     gl.uniform1f(this.u.uEmissive,part.material.emit||0);
     if(isTransparent)gl.depthMask(false);
     gl.drawArrays(gl.TRIANGLES,0,geom.count);
     if(isTransparent)gl.depthMask(true);
+   }
+   if(!compare&&Number.isFinite(this.trailAngle)&&Math.abs(this.trailAngle-q)>.007){
+    gl.depthMask(false);
+    for(const part of this.parts.filter(p=>p.group==='hatch')){
+     const geom=typeof part.geo==='string'?this.G[part.geo]:part.geo;
+     const mat=typeof part.model==='function'?part.model(this.trailAngle):part.model;
+     gl.bindVertexArray(geom.vao);gl.uniformMatrix4fv(this.u.uModel,false,new Float32Array(mat));
+     gl.uniform4fv(this.u.uColor,new Float32Array([.55,.59,.51,.11]));
+     gl.uniform1f(this.u.uMetal,0);gl.uniform1f(this.u.uEmissive,0);
+     gl.drawArrays(gl.TRIANGLES,0,geom.count);
+    }
+    gl.depthMask(true);
    }
    gl.bindVertexArray(null);
   }
@@ -202,7 +217,7 @@ class PhysicalRenderer {
   // Perspective mesh renderer for restricted browsers without WebGL. The exact
   // same 3D meshes, camera, hinge transforms and strut positions are used.
   const ctx=this.ctx,w=this.canvas.width,h=this.canvas.height;
-  ctx.clearRect(0,0,w,h);ctx.fillStyle='#0b1421';ctx.fillRect(0,0,w,h);
+  ctx.clearRect(0,0,w,h);ctx.fillStyle=this.light?'#f1f2ec':'#0b1421';ctx.fillRect(0,0,w,h);
   const views=compare?[{left:0,width:Math.floor(w/2),q},{left:Math.floor(w/2),width:w-Math.floor(w/2),q:q2}]:[{left:0,width:w,q}];
   for(const view of views){
    const eye=this.eye(),proj=M.persp((compare?47:43)*PI/180,view.width/h,.06,55);
@@ -218,7 +233,8 @@ class PhysicalRenderer {
     if(alpha<.01)continue;
     const mat=typeof part.model==='function'?part.model(view.q):part.model;
     const geo=typeof part.geo==='string'?this.G[part.geo]:part.geo;
-    let xyz=geo.positions;const rawColor=color(part.material.c);
+    let xyz=geo.positions;const selected=this.light&&part.side===this.selected&&part.material.metal<.8;
+    const rawColor=color(selected?'#db782e':part.material.c);
     const stride=part.geo==='cylinder'?2:part.geo==='sphere'?3:1;
     for(let i=0;i<xyz.length;i+=9*stride){
       const points=[],worldPoints=[];let d=0,clipped=false;

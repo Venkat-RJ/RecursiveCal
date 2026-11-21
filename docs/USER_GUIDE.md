@@ -1,6 +1,6 @@
 # Using RecursiveCal
 
-RecursiveCal 0.3 provides two executable research tools: a physical-unit liftgate workbench and a separate normalized diagnostic benchmark. The workbench helps inspect assumed mechanisms and compare measurements. The benchmark tests observation-dependent diagnostic decisions. Neither is connected to hardware.
+RecursiveCal provides a physical liftgate workspace with an observation-only Bayesian investigator and a separate normalized diagnostic benchmark. The workspace helps inspect assumed mechanisms, compare measurements, run bounded investigations and verify a committed calibration. The benchmark tests observation-dependent diagnostic decisions. Neither is connected to hardware.
 
 ## Install and check
 
@@ -23,11 +23,15 @@ recursivecal serve
 
 Open `http://127.0.0.1:8765`. The server stays in that terminal. Ctrl+C stops it. Choose another port with `--port 8766`. The server accepts only loopback connections; it is a local single-user tool, not a public hosting service.
 
-The Simulation view runs the SI model. Configure the scenario, physical parameters, controller, numerical step, noise seed, and limit behavior. Inspect the signal traces, move the time cursor, pin a run to compare, and export JSON or CSV. Imported JSON retains its original settings and provenance. Changing a form after a run does not rewrite the saved run.
+The root page has four tabs. **Rig & data** runs the SI model and synchronizes the 3D pose, actuator extension, plots and readouts to one recorded time. **Investigate** runs the bounded Bayesian or fixed-test policy, streams completed computation stages, and compares acquisition samples with predictions made before each test. **Calibrate** separates the inferred parameter values from the values actually committed. **Verify** compares baseline and committed motion, displays every acceptance limit, and reports unpowered support separately.
+
+Use **Configure** to change the next run, **Run simulation** or **New investigation** to execute, and **Export** to retain the complete JSON. The playback controls replay saved data; they do not advance the physical solver. Imported JSON retains its original settings and provenance. Changing a form after a run does not rewrite the saved run. Investigation imports check the report and committed-history digests before replacing the current evidence.
+
+The cutaway is an illustrative internal assembly. Its nut and rod translate with the displayed strut extension. Motor rotation, electrical current and heating are not modeled. Both actuators currently share the same force state. Investigation pose is derived from the sensor trace; verification pose uses the sealed evaluator trace.
 
 Passive hold and power loss intentionally reveal the default support deficit. The default passive-hold simulation stops when it reaches its assumed speed limit. Its short trace is an aborted run, not a completed 6.5-second success. An explicit holding-brake parameter changes the modeled architecture; it does not establish a real brake's capacity.
 
-The Measurements view fits force-length data or compares angle traces. The Evidence view reads benchmark summaries. The recorded examples are saved synthetic artifacts from this release. Static preview mode can inspect those examples and imported files; executing a new simulation or fitting data requires the local server.
+**Measurement tools** opens `data.html`, which retains force-length fitting, trajectory comparison, extended simulation settings, pinned runs and the benchmark Evidence view. The recorded examples are saved synthetic artifacts from this release. Static preview mode can inspect those examples and imported files; executing a new simulation or fitting data requires the local server. See [the workspace guide](WORKBENCH.md) for the complete screen and data workflow.
 
 ## Run and export a simulation
 

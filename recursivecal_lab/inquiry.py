@@ -377,7 +377,8 @@ def capabilities() -> dict[str, Any]:
 
 
 def run_study(*, case: str = "compound", seed: int = 7, policy: str = "bayes", max_tests: int = MAX_TESTS,
-              budget: float = BUDGET, progress: Callable[[str], None] | None = None) -> dict[str, Any]:
+              budget: float = BUDGET, progress: Callable[[str], None] | None = None,
+              on_event: Callable[[dict[str, Any]], None] | None = None) -> dict[str, Any]:
     integer(seed, "seed", 0, 2**31 - 30000)
     if policy not in ("bayes", "fixed", "no_probe"):
         raise ValueError("policy must be bayes, fixed, or no_probe")
@@ -385,8 +386,16 @@ def run_study(*, case: str = "compound", seed: int = 7, policy: str = "bayes", m
     session = InquirySession(PhysicalRig(parameters, seed=seed, closing_friction_extra_Nm=closing_extra),
                              max_tests=max_tests, budget=budget)
     initial = session.observe()
+    def emit(kind: str, **data: Any) -> None:
+        # The monitor is observational. It never supplies actions to the policy.
+        # No evaluator records or plant truth are emitted before commitment.
+        if on_event is not None:
+            on_event(deepcopy({"type": kind, **data}))
+
+    emit("started", observation=initial)
     investigator = BayesianInvestigator(initial["measurement"], seed=seed)
     decisions = []
+    prediction_history = []
     fixed = iter(("high_sweep", "low_sweep", "mid_sweep"))
     reason = "no diagnostic tests requested"
     while policy != "no_probe":
@@ -404,8 +413,25 @@ def run_study(*, case: str = "compound", seed: int = 7, policy: str = "bayes", m
             break
         if progress:
             progress(f"Test {len(view['history']) + 1}: {action}; cost {CATALOG[action].cost:g}; budget remaining {view['budget_remaining']:g}")
+        # Record candidate predictions BEFORE acquiring the experiment. These
+        # are public model-bank estimates, not the hidden plant parameters.
+        _, predictions = investigator.predict(action, view["measurement"])
+        candidates = []
+        for index in np.argsort(-investigator.weights, kind="stable")[:3]:
+            prediction = predictions[int(index)]
+            fields = ("time_s", "angle_rad", "velocity_rad_s", "strut_force_N_each")
+            candidates.append({"parameters": asdict(investigator.estimates[int(index)]),
+                               "prior_weight": float(investigator.weights[int(index)]),
+                               "trace": [{key: row[key] for key in fields} for row in prediction["trace"]],
+                               "observations": public_result(prediction)["observations"],
+                               "termination": prediction["metrics"]["termination"]})
+        predicted = {"step": len(view["history"]) + 1, "action": action, "candidates": candidates}
+        prediction_history.append(predicted)
+        emit("experiment_selected", decision=decisions[-1], prediction=predicted, observation=view)
         observation = session.step(action)
+        emit("experiment_completed", record=observation["history"][-1], observation=observation)
         summary = investigator.update(observation["history"][-1])
+        emit("belief_updated", belief=investigator.history[-1], summary=summary)
         if progress:
             progress(f"  posterior entropy {summary['entropy_nats']:.4f} nats; normalized residual {summary['best_normalized_residual']:.3f}; model mismatch {summary['model_mismatch']}")
     final_view = session.observe()
@@ -422,6 +448,7 @@ def run_study(*, case: str = "compound", seed: int = 7, policy: str = "bayes", m
         reason = ("model mismatch: no declared hypothesis explains the measurements" if investigator.model_mismatch else
                   "diagnostic limit event" if aborted else "insufficient identification or direction coverage")
     commitment = session.commit(asdict(estimate), disposition=disposition, reason=reason)
+    emit("committed", commitment=commitment, final_belief=investigator.summary())
     if progress:
         progress(f"Commit: {disposition}. Running independent motion, passive-hold and power-loss verification.")
     verification = verify_calibration(parameters, closing_extra, estimate, seed=seed)
@@ -438,6 +465,7 @@ def run_study(*, case: str = "compound", seed: int = 7, policy: str = "bayes", m
                              "inference": "72 finite hypotheses; approximate Gaussian likelihood; 48 Monte Carlo fantasies per action",
                              "cost_units": "declared test-cost units including setup; not elapsed time or a financial cost"},
               "initial_observation": initial, "decisions": decisions, "belief_history": investigator.history,
+              "prediction_history": prediction_history,
               "final_belief": investigator.summary(), **records,
               "verification": verification,
               "outcome": "verified_in_simulation" if disposition == "candidate" and verification["all_motion_profiles_passed"]

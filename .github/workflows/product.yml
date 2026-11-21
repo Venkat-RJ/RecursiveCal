@@ -108,6 +108,7 @@ jobs:
       - name: Exercise physical inquiry, CAD replay, evidence export and independent rejection
         if: always()
         run: |
+          node tests/workspace_contracts.cjs
           python tests/inquiry_smoke.py
       - name: Preserve browser evidence
         if: always()

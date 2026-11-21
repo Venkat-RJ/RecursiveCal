@@ -62,7 +62,7 @@ def run(browser_path: str | None, output: Path) -> None:
                 else:
                     report["console_errors"].append(message.text)
             page.on("console", record_console)
-            page.goto(base, wait_until="networkidle")
+            page.goto(base + "/data.html", wait_until="networkidle")
             expect(page.locator("body")).to_have_attribute("data-ready", "connected")
             assert page.locator("#runButton").is_enabled()
             assert page.locator("#exportRun").is_disabled()
