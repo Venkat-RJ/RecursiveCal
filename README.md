@@ -10,9 +10,11 @@ This is a **research simulator**, not an industrial calibration product, real-ha
 
 ## Interactive visual laboratory
 
-Open [visualization/index.html](visualization/index.html) in a browser to explore the actuator model interactively. No server or API key is needed.
+Open [visualization/index.html](visualization/index.html) locally to try the interactive virtual test cell. No server or API key is required.
 
-Choose synthetic fault scenarios, run bounded diagnostic probes, animate the mechanical response, tune the controller, and compare it against a frozen **classical Bayesian reference**. The screen uses the same numerical dynamics and scoring equations as `recursivecal.py`; a Python/JavaScript parity test was run on 28 cases.
+The demo now includes a **recognizable SUV power-liftgate illustration** and an **engineering actuator test-bench view**. Choose a fault, run diagnostic probes, watch simulated motion and telemetry, tune the controller, and replay factory vs calibrated responses side by side. Blue consistently means target, teal actual motion, amber factory/fault, and purple diagnostic action.
+
+The **SUV geometry is illustrative**, not a validated physical tailgate model. Position, trajectories, and scores come from the same normalized 1D simulation equations as `recursivecal.py`. The automatic replay is a **classical Bayesian reference**, not an RL-trained agent. Browser tests and 28 Python/JavaScript physics comparisons have passed.
 
 The visual demo bundles **public showcase-only seeds and hidden plant parameters** in the HTML so it can run offline. It must **never be used as the secure RL task evaluator**. See [visualization/README.md](visualization/README.md) for scope and source files.
 
