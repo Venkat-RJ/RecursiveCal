@@ -107,10 +107,15 @@ def run(output: Path, browser_path: str | None) -> None:
                 assert page.evaluate('() => !window.fixtureInjected')
                 report['checks'].append('Full report import and rejection of changed evidence')
 
+                page.locator('#importStudy').set_input_files(saved)
+                expect(page.locator('#message')).to_contain_text('passed all four independent motion checks')
+                page.evaluate('() => { document.activeElement?.blur(); window.scrollTo(0,0); }')
+
                 for width in (390, 820, 1500):
                     page.set_viewport_size({'width': width, 'height': 950})
                     assert page.evaluate('() => document.documentElement.scrollWidth <= window.innerWidth + 1'), width
                     if width == 390:
+                        assert 'the machine.' in page.locator('.setup h1').inner_text().replace('\n', ' ')
                         page.screenshot(path=str(output / 'inquiry-mobile.png'), full_page=True)
                 report['checks'].append('No horizontal overflow at 390, 820 and 1500 pixels')
 

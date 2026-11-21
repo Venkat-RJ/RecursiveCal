@@ -64,7 +64,7 @@
     state.renderer?.draw(before.true_angle_rad,after.true_angle_rad,true);
     text("beforeAngle",fmt(before.true_angle_rad*180/Math.PI,1)+"°");text("afterAngle",fmt(after.true_angle_rad*180/Math.PI,1)+"°");
     text("cursorTime",fmt(state.time)+" s");text("endTime",fmt(end)+" s");$("scrubber").value=Math.round(state.time/end*1000);
-    const cursor=$("trajectoryCursor");if(cursor){const x=53+state.time/end*925;cursor.setAttribute("x1",x);cursor.setAttribute("x2",x);}
+    const cursor=$("trajectoryCursor");if(cursor){const {left,right}=state.plot;const x=left+state.time/end*(right-left);cursor.setAttribute("x1",x);cursor.setAttribute("x2",x);}
   }
   function svgElement(tag,attributes,textValue) {
     const el=document.createElementNS("http://www.w3.org/2000/svg",tag);
@@ -72,15 +72,17 @@
     if(textValue!==undefined)el.textContent=textValue;return el;
   }
   function drawPlot() {
-    const pair=currentPair(),end=duration(),svg=$("trajectory");svg.replaceChildren();
-    const X=t=>53+t/end*925,Y=q=>188-q/Math.PI*180/90*163;
-    for(let angle=0;angle<=90;angle+=30){const y=188-angle/90*163;svg.append(svgElement("line",{x1:53,x2:978,y1:y,y2:y,stroke:"#e8edf0"}),svgElement("text",{x:42,y:y+3,fill:"#7e909a","font-size":10,"text-anchor":"end"},angle+"°"));}
-    for(let i=0;i<=6;i++){const t=end*i/6;svg.append(svgElement("text",{x:X(t),y:208,fill:"#7e909a","font-size":10,"text-anchor":"middle"},fmt(t,1)+" s"));}
+    const pair=currentPair(),end=duration(),svg=$("trajectory"),narrow=window.innerWidth<760;svg.replaceChildren();
+    const width=narrow?520:1000,left=narrow?45:53,right=width-22,bottom=narrow?200:188,font=narrow?13:10,ticks=narrow?3:6;
+    state.plot={left,right};svg.setAttribute("viewBox",`0 0 ${width} ${bottom+32}`);
+    const X=t=>left+t/end*(right-left),Y=q=>bottom-q/Math.PI*180/90*(bottom-25);
+    for(let angle=0;angle<=90;angle+=30){const y=bottom-angle/90*(bottom-25);svg.append(svgElement("line",{x1:left,x2:right,y1:y,y2:y,stroke:"#e8edf0"}),svgElement("text",{x:left-10,y:y+4,fill:"#7e909a","font-size":font,"text-anchor":"end"},angle+"°"));}
+    for(let i=0;i<=ticks;i++){const t=end*i/ticks;svg.append(svgElement("text",{x:X(t),y:bottom+23,fill:"#7e909a","font-size":font,"text-anchor":"middle"},fmt(t,1)+" s"));}
     for(const [rows,key,color,dash] of [[pair.after.trace,"target_angle_rad","#8c9ca4","5 4"],[pair.before.trace,"true_angle_rad","#bb7136",null],[pair.after.trace,"true_angle_rad","#087e77",null]]) {
       const d=rows.map((row,index)=>(index?"L":"M")+fmt(X(row.time_s),2)+","+fmt(Y(row[key]),2)).join(" ");
       const attrs={d,fill:"none",stroke:color,"stroke-width":1.8};if(dash)attrs["stroke-dasharray"]=dash;svg.append(svgElement("path",attrs));
     }
-    svg.append(svgElement("line",{id:"trajectoryCursor",x1:53,x2:53,y1:22,y2:188,stroke:"#a8babf","stroke-width":1}));
+    svg.append(svgElement("line",{id:"trajectoryCursor",x1:left,x2:left,y1:22,y2:bottom,stroke:"#a8babf","stroke-width":1}));
   }
   function showJournal(report) {
     const journal=$("journal");journal.replaceChildren();
@@ -143,12 +145,13 @@
     const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
     await load(JSON.parse(await new Response(stream).text()),"Recorded evidence");
   }catch(error){message(error.message,"error");}});
-  $("importStudy").addEventListener("change",async event=>{const file=event.target.files[0];if(!file)return;try{if(file.size>8*1024*1024)throw new Error("Report exceeds the 8 MiB limit.");await load(JSON.parse(await file.text()),"Imported report");}catch(error){message(error.message,"error");}finally{event.target.value="";}});
+  $("importStudy").addEventListener("change",async event=>{const file=event.target.files[0];if(!file)return;try{if(file.size>8*1024*1024)throw new Error("Report exceeds the 8 MiB limit.");await load(JSON.parse(await file.text()),"Imported report");}catch(error){message("Import rejected. "+error.message+(state.report?" The previous report remains displayed.":""),"error");}finally{event.target.value="";}});
   $("profile").addEventListener("change",()=>{stop();state.profile=Number($("profile").value);drawPlot();setTime(0);});
   $("scrubber").addEventListener("input",()=>{stop();setTime(Number($("scrubber").value)/1000*duration());});
   $("cutaway").addEventListener("click",()=>{const active=$("cutaway").getAttribute("aria-pressed")!=="true";$("cutaway").setAttribute("aria-pressed",String(active));text("cutaway",active?"Show full assembly":"Show mechanism");state.renderer?.setFocus(active?"mechanism":"assembly");});
   $("play").addEventListener("click",()=>{if(state.playing){stop();return;}if(state.time>=duration())setTime(0);state.playing=true;text("play","Ⅱ");$("play").setAttribute("aria-label","Pause comparison");let previous=performance.now();const tick=now=>{if(!state.playing)return;setTime(state.time+Math.min(.1,(now-previous)/1000));previous=now;if(state.time>=duration())stop();else state.frame=requestAnimationFrame(tick);};state.frame=requestAnimationFrame(tick);});
   $("exportStudy").addEventListener("click",()=>{const blob=new Blob([JSON.stringify(state.report,null,2)+"\n"],{type:"application/json"}),url=URL.createObjectURL(blob),link=node("a");link.href=url;link.download=`recursivecal-${state.report.configuration.case}-seed${state.report.configuration.seed}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+  window.addEventListener("resize",()=>{if(state.report){drawPlot();setTime(state.time);}});
   async function init(){
     try{state.renderer=new window.PhysicalRenderer($("cad"));state.renderer.draw(0,0,true);}catch(error){$("cadFallback").hidden=false;}
     if(["127.0.0.1","localhost"].includes(location.hostname)) {
