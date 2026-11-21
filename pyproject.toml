@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "recursivecal-v1"
 version = "0.3.0"
 description = "Reproducible active calibration experiments and a local software-in-the-loop workbench"
-authors = [{name = "Venkateshwar Reddy"}]
+authors = [{name = "Venkateshwar Reddy Jambula"}]
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
@@ -30,7 +30,7 @@ paper = ["matplotlib>=3.7,<4", "reportlab>=4,<5"]
 [tool.setuptools]
 include-package-data = false
 py-modules = ["recursivecal", "bayes_id", "benchmark", "budget_sweep", "report_analysis", "demo", "train_probe_rl", "audit_rl"]
-packages = ["recursivecal_v1", "recursivecal_lab", "research", "research.adaptive_diagnostics"]
+packages = ["recursivecal_v1", "recursivecal_lab", "research", "research.adaptive_diagnostics", "research.sequential_inquiry"]
 
 [tool.setuptools.package-data]
 recursivecal_lab = ["web/*.html", "web/*.css", "web/*.js", "web/*.svg", "data/*.md"]
