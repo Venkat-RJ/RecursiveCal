@@ -1,19 +1,16 @@
-# RecursiveCal interactive visual laboratory
+# RecursiveCal Virtual Test Cell
 
-**Open [index.html](index.html) in your browser.** This is a standalone offline visualization, not an AI model or a physical actuator controller.
+Open **[index.html](index.html)** offline to explore the synthetic RecursiveCal actuator environment. Choose one of seven fault scenarios, run diagnostic probes, tune a controller, or click **Run Bayesian diagnosis**. The factory and calibrated runs can be replayed side by side.
 
-Choose a synthetic system, run a bounded diagnostic pulse, see its noisy measurements and moving actuator, adjust controller gain/friction compensation/encoder offset, and test the result. **Replay Bayesian diagnosis** replays two precomputed diagnostic actions and a calibration produced by the existing classical Bayesian Python baseline. It is not an RL-trained policy.
+The two views are **SUV liftgate**, a recognizable vehicle illustration driven by normalized actuator position, and **Actuator test bench**, the one-axis simulator representation. The liftgate's geometry, hinge, and strut are **illustrative**, not a validated multibody model. No hardware is connected.
 
-The browser uses the same normalized actuator dynamics, 20-ms simulation step, action bounds and calibration-quality formula as the canonical Python `recursivecal.py`. The local development parity test compared 28 simulator/parameter combinations and found agreement within 1.2e-16 in numerical outputs.
+**Signal colors:** blue `#4F9FE8` target; teal `#35C8A6` actual/calibrated motion; amber `#E8A348` fault/factory response; purple `#A98AEF` diagnostic test; red `#E35D64` intervention or negative result. Labels and dash patterns supplement colors.
 
-**Safety and research boundary:** The HTML intentionally embeds ground-truth plant parameters for animation. All seven scenarios are dedicated showcase seeds (70,000,000+), separate from training and held-out evaluation ranges. Do not train on or score agents in the browser. The real Verifiers environment keeps ground truth and rewards host-side. Browser demo measurement noise follows the same Gaussian noise model but uses a deterministic browser generator rather than the exact Python sequential RNG. This is synthetic physics and provides no evidence for hardware safety.
+The physical measurements and scores use the simulator equations. The before/after replay shows one common trajectory; quality is measured on four trajectories. The demo's automated policy is a **classical Bayesian reference**, not an RL-trained model. Hidden parameters are embedded in this local browser teaching demo and must never be served to an RL training agent.
 
-Sources:
-- `engine.js`: numerical physics port used for rendering and scoring
-- `app.js`: user interaction and animation
-- `styles.css`: responsive visual design
-- `scenarios.json`: frozen Python simulator/Bayesian replay showcase data
-- `template.html`: source HTML shell
-- `index.html`: self-contained distributable, no dependencies
+```bash
+python visualization/build.py
+node --check visualization/app.js
+```
 
-To regenerate the standalone demo after changing source files, run `python visualization/build.py` from the repo root (see script).
+Run from the repository root. The final HTML contains all CSS, JS, and scenario data. No external scripts or libraries are required. See [research results](../RESULTS.md) and the [RL pilot](../RL_PILOT.md).

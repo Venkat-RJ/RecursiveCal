@@ -1,0 +1,24 @@
+<svg id="machine" viewBox="0 0 900 328" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Animated diagram of an actuator motor, rail, and moving carriage under synthetic dynamics">
+         <defs>
+          <linearGradient id="railGradient"><stop stop-color="#263647"/><stop offset=".5" stop-color="#526979"/><stop offset="1" stop-color="#263647"/></linearGradient>
+          <linearGradient id="carGradient" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e2fffb" stop-opacity=".95"/><stop offset=".4" stop-color="#6daeb2"/><stop offset="1" stop-color="#193745"/></linearGradient>
+          <linearGradient id="motorG" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#324a5e"/><stop offset="1" stop-color="#0c1420"/></linearGradient>
+          <linearGradient id="pistonG"><stop stop-color="#456574"/><stop offset=".4" stop-color="#c2f3ef"/><stop offset=".8" stop-color="#507a83"/><stop offset="1" stop-color="#1b303e"/></linearGradient>
+          <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <pattern id="gridPattern" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" stroke="#9bd1cf" stroke-opacity=".065" fill="none"/></pattern>
+         </defs>
+         <rect width="900" height="328" fill="url(#gridPattern)"/>
+         <text x="32" y="29" font-size="10" letter-spacing="2.2" fill="#76939c">BENCH 001 // 1-AXIS ELECTROMECHANICAL ACTUATOR</text>
+         <path d="M34 62H866" stroke="#415565" stroke-opacity=".22" stroke-dasharray="3 7"/>
+         <path d="M34 275H866" stroke="#415565" stroke-opacity=".22" stroke-dasharray="3 7"/>
+         <g transform="translate(110 158)"><rect x="-50" y="-56" width="118" height="112" rx="17" fill="url(#motorG)" stroke="#668391" stroke-width="1.3"/><rect x="-57" y="-46" width="15" height="92" rx="5" fill="#223545" stroke="#45606c"/><rect x="-26" y="-63" width="68" height="12" rx="4" fill="#243b49" stroke="#466271"/><circle cx="12" cy="0" r="39" fill="#0b1922" stroke="#6a8b94" stroke-width="1.7"/><circle cx="12" cy="0" r="29" fill="#14242f" stroke="#304e59"/><g id="motorRotor"><path d="M12 -21V21M-9 0H33M-3 -15L27 15M27 -15L-3 15" stroke="#82ffe5" stroke-opacity=".55" stroke-width="3" stroke-linecap="round"/></g><circle cx="12" cy="0" r="6" fill="#b4e5df"/><text x="6" y="78" font-size="10" fill="#7293a0" letter-spacing="1.8" text-anchor="middle">MOTOR</text></g>
+         <path d="M180 143H819" stroke="#182935" stroke-width="26"/><path d="M180 143H819" stroke="url(#railGradient)" stroke-width="12"/><path d="M180 176H819" stroke="#182935" stroke-width="24"/><path d="M180 176H819" stroke="url(#railGradient)" stroke-width="8"/>
+         <g id="slots"><path d="M234 134v50M298 134v50M362 134v50M426 134v50M490 134v50M554 134v50M618 134v50M682 134v50M746 134v50" stroke="#67838b" stroke-opacity=".18" stroke-width="2"/></g>
+         <rect x="180" y="152" width="620" height="9" rx="4" fill="#10232e" stroke="#223b46"/>
+         <path id="pistonShaft" d="M171 158H510" stroke="url(#pistonG)" stroke-width="15" stroke-linecap="round"/>
+         <line id="targetLine" x1="522" y1="87" x2="522" y2="234" stroke="#f6ad65" stroke-width="2" stroke-dasharray="5 6" opacity=".8"/>
+         <rect id="targetCaptionBg" x="474" y="66" width="96" height="23" rx="5" fill="#f6ad65" fill-opacity=".14" stroke="#f6ad65" stroke-opacity=".5"/><text id="targetCaption" x="522" y="81" text-anchor="middle" font-size="10" letter-spacing="1.5" fill="#ffc08b">TARGET</text>
+         <g id="carriage" transform="translate(510 158)"><rect x="-30" y="-40" width="60" height="80" rx="7" fill="url(#carGradient)" stroke="#d9faf4" stroke-width="1"/><rect x="-38" y="-19" width="76" height="38" rx="6" fill="#1c3441" stroke="#60909a" stroke-width="1.5"/><rect x="-27" y="-9" width="54" height="18" rx="3" fill="#3f7e86"/><rect x="-19" y="-5" width="38" height="10" rx="1" fill="#8effed" fill-opacity=".6"/><circle cx="0" cy="-51" r="4" fill="#82ffe4" filter="url(#glow)"/><path d="M0 -43V-35" stroke="#82ffe4" stroke-width="2"/></g>
+         <path d="M180 241H800" stroke="#3f5662" stroke-width="1"/><g id="ticks"><path d="M180 235v11M304 235v11M428 235v11M552 235v11M676 235v11M800 235v11" stroke="#69838e"/><text x="180" y="263" text-anchor="middle" font-size="10" fill="#7899a1">−0.5</text><text x="490" y="263" text-anchor="middle" font-size="10" fill="#7899a1">0</text><text x="800" y="263" text-anchor="middle" font-size="10" fill="#7899a1">+0.5</text></g>
+         <text x="36" y="308" font-size="10" letter-spacing="1.6" fill="#688c98">SYNTHETIC POSITION / NORMALIZED UNITS</text><text x="864" y="308" text-anchor="end" font-size="10" letter-spacing="1.6" fill="#688c98">SAFE TRAVEL ±0.50</text>
+        </svg>

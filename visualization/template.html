@@ -1,79 +1,120 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="theme-color" content="#080d14" />
-<title>RecursiveCal | Interactive Systems Laboratory</title>
-<style>
-__CSS__
-</style>
+<meta name="theme-color" content="#0d1419" />
+<title>RecursiveCal | Virtual Engineering Test Cell</title>
+<meta name="description" content="Explore a synthetic actuator calibration experiment. Watch the mechanical response, run diagnostics and compare factory with calibrated control." />
+<style>__CSS__</style>
 </head>
 <body>
-<div class="noise" aria-hidden="true"></div>
-<div class="app">
-<header class="topbar">
-  <div class="wordmark"><div class="brand-mark"><svg viewBox="0 0 34 34" fill="none"><path d="M5 22C5 14 10 9 17 9c7 0 12 5 12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M24 18l5 4 3-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M21 22c-1.2 1.7-2.8 2.4-5 2.4-3.3 0-5.4-2.5-5.4-5.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><span>Recursive<span class="brand-light">Cal</span></span><span class="top-tag">LAB / 001</span></div>
-  <div class="top-right"><div class="chip"><i></i>LOCAL PHYSICS SIM</div><a href="https://github.com/Venkat-RJ/RecursiveCal" target="_blank" rel="noopener noreferrer">SOURCE <span>↗</span></a></div>
-</header>
-<section class="pagehead">
-  <div><div class="eyebrow"><span class="eyeline"></span> INTERACTIVE RESEARCH DEMO <span class="tiny-split">/</span> SYNTHETIC DYNAMICS</div>
-    <h1>Make the machine <em>tell you</em><br class="desktop-break"> what's wrong.</h1>
-    <p>A physical system has changed. Run an experiment, observe its response, and recalibrate. What would you test next?</p>
+<div class="app-shell">
+  <header class="masthead">
+    <a class="brand" href="https://github.com/Venkat-RJ/RecursiveCal" target="_blank" rel="noopener" aria-label="RecursiveCal on GitHub">
+      <span class="brand-mark"><svg viewBox="0 0 38 38" fill="none" aria-hidden="true"><path d="M5 21a14 14 0 0 1 23-11" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M28 5v7h-7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M33 17a14 14 0 0 1-23 11" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M10 33v-7h7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span>Recursive<span class="brand-second">Cal</span></span>
+      <small>VIRTUAL TEST CELL</small>
+    </a>
+    <div class="masthead-right"><span class="system-online"><i></i> LOCAL SIMULATION</span><span class="head-rule"></span><a href="https://github.com/Venkat-RJ/RecursiveCal" target="_blank" rel="noopener">GITHUB <span aria-hidden="true">↗</span></a></div>
+  </header>
+
+  <section class="intro">
+    <div>
+      <p class="overline">RC / ENGINEERING LAB <span class="overline-sep">/</span> EXPERIMENT 001</p>
+      <h1>What would you <em>test next?</em></h1>
+      <p class="intro-copy">A familiar machine, an unfamiliar fault. Run a diagnostic experiment, inspect the response, then see whether your calibration actually works.</p>
+    </div>
+    <div class="intro-actions">
+      <button class="button button-primary" id="btnAuto" type="button"><span class="play-icon" aria-hidden="true">▶</span> Run Bayesian diagnosis</button>
+      <button class="button button-outline" id="btnCompare" type="button">↔ &nbsp; Before / after</button>
+      <button class="button button-plain" id="btnReset" type="button">↻ Reset</button>
+    </div>
+  </section>
+
+  <div class="scenario-section">
+    <div class="row-head"><span class="index-label">01</span><span class="eyebrow">INJECT A FAULT</span><span class="small-muted">Choose a simulated condition</span></div>
+    <div id="scenarios" class="scenario-list" role="group" aria-label="Simulated fault scenarios"></div>
   </div>
-  <div class="head-controls"><button id="btnAuto" class="btn primary" type="button"><span>▶</span> Replay Bayesian diagnosis</button><button id="btnReset" class="btn subtle" type="button"><span>↻</span> Reset</button></div>
-</section>
-<section class="scenario-bar"><div class="section-kicker">01 <span>CHOOSE A SYSTEM</span></div><div id="scenarios" class="scenario-buttons"></div></section>
-<div class="layout">
-  <main class="main-panel">
-    <section class="screen card">
-      <div class="screen-header"><div class="panel-label"><span class="status-dot"></span> ACTUATOR TEST BENCH <span class="slash">/</span> <span id="scenarioTitle">COMBINED FAULTS</span></div><div class="screen-right"><span id="simStatus" class="live-chip">● SYSTEM READY</span><span class="frame-num">RC-A01 / SIM</span></div></div>
-      <div class="system-stage" id="systemStage">
-        <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
-        <svg id="machine" viewBox="0 0 900 328" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Animated diagram of an actuator motor, rail, and moving carriage under synthetic dynamics">
-         <defs>
-          <linearGradient id="railGradient"><stop stop-color="#263647"/><stop offset=".5" stop-color="#526979"/><stop offset="1" stop-color="#263647"/></linearGradient>
-          <linearGradient id="carGradient" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e2fffb" stop-opacity=".95"/><stop offset=".4" stop-color="#6daeb2"/><stop offset="1" stop-color="#193745"/></linearGradient>
-          <linearGradient id="motorG" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#324a5e"/><stop offset="1" stop-color="#0c1420"/></linearGradient>
-          <linearGradient id="pistonG"><stop stop-color="#456574"/><stop offset=".4" stop-color="#c2f3ef"/><stop offset=".8" stop-color="#507a83"/><stop offset="1" stop-color="#1b303e"/></linearGradient>
-          <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          <pattern id="gridPattern" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" stroke="#9bd1cf" stroke-opacity=".065" fill="none"/></pattern>
-         </defs>
-         <rect width="900" height="328" fill="url(#gridPattern)"/>
-         <text x="32" y="29" font-size="10" letter-spacing="2.2" fill="#76939c">BENCH 001 // 1-AXIS ELECTROMECHANICAL ACTUATOR</text>
-         <path d="M34 62H866" stroke="#415565" stroke-opacity=".22" stroke-dasharray="3 7"/>
-         <path d="M34 275H866" stroke="#415565" stroke-opacity=".22" stroke-dasharray="3 7"/>
-         <g transform="translate(110 158)"><rect x="-50" y="-56" width="118" height="112" rx="17" fill="url(#motorG)" stroke="#668391" stroke-width="1.3"/><rect x="-57" y="-46" width="15" height="92" rx="5" fill="#223545" stroke="#45606c"/><rect x="-26" y="-63" width="68" height="12" rx="4" fill="#243b49" stroke="#466271"/><circle cx="12" cy="0" r="39" fill="#0b1922" stroke="#6a8b94" stroke-width="1.7"/><circle cx="12" cy="0" r="29" fill="#14242f" stroke="#304e59"/><g id="motorRotor"><path d="M12 -21V21M-9 0H33M-3 -15L27 15M27 -15L-3 15" stroke="#82ffe5" stroke-opacity=".55" stroke-width="3" stroke-linecap="round"/></g><circle cx="12" cy="0" r="6" fill="#b4e5df"/><text x="6" y="78" font-size="10" fill="#7293a0" letter-spacing="1.8" text-anchor="middle">MOTOR</text></g>
-         <path d="M180 143H819" stroke="#182935" stroke-width="26"/><path d="M180 143H819" stroke="url(#railGradient)" stroke-width="12"/><path d="M180 176H819" stroke="#182935" stroke-width="24"/><path d="M180 176H819" stroke="url(#railGradient)" stroke-width="8"/>
-         <g id="slots"><path d="M234 134v50M298 134v50M362 134v50M426 134v50M490 134v50M554 134v50M618 134v50M682 134v50M746 134v50" stroke="#67838b" stroke-opacity=".18" stroke-width="2"/></g>
-         <rect x="180" y="152" width="620" height="9" rx="4" fill="#10232e" stroke="#223b46"/>
-         <path id="pistonShaft" d="M171 158H510" stroke="url(#pistonG)" stroke-width="15" stroke-linecap="round"/>
-         <line id="targetLine" x1="522" y1="87" x2="522" y2="234" stroke="#f6ad65" stroke-width="2" stroke-dasharray="5 6" opacity=".8"/>
-         <rect id="targetCaptionBg" x="474" y="66" width="96" height="23" rx="5" fill="#f6ad65" fill-opacity=".14" stroke="#f6ad65" stroke-opacity=".5"/><text id="targetCaption" x="522" y="81" text-anchor="middle" font-size="10" letter-spacing="1.5" fill="#ffc08b">TARGET</text>
-         <g id="carriage" transform="translate(510 158)"><rect x="-30" y="-40" width="60" height="80" rx="7" fill="url(#carGradient)" stroke="#d9faf4" stroke-width="1"/><rect x="-38" y="-19" width="76" height="38" rx="6" fill="#1c3441" stroke="#60909a" stroke-width="1.5"/><rect x="-27" y="-9" width="54" height="18" rx="3" fill="#3f7e86"/><rect x="-19" y="-5" width="38" height="10" rx="1" fill="#8effed" fill-opacity=".6"/><circle cx="0" cy="-51" r="4" fill="#82ffe4" filter="url(#glow)"/><path d="M0 -43V-35" stroke="#82ffe4" stroke-width="2"/></g>
-         <path d="M180 241H800" stroke="#3f5662" stroke-width="1"/><g id="ticks"><path d="M180 235v11M304 235v11M428 235v11M552 235v11M676 235v11M800 235v11" stroke="#69838e"/><text x="180" y="263" text-anchor="middle" font-size="10" fill="#7899a1">−0.5</text><text x="490" y="263" text-anchor="middle" font-size="10" fill="#7899a1">0</text><text x="800" y="263" text-anchor="middle" font-size="10" fill="#7899a1">+0.5</text></g>
-         <text x="36" y="308" font-size="10" letter-spacing="1.6" fill="#688c98">SYNTHETIC POSITION / NORMALIZED UNITS</text><text x="864" y="308" text-anchor="end" font-size="10" letter-spacing="1.6" fill="#688c98">SAFE TRAVEL ±0.50</text>
-        </svg>
-        <div class="stage-overlay"><span class="overlay-label">LIVE POSITION</span><strong id="posBig">−0.150</strong><small>norm. units</small></div>
-        <div id="movementGlow" class="movement-glow"></div>
+
+  <div class="work-grid">
+    <main class="main-column">
+      <section class="card physical-card">
+        <div class="panel-header">
+          <div><div class="panel-subtitle">TEST CELL / RC-001</div><h2>Physical system <span id="scenarioTitle">Combined faults</span></h2></div>
+          <div class="right-status"><span id="simStatus" class="status-pill">● SYSTEM READY</span><span class="sim-label">SYNTHETIC • NO HARDWARE</span></div>
+        </div>
+        <div class="mode-bar">
+          <div class="mode-toggle" role="group" aria-label="Simulation view"><button id="btnVehicle" class="mode-button active" aria-pressed="true" type="button">SUV liftgate</button><button id="btnBench" class="mode-button" aria-pressed="false" type="button">Actuator test bench</button></div>
+          <div class="legend-inline"><span><i class="key-target"></i> Target</span><span><i class="key-actual"></i> Actual</span><span><i class="key-fault"></i> Fault</span><span><i class="key-probe"></i> Diagnostic</span></div>
+        </div>
+        <div class="simulated-world" id="systemStage">
+          <div class="view-background"></div>
+          <div id="vehicleView" class="view-panel"><div id="vehicle-main" class="vehicle-holder"></div><div class="scene-info"><span class="scene-kicker">VEHICLE VIEW</span><strong id="gateReadout">27%</strong><small>illustrative liftgate travel</small></div></div>
+          <div id="benchView" class="view-panel" hidden><div class="bench-image">__BENCH__</div><div class="scene-info"><span class="scene-kicker">ACTUATOR X</span><strong id="benchPos">−0.150</strong><small>normalized position</small></div></div>
+          <div class="scene-disclaimer"><span class="tiny-circle">i</span><span id="sceneNote">SUV geometry is illustrative. Motion is driven by the 1D actuator simulation.</span></div>
+        </div>
+        <div class="telemetry-ribbon" aria-label="Live simulator telemetry">
+          <div><span>POSITION <small>x</small></span><strong id="valPos">−0.150</strong><small>normalized</small></div>
+          <div><span>VELOCITY <small>v</small></span><strong id="valVel">0.000</strong><small>norm. / s</small></div>
+          <div><span>TORQUE <small>τ</small></span><strong id="valTorque">0.000</strong><small>normalized</small></div>
+          <div><span>SAFETY <small>shield</small></span><strong id="valInterventions">0</strong><small>interventions</small></div>
+          <div><span>PROBE COST</span><strong id="valCost">0.00</strong><small>/ 4.50 budget</small></div>
+        </div>
+      </section>
+
+      <section class="card chart-card">
+        <div class="panel-header compact">
+          <div><div class="panel-subtitle">02 / LIVE INSTRUMENTATION</div><h2 id="plotTitle">Position tracking</h2></div>
+          <div class="chart-legend"><span><i class="key-target"></i>Target</span><span><i class="key-factory"></i>Factory</span><span><i class="key-actual"></i>Calibrated</span></div>
+        </div>
+        <div class="chart-container"><canvas id="plot" aria-label="Simulated actuator tracking response over time" width="1100" height="290"></canvas></div>
+        <div class="plot-foot"><span>POSITION (NORMALIZED)</span><span>TIME (SECONDS)</span></div>
+      </section>
+
+      <section id="comparison" class="card comparison-card" aria-labelledby="comparisonTitle">
+        <div class="panel-header compact">
+          <div><div class="panel-subtitle">03 / SAME FAULT, SAME COMMAND</div><h2 id="comparisonTitle">Before / after calibration</h2></div>
+          <button id="btnReplayCompare" class="button button-small" type="button">▶ Replay both</button>
+        </div>
+        <p class="comparison-explainer">Two simulated runs with the same hidden system and the same target. Only the controller calibration changes.</p>
+        <div class="comparison-grid">
+          <div class="comparison-cell"><div class="compare-head"><span><i class="key-factory"></i> FACTORY CALIBRATION</span><strong id="factoryQualityMini">0.0000</strong></div><div class="mini-vehicle" id="vehicle-before"></div><div class="mini-progress"><div id="beforeProgress"></div></div><small id="beforePosition">Position −0.150</small></div>
+          <div class="comparison-cell"><div class="compare-head"><span><i class="key-actual"></i> CURRENT CALIBRATION</span><strong id="currentQualityMini">0.0000</strong></div><div class="mini-vehicle" id="vehicle-after"></div><div class="mini-progress"><div id="afterProgress"></div></div><small id="afterPosition">Position −0.150</small></div>
+        </div>
+        <div class="compare-outcome" id="compareOutcome">Same controller settings. Run Bayesian diagnosis or adjust calibration to compare a change.</div>
+      </section>
+      <div class="score-strip">
+        <div><span>FACTORY QUALITY</span><strong id="factoryScore">0.0000</strong><small>held-out evaluation</small></div>
+        <div class="score-accent"><span>CURRENT NET REWARD</span><strong id="currentScore">0.0000</strong><small>quality minus probe cost</small></div>
+        <div><span>NET CHANGE</span><strong id="scoreDelta">+0.0000</strong><small id="scoreCaption">vs factory</small></div>
       </div>
-      <div class="telemetry"><div><span>POSITION <small>x</small></span><strong id="valPos">−0.150</strong></div><div><span>VELOCITY <small>v</small></span><strong id="valVel">0.000</strong></div><div><span>TORQUE <small>τ</small></span><strong id="valTorque">0.000</strong></div><div><span>INTERVENTIONS</span><strong id="valInterventions">0</strong></div><div><span>TEST COST</span><strong id="valCost">0.00 / 4.50</strong></div></div>
-    </section>
-    <section class="chart card"><div class="panel-heading"><div><div class="section-kicker">02 <span>OBSERVE THE RESPONSE</span></div><h2 id="plotTitle">Tracking response</h2></div><div class="chart-legends"><span><i class="target"></i>Target</span><span><i class="factory"></i>Factory</span><span><i class="updated"></i>Current calibration</span></div></div><div class="chartframe"><canvas id="plot" width="1100" height="270" aria-label="Live simulated actuator position versus time chart"></canvas></div><div class="chart-foot"><span>POSITION / NORMALIZED</span><span>TIME 0.00 → 1.80 s</span></div></section>
-    <section class="score-row"><div class="score-card"><span>FACTORY QUALITY</span><strong id="factoryScore">0.000</strong><small>Uncalibrated baseline</small></div><div class="score-card accent"><span>CURRENT NET REWARD</span><strong id="currentScore">0.000</strong><small>Quality minus test cost</small></div><div class="score-card"><span>NET CHANGE</span><strong id="scoreDelta">+0.000</strong><small id="scoreCaption">From factory calibration</small></div></section>
-  </main>
-  <aside class="sidebar">
-    <section class="card controls-card"><div class="section-kicker">03 <span>DESIGN AN EXPERIMENT</span></div><div class="control-title"><h2>Diagnostic probes</h2><span id="budgetChip" class="budget-chip">4.5 LEFT</span></div><p class="hint">Choose one safe measurement. It costs part of your experiment budget.</p><div id="probeButtons" class="probe-buttons"></div><div class="observations"><span class="small-heading">OBSERVATION LOG</span><div id="log" class="log"><div class="empty-log">No measurements yet.<br>Choose a diagnostic probe.</div></div></div></section>
-    <section class="card calibration-card"><div class="section-kicker">04 <span>CALIBRATE & VERIFY</span></div><h2>Controller tuning</h2><p class="hint">Adjust the controller, then test its response across four unseen trajectories.</p><div class="control-line"><div><label for="gain">Feedback gain</label><strong id="gainValue">1.00</strong></div><input type="range" id="gain" min="0" max="5" step="1" value="2"/></div><div class="control-line"><div><label for="ff">Friction feed-forward</label><strong id="ffValue">0.08</strong></div><input type="range" id="ff" min="0" max="4" step="1" value="1"/></div><div class="control-line"><div><label for="bias">Sensor offset</label><strong id="biasValue">0.00</strong></div><input type="range" id="bias" min="0" max="4" step="1" value="2"/></div><button id="btnTest" class="btn primary full" type="button">▶ Run calibration test</button><button id="btnFactory" class="btn ghost full" type="button">Restore factory calibration</button></section>
-    <section class="card reveal-card"><button id="btnReveal" class="reveal-button" type="button"><span>⊙ &nbsp; DEMO INSPECTION</span><span id="revealMark">SHOW +</span></button><div id="hiddenDetails" class="hidden-details" hidden></div><p>Actual hidden parameters are visible only in this offline demo. The RL environment keeps them host-side.</p></section>
-  </aside>
-</div>
-<footer><div>RecursiveCal <span>·</span> Visual lab v0.1 <span>·</span> Synthetic actuator model, no hardware connected</div><div>PHYSICS PORT VERIFIED AGAINST PYTHON &nbsp; / &nbsp; <span>OPEN RESEARCH</span></div></footer>
+    </main>
+
+    <aside class="sidebar">
+      <section class="card controls-card">
+        <div class="panel-subtitle">04 / EXPERIMENT DESIGN</div>
+        <div class="heading-between"><h2>Diagnostic probes</h2><span id="budgetChip" class="budget-chip">4.50 LEFT</span></div>
+        <p class="section-copy">Choose a bounded test. Each one costs some of your budget and produces a noisy measurement.</p>
+        <div id="probeButtons" class="probes"></div>
+        <div class="observation-section"><div class="section-minor"><span class="purple-dot"></span> MEASUREMENT LOG</div><div id="log" class="observation-log"><p class="no-measurement">No measurements yet.<br />Try a low-torque diagnostic pulse.</p></div></div>
+      </section>
+      <section class="card tuning-card">
+        <div class="panel-subtitle">05 / CALIBRATE</div><h2>Controller parameters</h2>
+        <p class="section-copy">Change the feedback parameters, then test on the hidden evaluation trajectories.</p>
+        <div class="control-item"><div><label for="gain">Feedback gain</label><strong id="gainValue">1.00</strong></div><input id="gain" type="range" min="0" max="5" step="1" value="2" /></div>
+        <div class="control-item"><div><label for="ff">Friction feed-forward</label><strong id="ffValue">0.08</strong></div><input id="ff" type="range" min="0" max="4" step="1" value="1" /></div>
+        <div class="control-item"><div><label for="bias">Sensor offset</label><strong id="biasValue">0.00</strong></div><input id="bias" type="range" min="0" max="4" step="1" value="2" /></div>
+        <button id="btnTest" class="button button-teal full-width" type="button">▶ Test calibration</button>
+        <button id="btnFactory" class="button button-quiet full-width" type="button">Restore factory values</button>
+      </section>
+      <section class="card transparency-card"><button id="btnReveal" class="transparency-button" type="button"><span>VIEW HIDDEN SIMULATION PARAMETERS</span><span id="revealMark">SHOW +</span></button><div id="hiddenDetails" class="hidden-details" hidden></div><p>Only this local teaching demo can reveal hidden parameters. Agents running in Verifiers do not see them.</p></section>
+    </aside>
+  </div>
+  <footer><span>RecursiveCal / Virtual test cell <b>v0.2</b></span><span>Simulated physics. Vehicle depiction is illustrative; no real hardware connected.</span><a href="https://github.com/Venkat-RJ/RecursiveCal" target="_blank" rel="noopener">OPEN RESEARCH ↗</a></footer>
 </div>
 <script type="application/json" id="scenarioData">__SCENARIOS__</script>
-<script>
-__ENGINE__
-__APP__
-</script>
+<script>__ENGINE__</script>
+<script>__APP__</script>
 </body>
 </html>
