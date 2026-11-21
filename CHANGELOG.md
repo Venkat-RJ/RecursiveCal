@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.0 - 2026-11-21
+
+Connected the physical simulator, observation-only investigator, calibration controller, independent verifier and CAD workbench. The rig carries position, velocity, actuator force, time and work between tests, with an explicit charged fixture operation.
+
+Added a finite-bank Bayesian baseline, seeded one-step information-gain estimates, commanded opening/closing confirmation, residual-based model rejection and abstention. Added fixed-test and nominal-controller comparisons. This is a physical engineering foundation, not an RL superiority claim.
+
+Added the `inquire` and `verify-inquiry` foreground commands, bounded synchronous HTTP operations, full evidence reports, browser-compatible integrity digests, trace-derived metric verification and authored CAD playback. Added mechanical, information-boundary and browser acceptance tests.
+
+Retained the frozen normalized benchmark, original SI equations, v0.3 evidence and manuscript. All new fixture data remains synthetic; physical validation and sufficient unpowered support remain explicit requirements.
+
 ## 0.3.0 - 2026-11-21
 
 Added an installable local research workbench with a foreground CLI and HTTP API, strict input contracts, simulation and trace export, experiment artifact verification, and packaged offline assets.

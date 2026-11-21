@@ -72,6 +72,10 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/capabilities":
             self._json(200, capabilities())
             return
+        if path == "/api/inquiry/capabilities":
+            from .inquiry import capabilities as inquiry_capabilities
+            self._json(200, inquiry_capabilities())
+            return
         if path == "/api/health":
             self._json(200, {"status": "ok", "version": __version__, "hardware_connected": False})
             return

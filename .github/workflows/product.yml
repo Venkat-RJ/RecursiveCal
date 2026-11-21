@@ -52,13 +52,15 @@ jobs:
           cd "$RUNNER_TEMP"
           recursivecal doctor
           recursivecal simulate --output installed-run.json --csv installed-trace.csv
+          recursivecal inquire --case weak_motor --output installed-inquiry.json
+          recursivecal verify-inquiry installed-inquiry.json
           recursivecal experiment --quick --output installed-experiment
           recursivecal verify installed-experiment
       - name: Preserve package artifacts
         if: matrix.python == '3.12'
         uses: actions/upload-artifact@v4
         with:
-          name: recursivecal-v0.3-packages
+          name: recursivecal-v0.4-packages
           path: dist/
           retention-days: 30
 
@@ -81,12 +83,18 @@ jobs:
         run: |
           node tests/workbench_contracts.cjs
           python tests/workbench_smoke.py
+      - name: Exercise physical inquiry, CAD replay, evidence export and independent rejection
+        if: always()
+        run: |
+          python tests/inquiry_smoke.py
       - name: Preserve browser evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: recursivecal-workbench-evidence
-          path: artifacts/workbench/
+          path: |
+            artifacts/workbench/
+            artifacts/inquiry-browser/
           retention-days: 30
 
   source-contract:

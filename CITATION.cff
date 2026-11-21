@@ -6,12 +6,12 @@ authors:
   - given-names: "Venkateshwar Reddy"
     family-names: "Jambula"
     website: "https://github.com/Venkat-RJ"
-version: "0.3.0"
+version: "0.4.0"
 date-released: "2026-11-21"
 license: MIT
 repository-code: "https://github.com/Venkat-RJ/RecursiveCal"
 url: "https://github.com/Venkat-RJ/RecursiveCal"
-abstract: "An open source research workbench for synthetic active diagnosis and calibration, with a separate SI liftgate model, measured-data import, reproducible contextual-bandit experiments, and explicit model-adequacy limits."
+abstract: "An open source research workbench for synthetic active diagnosis and calibration, with a persistent SI liftgate rig, an observation-only Bayesian investigator, independent calibration verification, CAD replay, measured-data import, preserved contextual-bandit experiments, and explicit model-adequacy limits."
 keywords:
   - calibration
   - experimental design

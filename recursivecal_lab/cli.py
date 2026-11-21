@@ -59,6 +59,16 @@ def parser() -> argparse.ArgumentParser:
     exp.add_argument("--quick", action="store_true", help="small smoke run, not publication evidence")
     verify = commands.add_parser("verify", help="verify experiment artifacts and saved checkpoints")
     verify.add_argument("directory", type=Path)
+    inquiry = commands.add_parser("inquire", help="investigate the persistent SI rig and independently verify a calibration")
+    from .inquiry import CASE_LABELS
+    inquiry.add_argument("--case", choices=list(CASE_LABELS), default="compound")
+    inquiry.add_argument("--policy", choices=["bayes", "fixed", "no_probe"], default="bayes")
+    inquiry.add_argument("--seed", type=int, default=7)
+    inquiry.add_argument("--max-tests", type=int, default=5)
+    inquiry.add_argument("--budget", type=float, default=8.0)
+    _output(inquiry)
+    check = commands.add_parser("verify-inquiry", help="check a physical inquiry report's integrity and protocol")
+    check.add_argument("report", type=Path)
     web = commands.add_parser("serve", help="serve the workbench in the foreground on loopback")
     web.add_argument("--host", choices=["127.0.0.1", "localhost"], default="127.0.0.1")
     web.add_argument("--port", type=int, default=8765)
@@ -81,7 +91,7 @@ def _parameter_input(path: Path | None) -> tuple[dict | None, dict | None]:
 def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
     try:
-        if args.command in ("simulate", "fit-force", "replay"):
+        if args.command in ("simulate", "fit-force", "replay", "inquire"):
             paths = [args.output] + [value for value in (getattr(args, "csv", None) if args.command == "simulate" else None,
                                                        getattr(args, "parameters_output", None)) if value is not None]
             resolved = [path.resolve() for path in paths]
@@ -104,6 +114,23 @@ def main(argv: list[str] | None = None) -> int:
             from .server import serve
             serve(host=args.host, port=args.port)
             return 0
+        if args.command == "inquire":
+            from .inquiry import run_study
+            result = run_study(case=args.case, policy=args.policy, seed=args.seed,
+                               max_tests=args.max_tests, budget=args.budget,
+                               progress=lambda message: print(message, file=sys.stderr, flush=True))
+            saved = write_json(args.output, result, overwrite=args.overwrite)
+            print(json.dumps({"output": str(saved), "outcome": result["outcome"],
+                              "diagnostic_cost": result["cost"], "commitment": result["commitment"],
+                              "before_mean_rmse_deg": result["verification"]["before_mean_rmse_deg"],
+                              "after_mean_rmse_deg": result["verification"]["after_mean_rmse_deg"],
+                              "hardware_validated": False}, indent=2, allow_nan=False))
+            return 0
+        if args.command == "verify-inquiry":
+            from .inquiry import verify_report
+            result = verify_report(read_json(args.report))
+            print(json.dumps(result, indent=2, allow_nan=False))
+            return 0 if result["valid"] else 1
         if args.command == "model":
             from .physics import ModelParameters, passive_hold
             parameters, provenance = _parameter_input(args.parameters)
