@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RecursiveCal · Physical Systems Laboratory</title>
+<meta name="description" content="A real-time 3D tailgate experiment. Inspect mechanical hinges, telescoping struts, motor current, and the effect of calibration under hidden dynamics.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+<header class="mast">
+ <div class="identity"><span class="brandmark" aria-hidden="true"><span></span><span></span></span><div><strong>RecursiveCal</strong><span class="subhead">PHYSICAL SYSTEMS LABORATORY</span></div></div>
+ <div class="mast-center"><span class="bullet live"></span> KINEMATIC TEST CELL <span class="mast-sep">/</span> RCL-01 <span class="mast-sep">/</span> TAILGATE</div>
+ <div class="mast-right"><span class="state-dot"></span> MODEL IN THE LOOP <span class="mast-sep">|</span> <span class="build">EXPERIMENTAL TWIN 0.1</span></div>
+</header>
+<div class="workspace">
+ <aside class="control-pane">
+  <div class="control-head"><div class="eyebrow">EXPERIMENT SETUP</div><h1>Power liftgate <span>test cell</span></h1><p>Observe the mechanism. Change a fault. Watch how the controller responds.</p></div>
+  <div class="pane-section">
+   <div class="section-name"><span>01</span> INJECT FAULT</div>
+   <label class="field-label" for="faultSelect">Simulated plant condition</label>
+   <select id="faultSelect" aria-label="Simulated plant condition">
+    <option value="combined" selected>Motor fade + high friction</option>
+    <option value="healthy">Nominal system</option><option value="friction">High hinge friction</option>
+    <option value="motor">Motor power reduced</option><option value="load">Heavier tailgate</option>
+    <option value="sensor">Angle sensor drift</option><option value="gas">Weak gas spring</option>
+   </select>
+   <div class="fault-note"><span class="fault-mark"></span><span id="faultInfo">Reduced drive power and increased hinge resistance.</span></div>
+  </div>
+  <div class="pane-section">
+   <div class="section-name"><span>02</span> CONTROLLER</div>
+   <div class="controller-selector"><button class="pill active" data-controller="factory" type="button">Factory</button><button class="pill" data-controller="tuned" type="button">Modified</button></div>
+   <div class="control-slider"><div><label for="gainInput">Feedback gain</label><output id="gainValue">1.00×</output></div><input id="gainInput" type="range" min="0.7" max="1.8" step="0.05" value="1"></div>
+   <div class="control-slider"><div><label for="frictionInput">Friction feedforward</label><output id="frictionValue">8 Nm</output></div><input id="frictionInput" type="range" min="0" max="34" step="1" value="8"></div>
+   <div class="control-slider"><div><label for="gravityInput">Gravity compensation</label><output id="gravityValue">1.00×</output></div><input id="gravityInput" type="range" min="0.7" max="1.35" step="0.05" value="1"></div>
+   <button id="suggestBtn" class="secondary-btn" type="button"><span class="btn-mono">▤</span> Apply reference calibration <span class="small-right">ORACLE</span></button>
+   <div class="fineprint">Reference calibration uses the simulator's hidden plant. It is not an RL agent result.</div>
+  </div>
+  <div class="pane-section experiment-section">
+   <div class="section-name"><span>03</span> EXPERIMENT</div>
+   <div class="mode-title">View mechanical test</div>
+   <div class="controller-selector view-selector"><button type="button" id="viewVehicle" class="pill active">Full vehicle</button><button type="button" id="viewMech" class="pill">Mechanism</button></div>
+   <button id="compareBtn" type="button" class="secondary-btn"><span class="square-icon"></span> Compare factory / modified</button>
+  </div>
+  <div class="start-group">
+   <button id="runBtn" class="primary-btn" type="button"><span id="playSymbol">▶</span><span id="playLabel">RUN OPENING TEST</span><span class="keyhint">SPACE</span></button>
+   <button id="resetBtn" class="reset-btn" type="button" title="Return to the beginning">↺</button>
+  </div>
+  <p class="side-disclaimer">This is a parameterized 1-DOF hinge model, not OEM CAD or a validated vehicle digital twin.</p>
+ </aside>
+ <main class="main-pane">
+  <div class="viewport" id="viewport">
+    <canvas id="scene" aria-label="Interactive 3D SUV tailgate and two motorized telescoping struts"></canvas>
+    <div id="unsupported" hidden>3D graphics unavailable in this browser. Try a current Chromium or Firefox browser with WebGL2 enabled.</div>
+    <div class="viewport-hud top-left"><div class="eyebrow">LIVE MECHANISM</div><div class="scene-title">Hinge + dual power struts</div><div class="scene-description">Drag to rotate · Scroll to zoom · ⛶ for immersive view</div></div>
+    <div class="viewport-hud top-right"><span class="sim-pill"><i></i> SYNTHETIC PHYSICS</span><span class="sim-pill sub" id="fpsText">SIM 100 Hz</span></div>
+    <div class="viewport-tools"><button id="fullscreenBtn" aria-label="Toggle immersive view" title="Immersive 3D view" type="button">⛶</button><button id="overlayPlay" aria-label="Play or pause simulation" title="Play or pause simulation" type="button">▶</button><button id="resetCamera" aria-label="Reset camera" title="Reset camera" type="button">⌖</button><button id="toggleLabels" aria-label="Toggle component labels" title="Toggle component labels" type="button">◎</button></div>
+    <div class="compare-half" id="compareHalf" hidden><div><span>FACTORY CONTROLLER</span><strong id="factoryAngle">0.0°</strong></div><div><span>MODIFIED CONTROLLER</span><strong id="tunedAngle">0.0°</strong></div></div>
+    <div id="callouts" class="callouts"><span id="callHinge" class="callout">HINGE AXLE <i></i></span><span id="callStrut" class="callout">POWER STRUT <i></i></span></div>
+    <div class="viewport-foot"><div class="swatches"><span><i class="target"></i> Target</span><span><i class="actual"></i> Actual</span><span><i class="fault"></i> Fault / factory</span><span><i class="test"></i> Diagnostic</span><span><i class="safety"></i> Safety</span></div><span class="caption-info">Illustrative geometry · Force/motion linked to model</span></div>
+  </div>
+  <div class="instrument-strip">
+    <div class="instrument-header"><div class="label-group"><div class="eyebrow">MEASUREMENTS</div><div class="instrument-name">Motion response <span id="testState">READY</span></div></div><div class="time-pair"><span>TEST TIME</span><strong id="timeNow">0.00</strong><span class="units">s</span></div></div>
+    <div class="instruments">
+      <div class="signal-chart"><canvas id="plot" aria-label="Live opening angle chart comparing target and actual hinge angle"></canvas><div class="plot-legend"><span><i class="target"></i> Command</span><span><i class="actual"></i> Response</span><span id="baselineLegend" hidden><i class="fault"></i> Factory</span></div></div>
+      <div class="readouts"><div><small>OPEN ANGLE</small><strong id="angleNow">0.0<span>deg</span></strong></div><div><small>STRUT STROKE</small><strong id="strokeNow">0<span>mm</span></strong></div><div><small>MOTOR CURRENT</small><strong id="currentNow">0.0<span>A</span></strong></div><div><small>TRACKING ERROR</small><strong id="errorNow">0.0<span>deg</span></strong></div></div>
+    </div>
+    <div class="timeline"><span id="timelineStart">0.00s</span><input type="range" id="scrubber" min="0" max="6.5" step="0.01" value="0" aria-label="Scrub simulation timeline"><span>6.50s</span></div>
+  </div>
+  <div class="measurement-footer"><div id="resultSummary">Choose a fault and run the opening cycle to inspect physical response.</div><div>TIME STEP 10 ms <span class="sep">/</span> NO HARDWARE CONNECTED</div></div>
+ </main>
+</div>
+</div>
+<script src="physics.js"></script>
+<script src="renderer3d.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

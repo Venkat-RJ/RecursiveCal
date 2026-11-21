@@ -1,0 +1,22 @@
+name: RecursiveCal Physical Twin JS checks
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'visualization/physical_twin/**'
+      - '.github/workflows/physical-twin.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check visualization/physical_twin/physics.js
+      - run: node --check visualization/physical_twin/renderer3d.js
+      - run: node --check visualization/physical_twin/app.js
+      - run: node visualization/physical_twin/tests/smoke.cjs
