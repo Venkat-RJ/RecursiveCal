@@ -29,7 +29,7 @@ jobs:
       - name: Install explicit CPU numerical dependency
         run: python -m pip install 'numpy==2.3.5'
       - name: Run observed-only, cost, and replay contracts
-        run: python -m unittest discover -s tests -p 'test_sequential_inquiry.py' -v
+        run: python -m unittest discover -s tests -p 'test_*inquiry.py' -v
       - name: Exploratory sequential Bayesian baseline comparison
         run: |
           python -m research.sequential_inquiry.benchmark \
