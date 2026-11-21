@@ -37,11 +37,12 @@ The code also includes a public-reference discussion in [measurement protocol](d
 ```bash
 python -m pip install cadquery numpy scipy trimesh
 python cad/build_assembly.py
+# Optional native CAD render: python -m pip install vtk
 python cad/render_assembly.py
 python cad/export_viewer_mesh.py
 python viewer/build.py
 python -m unittest discover -s tests -p 'test_*.py' -v
-python tests/test_browser.py
+python tests/test_browser.py  # optional: requires playwright and Chromium
 ```
 
 Core dynamics: `python simulation/physics_v2.py`. All 11 unit checks passed locally, plus browser interactions and a 7-scenario Python/JS parity audit. The viewer works with a software-3D fallback where WebGL is unavailable; the hardware WebGL pathway has not been independently tested in that environment.
