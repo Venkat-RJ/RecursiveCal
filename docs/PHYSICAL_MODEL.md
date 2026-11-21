@@ -1,6 +1,6 @@
 # SI liftgate model
 
-`recursivecal_lab.physics` supplies a usable single-axis software-in-the-loop model. Its identifier is `recursivecal.si-liftgate/1`. It is separate from the frozen normalized v0.2 reinforcement-learning benchmark. Scores from those two systems are not interchangeable.
+`recursivecal_lab.physics` supplies a single-axis software-in-the-loop model. Its current identifier is `recursivecal.si-liftgate/2`. The persistent rig calls the same mechanical kernel. Archived `/1` results remain tied to their original source revision; the frozen normalized benchmark is another separate model. Scores across these definitions are not interchangeable. See the [physics validation record](PHYSICS_VALIDATION.md).
 
 The included geometry follows the repository's illustrative CAD mounts. Mass, inertia, force ratings, friction, actuator response, and controller settings are assumptions. No production-vehicle identification data have been supplied. The model is therefore a research instrument, not a validated digital twin or a hardware controller.
 
@@ -22,13 +22,13 @@ J\ddot q=2(F_m+F_g)L'(q)-mg r_c\sin(q+q_c)-\tau_{ext}
  -\tau_{friction}-2c_s[L'(q)]^2\dot q.
 \]
 
-`J` is in kg m², forces in N per strut, torques in Nm, and lengths in metres. Positive external closing torque opposes opening.
+`J` is in kg m², forces in N per strut, torques in Nm, and lengths in metres. Positive external closing torque opposes opening. The parallel-axis constraint requires `J >= mass_kg * com_radius_m**2`; configurations that violate it are rejected.
 
 Gas force is a linear interpolation between compressed and extended force ratings in the **length** coordinate. It is multiplied by the configured gas-force scale and `(temperature_C+273.15)/(reference_temperature_C+273.15)`. This fixed ideal-gas temperature multiplier omits seal behavior, friction hysteresis, and transient thermal dynamics. It is an explicit approximation, not a fitted thermal law.
 
 The motor force follows `dF_m/dt=(F_request*efficiency-F_m)/tau` with bounded requested force. The first-order response is integrated analytically within each step. A positive force extends the strut, a negative force retracts it. This is a force-domain actuator abstraction. There is no electrical circuit, battery-energy, or current prediction.
 
-The hinge uses Coulomb friction, a static holding threshold, and viscous damping. At zero speed, net torque below static-friction capacity is balanced. During motion, a dissipative velocity projection applies kinetic friction and implicit viscous damping. A configured holding brake contributes torque capacity only while the motor is unpowered. Its default is zero. The model does not invent a brake to hide a passive-hold failure.
+The hinge uses Coulomb friction, a static holding threshold, and viscous damping. At zero speed, torque within the directional static-friction capacity is balanced. A sliding interval ends at its actual zero-velocity time; static friction is reapplied before any reversal. Both velocity and displacement are integrated. The persistent rig can add a separate closing-direction friction term. A configured holding brake contributes capacity only while unpowered. Its default is zero.
 
 ## Controller and scenarios
 
@@ -47,15 +47,15 @@ The separate historical CAD model uses `g=9.81`; this model uses `g=9.80665`. It
 
 ## Numerical method and events
 
-Motor response is analytic within a step. Geometry and external torque are evaluated at a predicted midpoint. Velocity uses the friction projection, and position uses the average of old and new velocity. With damping and switching the overall method is generally first order. In the frictionless, contact-free energy test, refinement gives the expected faster convergence. No blanket fourth-order claim is made.
+Geometry, gas/gravity torque and the viscous coefficient use an iterated position midpoint. Within that local approximation, the motor force retains its exponential time dependence in velocity, displacement and motor work. Sliding intervals use an analytic linear-ODE flow. Zero-velocity transitions and static release split that flow, including the remaining time after a reversal. This avoids applying a whole-step average motor force to motion that occurred earlier in the step. Smooth-case refinement is checked against an independent solver; it is not a global error bound for every hybrid trajectory.
 
 The final step is shortened to the requested duration. The integrator also stops a step exactly at a power-loss boundary. The last reported timestamp is the actual completed time, including early termination. Repeated runs with the same inputs and seed are deterministic in the same Python environment.
 
-Lower and upper mechanical stops project position into range and set velocity to zero. This is an inelastic contact approximation, not a contact-force or anti-pinch model. Stop events record the incident speed. `unconstrained_torque_Nm` excludes the impulsive stop reaction and must not be interpreted as a load-cell measurement during contact.
+Lower and upper stops localize contact within the local trajectory, set velocity to zero inelastically, record incoming speed and kinetic-energy loss, and integrate the remaining interval. A resting stop supplies unilateral reaction while motor force continues to evolve; sufficient inward force can release it. This remains an idealized rigid-contact approximation. Contact force, elastic deformation and anti-pinch behaviour are not modeled. `unconstrained_torque_Nm` excludes the stop reaction.
 
-Speed is checked at each recorded state. With `abort_on_limit=True`, exceeding the configured threshold terminates the simulation and records `aborted_speed_limit`. A step can cross the threshold before detection. This monitor is an experiment guard, not a continuous-time safety guarantee or physical emergency-stop system. Force saturation is reported as the fraction of completed time, not hidden as a successful calibration.
+Speed monitoring includes local velocity extrema and incoming contact speeds, before the stop resets velocity. With `abort_on_limit=True`, a breach records `aborted_speed_limit`. Termination takes effect at the outer control-step boundary, rather than at an exactly localized speed-threshold crossing. This is an experiment guard, not a hardware emergency stop. Force saturation is reported as a fraction of completed time.
 
-`mechanical_work_signed_J` approximates total motor work `integral 2 F_m L'(q) dq`. `mechanical_work_abs_J` sums its absolute incremental magnitude. Neither includes electrical losses or predicts battery consumption.
+`mechanical_work_signed_J` approximates total motor work `integral 2 F_m L'(q) dq`, retaining the motor's time dependence in each locally frozen geometry. Absolute work accounts for force and motion reversals. Separate friction and impact dissipation fields are provided. `mechanical_energy()` includes kinetic, gravitational, external-load and assumed gas-spring potential energy. These are quantities of the numerical model; none predicts electrical losses or battery consumption.
 
 ## Python interface
 
@@ -78,13 +78,15 @@ The JSON trace is `recursivecal.run/1`; all values are finite JSON values. `para
 
 The test suite checks the mount derivative, virtual-work identity, conservative energy refinement before contact, trajectory convergence, reproducibility, exact duration, power-loss event timing, force bounds, invalid-input rejection, and passive hold with and without an explicit brake. Those are software and numerical checks. They cannot establish the accuracy of assumed coefficients.
 
-The published machine-readable evidence is in `research/releases/physical-v1/`. After installing the package, regenerate it with:
+Current machine-readable numerical evidence is in `research/releases/physics-v2/validation.json`. Reproduce the current checks in the foreground with:
 
 ```bash
-python research/releases/physical-v1/reproduce.py
+python -m pip install -e '.[validation]'
+python -m unittest discover -s tests -p 'test_mechanics_foundation_v2.py' -v
+python scripts/validate_physics.py --output artifacts/physics-validation.json
 ```
 
-The script emits twelve explicit software gates, their observed values, and their criteria. It writes a diagnostic audit and exits with an error if any gate fails. The criteria are regression tolerances chosen during software development, not independently preregistered physical accuracy limits. One gate deliberately requires the default unsupported hatch to fail passive hold. Passing the software audit therefore does not mean that the default mechanical architecture is adequate.
+The current audit evaluates 24 smooth mechanisms, three motor-reversal contact cases and 60 seconds of conservative oscillation. Its criteria are engineering regression tolerances, not independently preregistered hardware accuracy limits. Archived `physical-v1/` and `physical-inquiry-v1/` reports remain historical evidence for source revision `8d51692799b1eaffb18c3f91def12fac44a1b8af`. Reproduce those reports from that revision. Their source and evidence hashes are pinned in `physics-v2/historical-evidence.json`; the current audit separately checks the current source hashes.
 
 ## Independent physical reference
 

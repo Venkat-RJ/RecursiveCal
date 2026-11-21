@@ -2,7 +2,7 @@
 
 RecursiveCal's central system is an investigator coupled to a physical simulator. The investigator chooses an experiment, receives instrument readings, revises its belief, and eventually commits a calibration. A separate evaluator then tests that commitment on new trajectories. The evaluator can reject the calibration even when the diagnosis is correct.
 
-The connected foundation is implemented in `physical_rig.py` and `inquiry.py`, with a CAD workbench at `/inquiry.html`. Its identifiers are `recursivecal.physical-rig/1` and `recursivecal.physical-inquiry/1`. The original SI model, normalized benchmark, archived v0.3 evidence and manuscript remain separate, reproducible artifacts.
+The connected foundation is implemented in `physical_rig.py` and `inquiry.py`, with a CAD workbench at `/inquiry.html`. Its current identifiers are `recursivecal.physical-rig/2` and `recursivecal.physical-inquiry/1`. The report protocol is unchanged; the mechanics are versioned separately. Archived rig `/1` evidence remains attached to its original source revision. See [physics validation](PHYSICS_VALIDATION.md) for the current mechanical checks.
 
 ## Run the complete loop
 
@@ -35,7 +35,7 @@ Command force is limited to ±330 N per strut or the plant's lower force limit. 
 
 Position, velocity, actuator force, elapsed time and cumulative absolute motor work persist between experiments. A change of test does not silently reset the mechanism. The explicit `reference` action uses an external bench fixture: it fixes the angle at 20 degrees, zeros velocity and motor force, advances time and charges a setup cost. Fixture work is not counted as motor work.
 
-The integrator uses analytic actuator-force updates, midpoint force balance, an implicit viscous/Coulomb velocity update, shortened final steps and explicit event boundaries. Tests check force response, damping, conservative-energy refinement, time accounting and pre-contact speed. A numerical stop records a failed experiment; it is not a model of a certified physical emergency stop.
+Both simulation interfaces call the same mechanical step. It uses an iterated geometric midpoint, analytic motor-dependent sliding flow, explicit static-friction transitions and localized inelastic contacts. Incoming impact speed is retained before velocity is reset. Power-loss and observation boundaries are scheduled separately, even when extremely close. A numerical stop is an experiment outcome, not a certified hardware emergency stop.
 
 ### Instrument assumptions
 
@@ -89,7 +89,7 @@ After commitment, no further diagnostic steps or replacement commitment are allo
 | `coast` | Remove motor demand while force decays with lag | 0.18 s | 0.8 |
 | `reference` | External 20-degree encoder fixture check | 0.1 s | 1.5 |
 
-These costs are declared protocol units including setup assumptions. They are neither financial costs nor a claim that every fixture can be repositioned in 0.1 physical seconds. The fixture's motion is outside the modeled actuator trajectory. The default budget is 8 units with at most five tests. API bounds are 12 units and six tests.
+These costs are declared protocol units including setup assumptions. They are neither financial costs nor a claim that every fixture can be repositioned in 0.1 physical seconds. Fixture repositioning is externally supplied and outside the actuator trajectory. The following stationary fixture interval acquires three observations at their actual recorded times. The default budget is 8 units with at most five tests. API bounds are 12 units and six tests.
 
 Three timed instrumentation snapshots per experiment enter the likelihood. The report preserves the full diagnostic trace for audit. A limit-aborted episode must abstain. A Bayesian risk screen can reject a proposed action when more than 5% of posterior mass predicts an abort, but this conditional screen is not a real-world safety probability.
 

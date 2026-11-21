@@ -10,9 +10,9 @@ from dataclasses import asdict, dataclass, fields
 import math
 import random
 import json
-from typing import Any
+from typing import Any, NamedTuple
 
-MODEL_ID = "recursivecal.si-liftgate/1"
+MODEL_ID = "recursivecal.si-liftgate/2"
 SCENARIOS = ("open", "close", "passive_hold", "power_loss")
 
 
@@ -71,6 +71,9 @@ class ModelParameters:
                 raise ValueError(f"{name} must be nonnegative")
         if self.friction_static_Nm < self.friction_coulomb_Nm:
             raise ValueError("friction_static_Nm must be at least friction_coulomb_Nm")
+        minimum_inertia = self.mass_kg * self.com_radius_m ** 2
+        if self.inertia_kg_m2 < minimum_inertia - 1e-12 * max(1.0, minimum_inertia):
+            raise ValueError("hinge inertia must be at least mass_kg * com_radius_m**2")
         if not 0 <= self.motor_efficiency <= 1.5:
             raise ValueError("motor_efficiency must be between 0 and 1.5")
         if not -100 <= self.temperature_C <= 150 or not -100 <= self.gas_reference_temperature_C <= 150:
@@ -195,12 +198,359 @@ def _clip(value: float, low: float, high: float) -> float:
 
 def _friction_velocity(v: float, external: float, viscous: float, h: float,
                        p: ModelParameters, brake: float) -> float:
-    """Implicit viscous damping and a Coulomb/stiction velocity projection."""
-    if abs(v) < 1e-12 and abs(external) <= p.friction_static_Nm + brake:
-        return 0.0
-    free = (v + h * external / p.inertia_kg_m2) / (1 + h * viscous / p.inertia_kg_m2)
-    decrement = h * (p.friction_coulomb_Nm + brake) / (p.inertia_kg_m2 + h * viscous)
-    return math.copysign(max(0.0, abs(free) - decrement), free)
+    """Compatibility helper; the shared kernel also uses the exact displacement."""
+    return _friction_flow(v, external, viscous, h, p, brake)[0]
+
+
+def _friction_flow(v: float, torque: float, damping: float, h: float,
+                   p: ModelParameters, brake: float = 0.0,
+                   closing_extra: float = 0.0) -> tuple[float, float, float | None]:
+    """Exact velocity/displacement for frozen torque and viscous coefficient.
+
+    The optional third result is the first zero-velocity time. Static friction
+    is reapplied there, with a new directional coefficient if sliding reverses.
+    This local solution is not an exact solution of the nonlinear whole plant.
+    """
+    if h <= 0:
+        return v, 0.0, None
+    if abs(v) < 1e-14:
+        v = 0.0
+        threshold = p.friction_static_Nm + brake + (closing_extra if torque < 0 else 0.0)
+        if abs(torque) <= threshold:
+            return 0.0, 0.0, None
+    direction = math.copysign(1.0, v if v else torque)
+    kinetic = p.friction_coulomb_Nm + brake + (closing_extra if direction < 0 else 0.0)
+    c = torque - direction * kinetic
+    inertia = p.inertia_kg_m2
+
+    def slide(t: float) -> tuple[float, float]:
+        rate = damping / inertia
+        x = rate * t
+        # Written in terms of initial acceleration to avoid cancellation as b -> 0.
+        if abs(x) < 1e-4:
+            phi1 = t * (1 - x / 2 + x*x / 6 - x**3 / 24 + x**4 / 120)
+            phi2 = t*t * (0.5 - x / 6 + x*x / 24 - x**3 / 120 + x**4 / 720)
+        else:
+            phi1 = -math.expm1(-x) / rate
+            phi2 = (t - phi1) / rate
+        acceleration = (c - damping * v) / inertia
+        return v + acceleration * phi1, v * t + acceleration * phi2
+
+    stop = None
+    if v and c * v < 0:
+        stop = (inertia / damping * math.log1p(-damping * v / c)
+                if damping else -inertia * v / c)
+    if stop is not None and stop <= h:
+        _, displacement = slide(stop)
+        vn, remainder, _ = _friction_flow(0.0, torque, damping, max(0.0, h - stop),
+                                         p, brake, closing_extra)
+        return vn, displacement + remainder, stop
+    vn, displacement = slide(h)
+    return vn, displacement, None
+
+
+def mechanical_energy(angle_rad: float, velocity_rad_s: float,
+                      parameters: ModelParameters | None = None) -> float:
+    """Kinetic plus gravitational, external-load and assumed gas-spring potential."""
+    p = parameters or ModelParameters()
+    short = geometry(0, p)["length_m"]
+    span = geometry(p.max_angle_rad, p)["length_m"] - short
+    extension = geometry(angle_rad, p)["length_m"] - short
+    scale = p.gas_scale * (p.temperature_C + 273.15) / (p.gas_reference_temperature_C + 273.15)
+    slope = (p.gas_force_compressed_N_each - p.gas_force_extended_N_each) / span
+    gas_potential = -2 * scale * (p.gas_force_compressed_N_each * extension - 0.5 * slope * extension**2)
+    return (0.5 * p.inertia_kg_m2 * velocity_rad_s**2
+            - p.mass_kg * p.gravity_m_s2 * p.com_radius_m * math.cos(angle_rad + p.com_offset_rad)
+            + p.external_closing_torque_Nm * angle_rad + gas_potential)
+
+
+class _Flow(NamedTuple):
+    velocity: float
+    displacement: float
+    turns: tuple[float, ...]
+    peak_speed: float
+    motor_work: float
+    motor_work_abs: float
+    friction_loss: float
+
+
+def _phi(rate: float, t: float) -> tuple[float, float]:
+    """Integrals of exp(-rate*t), and of its time integral; stable at rate=0."""
+    x = rate * t
+    if abs(x) < 1e-4:
+        return (t * (1 - x/2 + x*x/6 - x**3/24 + x**4/120),
+                t*t * (.5 - x/6 + x*x/24 - x**3/120 + x**4/720))
+    first = -math.expm1(-x) / rate
+    return first, (t - first) / rate
+
+
+def _divided_phi(a: float, b: float, t: float) -> float:
+    """(phi(a)-phi(b))/(b-a), including coincident and zero-rate limits."""
+    if abs(a - b) * t < 1e-5:
+        rate = (a + b) / 2
+        x = rate * t
+        if abs(x) < 1e-4:
+            return t*t * (.5 - x/3 + x*x/8 - x**3/30 + x**4/144)
+        return (-math.expm1(-x) - x * math.exp(-x)) / rate**2
+    return (_phi(a, t)[0] - _phi(b, t)[0]) / (b - a)
+
+
+def _lagged_flow(v: float, base: float, f0: float, target: float, arm: float,
+                 damping: float, h: float, p: ModelParameters, brake: float,
+                 closing_extra: float) -> _Flow:
+    """Local flow with exact exponential motor forcing, including its first moment.
+
+    Geometry, gas/gravity torque and viscous coefficient are frozen by the
+    outer midpoint iteration. Motor force is never averaged across an impact.
+    Sliding zeros, static release and velocity extrema are resolved internally.
+    """
+    if h <= 0:
+        return _Flow(v, 0.0, (), abs(v), 0.0, 0.0, 0.0)
+    if f0 == target:
+        net = base + 2 * arm * target
+        vn, dq, turn = _friction_flow(v, net, damping, h, p, brake, closing_extra)
+        distance = abs(dq)
+        if turn is not None and 0 < turn < h:
+            first = _friction_flow(v, net, damping, turn, p, brake, closing_extra)[1]
+            distance = abs(first) + abs(dq - first)
+        work = 2 * arm * target * dq
+        return _Flow(vn, dq, () if turn is None else (turn,), max(abs(v), abs(vn)),
+                     work, abs(2 * arm * target) * distance,
+                     max(0.0, net*dq - .5*p.inertia_kg_m2*(vn*vn-v*v)))
+    inertia, rate, lag = p.inertia_kg_m2, damping / p.inertia_kg_m2, 1 / p.actuator_time_constant_s
+    time = displacement = work = absolute_work = loss = 0.0
+    peak = abs(v)
+    turns = []
+    fixed = base + 2 * arm * target
+    while time < h:
+        remaining = h - time
+        beta = 2 * arm * (f0 - target)
+        net0, net1 = fixed + beta, fixed + beta * math.exp(-lag * remaining)
+        if abs(v) < 1e-14:
+            v = 0.0
+            low, high = -(p.friction_static_Nm + brake + closing_extra), p.friction_static_Nm + brake
+            if low <= net0 <= high:
+                if low <= net1 <= high:
+                    break
+                threshold = high if net1 > high else low
+                ratio = (threshold - fixed) / beta
+                waiting = min(remaining, max(0.0, -math.log(ratio) / lag)) if ratio > 0 else remaining
+                f0 = target + (f0 - target) * math.exp(-lag * waiting)
+                time += waiting
+                remaining = h - time
+                if remaining <= max(1e-15, h * 1e-13):
+                    break
+                beta = 2 * arm * (f0 - target)
+                direction = math.copysign(1.0, net1)
+            else:
+                direction = math.copysign(1.0, net0)
+        else:
+            direction = math.copysign(1.0, v)
+        kinetic = p.friction_coulomb_Nm + brake + (closing_extra if direction < 0 else 0.0)
+        c = fixed - direction * kinetic
+        initial_v = v
+
+        def slide(t: float) -> tuple[float, float, float]:
+            phi1, phi2 = _phi(rate, t)
+            convolution = math.exp(-min(rate, lag) * t) * _phi(abs(rate - lag), t)[0]
+            velocity = initial_v * math.exp(-rate*t) + c/inertia*phi1 + beta/inertia*convolution
+            distance = initial_v*phi1 + c/inertia*phi2 + beta/inertia*_divided_phi(lag, rate, t)
+            # Integral exp(-lag*t) * velocity(t) dt, used for exact local work.
+            weighted = (initial_v*_phi(rate+lag, t)[0]
+                        + c/inertia*_divided_phi(lag, lag+rate, t)
+                        + beta/inertia*_divided_phi(2*lag, lag+rate, t))
+            motor_work = 2 * arm * target * distance + beta * weighted
+            return velocity, distance, motor_work
+
+        def acceleration(t: float) -> float:
+            return (c + beta*math.exp(-lag*t) - damping*slide(t)[0]) / inertia
+
+        # Acceleration is the sum of two exponentials (or their coincident-rate
+        # limit), so there is at most one internal velocity extremum per slide.
+        extremum = None
+        if acceleration(0) * acceleration(remaining) < 0:
+            left, right = 0.0, remaining
+            initial_sign = math.copysign(1.0, acceleration(0))
+            for _ in range(42):
+                middle = (left + right) / 2
+                if acceleration(middle) * initial_sign > 0:
+                    left = middle
+                else:
+                    right = middle
+            extremum = (left + right) / 2
+        boundaries = [0.0] + ([] if extremum is None else [extremum]) + [remaining]
+        stop = None
+        for left, right in zip(boundaries, boundaries[1:]):
+            if direction * slide(right)[0] >= 0:
+                continue
+            for _ in range(42):
+                middle = (left + right) / 2
+                if direction * slide(middle)[0] > 0:
+                    left = middle
+                else:
+                    right = middle
+            stop = (left + right) / 2
+            break
+        accepted = remaining if stop is None else stop
+        vn, dq, segment_work = slide(accepted)
+        peak = max(peak, abs(vn))
+        if extremum is not None and extremum < accepted:
+            peak = max(peak, abs(slide(extremum)[0]))
+        absolute_segment = abs(segment_work)
+        if f0 * (target + (f0-target)*math.exp(-lag*accepted)) < 0:
+            force_zero = -math.log(-target / (f0 - target)) / lag
+            first_work = slide(force_zero)[2]
+            absolute_segment = abs(first_work) + abs(segment_work - first_work)
+        loss += max(0.0, base*dq + segment_work - .5*inertia*(vn*vn-initial_v*initial_v))
+        work += segment_work
+        absolute_work += absolute_segment
+        displacement += dq
+        time += accepted
+        f0 = target + (f0 - target)*math.exp(-lag*accepted)
+        v = vn
+        if stop is None:
+            break
+        v = 0.0
+        turns.append(time)
+        if len(turns) > 4:
+            raise ValueError("unresolved sliding transitions; reduce the timestep")
+    return _Flow(v, displacement, tuple(turns), peak, work, absolute_work, loss)
+
+
+def advance_mechanics(q: float, v: float, force: float, delivered: float, h: float,
+                      p: ModelParameters, *, powered: bool,
+                      closing_extra: float = 0.0) -> dict[str, Any]:
+    """Shared finite-step mechanics for the standalone simulator and persistent rig.
+
+    Nonlinear coefficients use an iterated position midpoint. Motor force has
+    its analytical first-order response, including its effect on displacement.
+    Local sliding flows resolve friction and stopping distance. Contacts are localized within those flows,
+    are inelastic, and retain the remaining time. No collision force is inferred.
+    Caller validates inputs. Failure never mutates a persistent rig.
+    """
+    brake = p.holding_brake_Nm if not powered else 0.0
+    elapsed = work = work_abs = friction_loss = impact_loss = 0.0
+    peak_speed = abs(v)
+    contacts: list[dict[str, Any]] = []
+
+    def motor(f0: float, t: float) -> float:
+        return delivered + (f0 - delivered) * math.exp(-t / p.actuator_time_constant_s)
+
+    def external(angle: float, f: float) -> float:
+        arm = geometry(angle, p)["lever_m"]
+        return 2 * (f + gas_force(angle, p)) * arm - gravity_torque(angle, p)
+
+    for _ in range(32):
+        remaining = h - elapsed
+        if remaining <= max(1e-15, h * 1e-13):
+            break
+        # An initial outward velocity at a boundary is an immediate impact.
+        boundary = (0.0 if q <= 0 and v < 0 else
+                    p.max_angle_rad if q >= p.max_angle_rad and v > 0 else None)
+        if boundary is not None:
+            loss = 0.5 * p.inertia_kg_m2 * v*v
+            contacts.append({"type": "lower_stop" if boundary == 0 else "upper_stop",
+                             "time_offset_s": elapsed, "incident_speed_rad_s": abs(v),
+                             "kinetic_energy_loss_J": loss})
+            impact_loss += loss
+            q, v = boundary, 0.0
+
+        # A stationary body remains fixed until actual motor lag crosses its
+        # directional static threshold. A stop also supplies unilateral reaction.
+        if abs(v) < 1e-14:
+            v = 0.0
+            low = -(p.friction_static_Nm + brake + closing_extra) if q > 0 else -math.inf
+            high = p.friction_static_Nm + brake if q < p.max_angle_rad else math.inf
+            net0, net1 = external(q, force), external(q, motor(force, remaining))
+            if low <= net0 <= high:
+                if low <= net1 <= high:
+                    force = motor(force, remaining)
+                    elapsed = h
+                    break
+                threshold = high if net1 > high else low
+                left, right = 0.0, remaining
+                for _ in range(48):
+                    middle = (left + right) / 2
+                    net = external(q, motor(force, middle))
+                    if (net < threshold) == (net1 > high):
+                        left = middle
+                    else:
+                        right = middle
+                waiting = (left + right) / 2
+                force = motor(force, waiting)
+                elapsed += waiting
+                remaining = h - elapsed
+                if remaining <= max(1e-15, h * 1e-13):
+                    elapsed = h
+                    break
+
+        guess = q + remaining * v
+        for iteration in range(16):
+            midpoint = _clip(0.5 * (q + guess), 0.0, p.max_angle_rad)
+            arm = geometry(midpoint, p)["lever_m"]
+            base = 2 * gas_force(midpoint, p) * arm - gravity_torque(midpoint, p)
+            damping = p.friction_viscous_Nm_s + 2 * p.strut_damping_N_s_m_each * arm**2
+            result = _lagged_flow(v, base, force, delivered, arm, damping, remaining, p, brake, closing_extra)
+            candidate = q + result.displacement
+            if abs(candidate - guess) <= 2e-13 * max(1.0, abs(candidate)):
+                break
+            guess = candidate
+        else:
+            raise ValueError("mechanical midpoint did not converge; reduce the timestep")
+
+        def flow(t: float) -> _Flow:
+            return _lagged_flow(v, base, force, delivered, arm, damping, t, p, brake, closing_extra)
+
+        # A trajectory can hit a stop and turn back within the same step.
+        # Check both monotone portions, rather than checking only its endpoint.
+        times = [0.0] + [turn for turn in result.turns if 0 < turn < remaining] + [remaining]
+        hit_time = hit_boundary = None
+        for left, right in zip(times, times[1:]):
+            at_right = flow(right)
+            endpoint = q + at_right.displacement
+            boundary = (0.0 if endpoint < 0 or (endpoint <= 0 and at_right.velocity < 0) else
+                        p.max_angle_rad if endpoint > p.max_angle_rad or
+                        (endpoint >= p.max_angle_rad and at_right.velocity > 0) else None)
+            if boundary is None:
+                continue
+            for _ in range(48):
+                middle = (left + right) / 2
+                inside = q + flow(middle).displacement
+                if (inside > boundary) == (boundary == 0):
+                    left = middle
+                else:
+                    right = middle
+            hit_time, hit_boundary = (left + right) / 2, boundary
+            break
+
+        accepted = remaining if hit_time is None else hit_time
+        accepted_flow = flow(accepted)
+        work += accepted_flow.motor_work
+        work_abs += accepted_flow.motor_work_abs
+        friction_loss += accepted_flow.friction_loss
+        peak_speed = max(peak_speed, accepted_flow.peak_speed)
+        force = motor(force, accepted)
+        elapsed += accepted
+        q += accepted_flow.displacement
+        v = accepted_flow.velocity
+        if hit_time is None:
+            elapsed = h
+            break
+        q = hit_boundary
+        loss = 0.5 * p.inertia_kg_m2 * v*v
+        impact_loss += loss
+        contacts.append({"type": "lower_stop" if q == 0 else "upper_stop",
+                         "time_offset_s": elapsed, "incident_speed_rad_s": abs(v),
+                         "kinetic_energy_loss_J": loss})
+        v = 0.0
+    else:
+        raise ValueError("too many mechanical events in one step; reduce the timestep")
+    if not all(math.isfinite(value) for value in (q, v, force, work, work_abs, friction_loss, impact_loss, peak_speed)):
+        raise ValueError("nonfinite mechanical state")
+    return {"angle_rad": q, "velocity_rad_s": v, "motor_force_N_each": force,
+            "mechanical_work_signed_J": work, "mechanical_work_abs_J": work_abs,
+            "friction_dissipation_J": friction_loss, "impact_dissipation_J": impact_loss,
+            "peak_speed_rad_s": peak_speed, "contacts": contacts}
 
 
 def simulate(parameters: ModelParameters | dict[str, Any] | None = None, *,
@@ -262,7 +612,8 @@ def simulate(parameters: ModelParameters | dict[str, Any] | None = None, *,
     power_loss_recorded = False
     speed_limit_recorded = False
     termination = "completed"
-    last_contact: str | None = None
+    peak_speed = abs(v)
+    friction_loss = impact_loss = 0.0
 
     while True:
         if duration_s - t <= 1e-12:
@@ -312,9 +663,9 @@ def simulate(parameters: ModelParameters | dict[str, Any] | None = None, *,
             "tracking_error_rad": target - q, "motor_powered": powered,
             "force_saturated": abs(demand) > p.motor_force_max_N_each,
         })
-        if abs(v) > p.speed_limit_rad_s:
+        if peak_speed > p.speed_limit_rad_s:
             if not speed_limit_recorded:
-                events.append({"time_s": t, "type": "speed_limit", "details": {"actual_rad_s": abs(v), "limit_rad_s": p.speed_limit_rad_s}})
+                events.append({"time_s": t, "type": "speed_limit", "details": {"actual_rad_s": peak_speed, "limit_rad_s": p.speed_limit_rad_s}})
                 speed_limit_recorded = True
             if abort_on_limit:
                 termination = "aborted_speed_limit"
@@ -324,32 +675,21 @@ def simulate(parameters: ModelParameters | dict[str, Any] | None = None, *,
         h = min(dt_s, duration_s - t)
         if scenario == "power_loss" and t < p.power_loss_time_s < t + h:
             h = p.power_loss_time_s - t
-        # Analytic first-order actuator response at midpoint and endpoint.
-        force_mid = requested_delivered + (force - requested_delivered) * math.exp(-0.5 * h / p.actuator_time_constant_s)
-        force_new = requested_delivered + (force - requested_delivered) * math.exp(-h / p.actuator_time_constant_s)
-        q_mid = _clip(q + 0.5 * h * v, 0.0, p.max_angle_rad)
-        gm = geometry(q_mid, p)
-        net_mid = 2 * (force_mid + gas_force(q_mid, p)) * gm["lever_m"] - gravity_torque(q_mid, p)
-        damping_mid = p.friction_viscous_Nm_s + 2 * p.strut_damping_N_s_m_each * gm["lever_m"] ** 2
-        v_new = _friction_velocity(v, net_mid, damping_mid, h, p, brake)
-        q_new = q + 0.5 * h * (v + v_new)
-        contact = "lower_stop" if q_new < 0 else "upper_stop" if q_new > p.max_angle_rad else None
-        if contact:
-            if contact != last_contact:
-                events.append({"time_s": min(duration_s, t + h), "type": contact,
-                               "details": {"incident_speed_rad_s": abs(v_new), "impact_model": "inelastic projection"}})
-            q_new = _clip(q_new, 0, p.max_angle_rad)
-            v_new = 0.0
-        if not all(math.isfinite(value) for value in (q_new, v_new, force_new, net_mid, damping_mid)):
-            raise ValueError("simulation produced a nonfinite state; reduce the timestep or revise the parameter range")
-        last_contact = contact
-        step_work = 2 * force_mid * gm["lever_m"] * (q_new - q)
-        work_abs += abs(step_work)
-        work_signed += step_work
+        step = advance_mechanics(q, v, force, requested_delivered, h, p, powered=powered)
+        for contact in step["contacts"]:
+            events.append({"time_s": t + contact["time_offset_s"], "type": contact["type"],
+                           "details": {"incident_speed_rad_s": contact["incident_speed_rad_s"],
+                                       "kinetic_energy_loss_J": contact["kinetic_energy_loss_J"],
+                                       "impact_model": "localized inelastic contact"}})
+        peak_speed = max(peak_speed, step["peak_speed_rad_s"])
+        work_abs += step["mechanical_work_abs_J"]
+        work_signed += step["mechanical_work_signed_J"]
+        friction_loss += step["friction_dissipation_J"]
+        impact_loss += step["impact_dissipation_J"]
         error_integral += h * (target - q) ** 2
         if abs(demand) > p.motor_force_max_N_each:
             saturated_duration += h
-        q, v, force = q_new, v_new, force_new
+        q, v, force = step["angle_rad"], step["velocity_rad_s"], step["motor_force_N_each"]
         t = min(duration_s, t + h)
 
     elapsed = trace[-1]["time_s"]
@@ -357,9 +697,10 @@ def simulate(parameters: ModelParameters | dict[str, Any] | None = None, *,
         "tracking_rmse_deg": math.degrees(math.sqrt(error_integral / elapsed)) if elapsed else abs(math.degrees(trace[0]["tracking_error_rad"])),
         "final_angle_deg": math.degrees(trace[-1]["angle_rad"]),
         "final_tracking_error_deg": math.degrees(trace[-1]["tracking_error_rad"]),
-        "peak_speed_rad_s": max(abs(row["velocity_rad_s"]) for row in trace),
+        "peak_speed_rad_s": peak_speed,
         "peak_motor_force_N_each": max(abs(row["motor_force_N_each"]) for row in trace),
         "mechanical_work_abs_J": work_abs, "mechanical_work_signed_J": work_signed,
+        "friction_dissipation_J": friction_loss, "impact_dissipation_J": impact_loss,
         "force_saturation_fraction": saturated_duration / elapsed if elapsed else 0.0,
         "completed_duration_s": elapsed, "termination": termination,
         "passive_hold": passive_hold(p), "event_count": len(events),

@@ -2,6 +2,7 @@
 "use strict";
 
 const RUN_SCHEMA = "recursivecal.run/1";
+const SUPPORTED_MODELS = ["recursivecal.si-liftgate/1", "recursivecal.si-liftgate/2"];
 const EXPERIMENT_SCHEMA = "recursivecal.experiment.v1";
 const MAX_FILE_BYTES = 32 * 1024 * 1024;
 const TRACE_FIELDS = ["time_s", "angle_rad", "target_angle_rad", "velocity_rad_s", "motor_force_N_each", "gas_force_N_each", "motor_torque_Nm", "stroke_m"];
@@ -12,7 +13,7 @@ function isRecord(value) {
 
 function validateRun(run) {
   if (!isRecord(run) || run.schema_version !== RUN_SCHEMA) throw new Error(`Expected schema_version ${RUN_SCHEMA}.`);
-  if (run.model_id !== "recursivecal.si-liftgate/1") throw new Error("This view accepts the SI liftgate model. Import diagnostic experiment summaries in Evidence.");
+  if (!SUPPORTED_MODELS.includes(run.model_id)) throw new Error("This view accepts supported SI liftgate models. Import diagnostic experiment summaries in Evidence.");
   if (!Array.isArray(run.trace) || run.trace.length < 1 || run.trace.length > 250001) throw new Error("The run must contain between 1 and 250001 trace samples.");
   let previous = -Infinity;
   for (let index = 0; index < run.trace.length; index += 1) {
@@ -197,7 +198,7 @@ if (typeof document !== "undefined") {
     const outcome = complete ? "Completed" : humanize(run.metrics.termination || "termination not recorded");
     setText("runStatus", label.startsWith("Recorded") ? "Recorded · " + outcome : outcome);
     $("runStatus").className = "run-state " + (complete ? "complete" : "warning");
-    setText("runIdentity", label + " · " + (config.scenario || "imported"));
+    setText("runIdentity", label + " · " + (config.scenario || "imported") + " · Physics " + run.model_id.split("/").at(-1));
     setText("sampleCount", run.trace.length.toLocaleString() + " samples");
     setText("durationReadout", numeric(run.trace.at(-1).time_s, 2) + " s");
     $("scrubber").max = run.trace.length - 1; $("scrubber").disabled = false; $("playbackButton").disabled = run.trace.length < 2;
@@ -434,7 +435,7 @@ if (typeof document !== "undefined") {
     try {
       if (!["http:", "https:"].includes(location.protocol) || !["127.0.0.1", "localhost"].includes(location.hostname)) throw new Error("Static viewer mode");
       const capabilities = await api("/api/capabilities");
-      if (!isRecord(capabilities) || capabilities.model_id !== "recursivecal.si-liftgate/1") throw new Error("Unexpected local API model.");
+      if (!isRecord(capabilities) || !SUPPORTED_MODELS.includes(capabilities.model_id)) throw new Error("Unexpected local API model.");
       state.capabilities = capabilities; state.connected = true;
       $("serviceStatus").className = "service-state connected"; $("serviceStatus").replaceChildren(create("i"), document.createTextNode("Local API connected"));
       $("runButton").disabled = false; $("fitButton").disabled = false; $("replayButton").disabled = !state.run;
@@ -505,7 +506,7 @@ if (typeof document !== "undefined") {
     try {
       loadRun(validateRun(window.RecursiveCalReference.run), "Recorded synthetic example");
       switchView("simulation");
-      message("Loaded a recorded synthetic run shipped with this release. These are saved results, not a new simulation. Model assumptions and provenance are included below.");
+      message(`Loaded archived synthetic evidence from ${state.run.model_id}. These are saved results, not a new simulation. A new run uses the connected engine version shown in its provenance.`);
     } catch (error) { message("Could not load recorded example: " + error.message, "error"); }
   });
   $("loadReferenceEvidence").addEventListener("click", () => {

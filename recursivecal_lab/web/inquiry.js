@@ -29,7 +29,7 @@
     return Array.from(new Uint8Array(hash),x=>x.toString(16).padStart(2,"0")).join("");
   }
   async function validate(report) {
-    if(report?.schema_version!=="recursivecal.physical-inquiry/1" || report.model_id!=="recursivecal.physical-rig/1")throw new Error("This is not a supported physical inquiry report.");
+    if(report?.schema_version!=="recursivecal.physical-inquiry/1" || !["recursivecal.physical-rig/1","recursivecal.physical-rig/2"].includes(report.model_id))throw new Error("This is not a supported physical inquiry report.");
     if(!Array.isArray(report.verification?.comparisons) || report.verification.comparisons.length!==4 || !Array.isArray(report.agent_history) || report.agent_history.length>6)throw new Error("Report structure is incomplete.");
     if(!["verified_in_simulation","verification_failed","abstained"].includes(report.outcome))throw new Error("Invalid report outcome.");
     const {report_sha256,...payload}=report;
@@ -143,7 +143,7 @@
     if(!window.RecursiveCalInquiryReferenceGzip)throw new Error("No recorded investigation is bundled.");
     const bytes=Uint8Array.from(atob(window.RecursiveCalInquiryReferenceGzip),c=>c.charCodeAt(0));
     const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
-    await load(JSON.parse(await new Response(stream).text()),"Recorded evidence");
+    await load(JSON.parse(await new Response(stream).text()),"Recorded evidence · archived physics 1");
   }catch(error){message(error.message,"error");}});
   $("importStudy").addEventListener("change",async event=>{const file=event.target.files[0];if(!file)return;try{if(file.size>8*1024*1024)throw new Error("Report exceeds the 8 MiB limit.");await load(JSON.parse(await file.text()),"Imported report");}catch(error){message("Import rejected. "+error.message+(state.report?" The previous report remains displayed.":""),"error");}finally{event.target.value="";}});
   $("profile").addEventListener("change",()=>{stop();state.profile=Number($("profile").value);drawPlot();setTime(0);});
