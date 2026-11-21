@@ -115,6 +115,7 @@ def run(browser_path: str | None, output: Path) -> None:
             assert page.locator("#forceKind").input_value() == "synthetic"
             page.locator("#fitButton").click()
             page.locator("#forceResults").wait_for(state="visible")
+            page.locator("#forceResults summary").click()
             fit = json.loads(page.locator("#forceJson").inner_text())
             assert "synthetic" in json.dumps(fit)
             assert "validation" in json.dumps(fit)
@@ -126,6 +127,8 @@ def run(browser_path: str | None, output: Path) -> None:
             assert "Fitted curve applied" in page.locator("#globalMessage").inner_text()
             page.locator("#runButton").click()
             expect(page.locator("#runButton")).to_be_enabled()
+            if not page.locator("#runProvenance").is_visible():
+                page.locator("details:has(#runProvenance) > summary").click()
             provenance = json.loads(page.locator("#runProvenance").inner_text())["provenance"]
             assert provenance["source_kind"] == "synthetic"
             assert provenance["parameter_provenance"]["source_kind"] == "synthetic"
@@ -139,6 +142,7 @@ def run(browser_path: str | None, output: Path) -> None:
             page.locator("#replaySource").fill("Smoke test: downsampled simulator trace")
             page.locator("#replayButton").click()
             page.locator("#replayResults").wait_for(state="visible")
+            page.locator("#replayResults summary").click()
             replay = json.loads(page.locator("#replayJson").inner_text())
             assert "synthetic" in json.dumps(replay)
             page.screenshot(path=str(output / "measurements_desktop.png"), full_page=True)
