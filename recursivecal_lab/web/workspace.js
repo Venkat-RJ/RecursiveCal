@@ -180,6 +180,7 @@
     $("actuatorPane").hidden=!$("showCutaway").checked;
     $("showVectors").closest("label").hidden=view!=="simulation";
     $("comparisonLabels").hidden=view!=="verify"||!r;
+    $("poseSource").parentElement.hidden=view==="verify"&&Boolean(r);
     text("actuatorTitle",(S.component==="right"?"Right":"Left")+" actuator");
     text("poseSource",view==="simulation"?"Simulator state":view==="verify"?"Verifier state":"Pose derived from the angle sensor");
     text("sourceStatus",S.data?S.data.origin+" · "+S.data.model+" · synthetic":S.busy?"Computing a new investigation":"No run loaded");
@@ -320,7 +321,7 @@
   }
   function buildPlot(id,series,unit) {
     const root=$(id);root.replaceChildren();const end=Math.max(S.data?.end||0,.01);
-    const width=600,left=43,right=584,top=14,bottom=142;
+    const width=S.view==="verify"?Math.max(600,root.clientWidth||600):600,left=43,right=width-16,top=14,bottom=142;
     let min=0,max=1;
     for(const line of series)for(const row of line.rows)if(Number.isFinite(row[line.key])){
       const value=row[line.key]*(line.scale||1);min=Math.min(min,value);max=Math.max(max,value);

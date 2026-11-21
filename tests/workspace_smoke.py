@@ -172,6 +172,8 @@ def run(output: Path, browser_path: str | None = None, visual_only: bool = False
                             assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 1"), (width,view)
                         if width == 390:
                             page.get_by_role("button", name="Rig & data", exact=True).click()
+                            page.locator("#timeline").fill("4200")
+                            page.locator("#timeline").dispatch_event("input")
                             page.screenshot(path=str(output / "simulation-mobile.png"), full_page=True)
                     checked("All four workspaces fit 390, 820 and 1560 pixel viewports without page overflow")
                     if not visual_only:
@@ -217,6 +219,8 @@ def run(output: Path, browser_path: str | None = None, visual_only: bool = False
                         page.get_by_role("button", name="Verify", exact=True).click()
                         assert page.locator(".check-table tr.fail").count() >= 1
                         expect(page.locator("#runState")).to_have_text("Failed")
+                        page.locator("#timeline").fill("10000")
+                        page.locator("#timeline").dispatch_event("input")
                         page.screenshot(path=str(output/"verification-failed.png"),full_page=True)
                         checked("The real streamed investigation commits once and displays the rejected verification profile")
 
