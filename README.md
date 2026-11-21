@@ -8,15 +8,15 @@ The current task is a synthetic single-axis actuator. Its dynamics are hidden. A
 
 This is a **research simulator**, not an industrial calibration product, real-hardware controller, or certified safety system.
 
-## Interactive visual laboratory
+## 3D physical systems test cell
 
-Open [visualization/index.html](visualization/index.html) locally to try the interactive virtual test cell. No server or API key is required.
+**[Open the new physical tailgate demo](visualization/physical_twin/demo.html)** · [Source and model notes](visualization/physical_twin/README.md)
 
-The demo now includes a **recognizable SUV power-liftgate illustration** and an **engineering actuator test-bench view**. Choose a fault, run diagnostic probes, watch simulated motion and telemetry, tune the controller, and replay factory vs calibrated responses side by side. Blue consistently means target, teal actual motion, amber factory/fault, and purple diagnostic action.
+This is a separate experimental 3D hinge model. An articulated hatch rotates around its hinge while two telescoping struts move between their mounting points. The opening angle, strut extension, controller response, gravity, and modeled force are linked by the same numerical simulation. Try fault injection, orbit inspection, mechanism cutaway, full-screen physical view, and synchronized factory/modified comparison.
 
-The **SUV geometry is illustrative**, not a validated physical tailgate model. Position, trajectories, and scores come from the same normalized 1D simulation equations as `recursivecal.py`. The automatic replay is a **classical Bayesian reference**, not an RL-trained agent. Browser tests and 28 Python/JavaScript physics comparisons have passed.
+**Research boundary:** this model uses illustrative mechanism geometry and physical parameters, not manufacturer CAD, real plant measurements, or certified vehicle controls. Its reference calibration uses known simulator parameters and is not an RL policy.
 
-The visual demo bundles **public showcase-only seeds and hidden plant parameters** in the HTML so it can run offline. It must **never be used as the secure RL task evaluator**. See [visualization/README.md](visualization/README.md) for scope and source files.
+The [earlier 2D actuator demonstration](visualization/index.html) remains available. It is tied to the original normalized linear-actuator benchmark and should not be confused with the new hinge model.
 
 ## Environment
 
