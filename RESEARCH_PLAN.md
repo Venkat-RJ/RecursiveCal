@@ -1,25 +1,75 @@
-# SafeCal research plan
+# RecursiveCal research plan
 
-**Question:** When does RL help with safe diagnostic experiment selection and recalibration beyond strong classical system-identification and experimental-design methods?
+**Question:** Can reinforcement learning improve sequential diagnostic experiment selection and calibration under uncertain dynamics, beyond strong classical system-identification and experimental-design methods?
 
-## Starting point
+This is a falsifiable research question, **not** a claim that RL already works.
 
-A working synthetic actuator and frozen evaluator; original coarse model and a stronger Bayesian particle baseline; a train-only selected two-probe cap; 60 held-out tasks for each of three current splits. **Classical Bayesian methods already close much of the original gap.** No neural policy has been trained. See `RESULTS.md`.
+## Current evidence
 
-## Falsifiable experiments
+- The first `SafeCal` environment is a synthetic single-axis actuator with seven shielded diagnostic probes, 150 legal final calibrations, a cost budget, and an independent terminal evaluator.
+- Classical Bayesian particle-based identification with a train-selected two-probe limit performs strongly on current single-fault, combined-fault, and one torque-deadzone shifted-dynamics split. See [RESULTS.md](RESULTS.md).
+- A 720-episode CPU policy-gradient pilot learned to use exactly one fixed probe. A hand-coded fixed-probe control reproduced its held-out scores; there is **no evidence of learned adaptive experiment selection**. See [RL_PILOT.md](RL_PILOT.md).
+- The Verifiers v1 interface passed taskset and scripted-interaction checks. A two-episode small-language-model smoke test completed but produced invalid action sequences and zero rewards. No language model has been fine-tuned with RL. See [LLM_SMOKE.md](LLM_SMOKE.md).
 
-1. **Validate the task and shields.** Keep hidden plant generation and scoring host-side; verify no response leaks hidden parameters, scoring internals, or seeds into the agent sandbox. Reject unsafe and over-budget actions independently of the model. Record calibration quality, probe count, cost, and rejected actions separately.
-2. **Establish competitive classical baselines.** Strengthen the current particle model with a decision-focused expected value-of-information policy, classical system identification (MAP/least-squares), conservative safe probing, and a budget-aware policy. Tune only on training seeds and freeze evaluation.
-3. **Measure model misspecification.** Beyond current single, compound and deadzone tasks, create separate held-out *model classes* such as delayed actuation, stick-slip friction and asymmetric load, with identifiability checks. Do not call them realistic without independent physical validation. A blind simulator judge evaluates held-out trajectories.
-4. **Train an RL policy if the task remains challenging.** Use `safecal_v1` with Prime Intellect Verifiers v1 and isolated execution. Compare open-weight 1B-3B model zero-shot tool use against RL-trained versions; report actual GPU-hours, rollouts and tokens. Use multiple seeds. Do not claim an RL gain until trained and measured.
-5. **Measure causal improvement.** Primary metric: seed-paired net calibration reward at fixed maximum diagnostic cost. Secondary: safety violations/blocked actions, number of experiments, quality at equal excitation, sample efficiency, and transfer to held-out dynamics. Compare with the strongest classical baseline. Report negative findings.
+## Proposed next experiment
 
-## Success and failure criteria
+The current tasks do not reliably require a policy to react to earlier measurements. Before any larger training run, introduce a task family where **the optimal next test differs depending on the outcome of a prior test**.
 
-RL is useful only if it improves over the best tuned **non-privileged** classical method with uncertainty estimates that support the claim, or demonstrates a specific transferable advantage unavailable to a simpler method. Gains must survive held-out models, equal decision budgets, and reward-audit checks.
+### 1. Verify that the new task is identifiable
 
-Stop or publish negative results if classical baselines tie or win, gains depend on seed leakage or evaluator shortcuts, tasks are unidentifiable under available probes, or the learned policy frequently requests invalid actions.
+Construct different hidden plant families that initially look similar but yield different responses to particular diagnostic probes. Show, by exhaustive or high-precision analysis, that:
 
-## Safety and ownership
+- all important fault classes can be distinguished within the available probe budget,
+- the *best next action* depends on observed measurements, not a fixed probe schedule,
+- the calibration objective and diagnostic cost do not reward always stopping immediately,
+- task generation and reward design were fixed before evaluating learned policies.
 
-The simulator is a research abstraction. Industrial liftgate calibration inspired the question, but this project contains no confidential data or control procedures from an employer. No policy should be deployed on hardware without separately validated models, safety mechanisms and domain-specific testing.
+A task that makes RL look good by construction is not useful.
+
+### 2. Strengthen the classical controls
+
+Compare against non-privileged alternatives using the same observations, legal actions, and cost:
+
+- no-test calibration, random probes, and fixed schedules,
+- regularized least-squares / maximum-a-posteriori system identification,
+- particle-based Bayesian identification with budget-aware stopping,
+- expected value-of-information and decision-focused probe selection.
+
+Select hyperparameters using **training tasks only**. A privileged oracle may provide an upper-bound reference, but not a fair policy comparator.
+
+### 3. Evaluate learned experiment selection
+
+Only after the task passes the identifiability and adaptive-action tests:
+
+- train small diagnostic policies, including a model-free baseline;
+- establish zero-shot tool-using language-model performance with valid structured actions;
+- evaluate RL-trained 1B–3B language models if feasible and justified by measured throughput;
+- run repeated training seeds, not just a single policy seed;
+- compare with fixed-probe controls and the strongest classical approach.
+
+The purpose is to isolate **experiment-selection learning** from improvements due to a better estimator, a different number of tests, or a cheaper fixed schedule.
+
+### 4. Measure transfer and failure
+
+**Primary endpoint:** paired net calibration reward at identical maximum diagnostic budgets on held-out dynamical-system classes.
+
+Also report:
+
+- raw calibration quality without probe-cost penalties,
+- number and cost of diagnostic actions,
+- unsafe/invalid requests and host-side interventions,
+- decisions at matched sample budgets,
+- calibration performance under shifted dynamics,
+- confidence intervals, repeated training-seed variation, and failure examples.
+
+Test on separately constructed held-out dynamics, not merely unseen seeds from the same generator. Keep scoring host-side and shield diagnostic actions independently of the agent.
+
+## Stop criteria
+
+A positive result requires a measured, reproducible benefit over strong classical and fixed-probe controls that survives held-out dynamics and a reward audit. If classical methods tie or win, if the learned policy collapses to a static action, or if the task has an identifiability flaw, report the negative result and revise the scientific question rather than spending larger training budgets.
+
+## Boundaries
+
+All mechanics and telemetry are simulated. This environment is not a model of any particular production actuator. It contains no proprietary parameters, and its host-side action restrictions are **not** a real-hardware safety validation.
+
+Source: [README](README.md) · [classical results](RESULTS.md) · [neural pilot](RL_PILOT.md).
