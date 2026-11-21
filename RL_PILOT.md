@@ -1,4 +1,4 @@
-# SafeCal neural diagnostic policy pilot (21 November 2026)
+# RecursiveCal / SafeCal neural diagnostic policy pilot (21 November 2026)
 
 **Result:** A small model-free policy-gradient experiment ran end-to-end, but did **not** establish adaptive RL capability. The learned policy always chose the same one-probe action (`pulse_neg_low`) and then stopped. A hand-coded one-probe policy produced **exactly identical** held-out rewards. This is an important negative control.
 
@@ -45,6 +45,6 @@ The training command above is equivalent to sequential 96-episode resumed blocks
 
 The current environment permits a single probe to be sufficient for many tasks. A policy that never adapts can already score well. Before requesting expensive 1B-3B language-model RL training, we should design **predeclared** task families where optimal second measurements depend on first observations and baseline posterior uncertainty; run identifiability checks, robust Bayesian value-of-information stopping baselines, and train/evaluate separate seeds. These should be justified by realistic diagnostic ambiguity rather than adjusting rewards to favor RL.
 
-Existing Verifiers v1 integration passed [real installed package CI smoke](https://github.com/Venkat-RJ/openresearch/actions/runs/44873170003). That tested taskset loading and host-run interactions with scripted actions, not true model inference. A separate small-language-model smoke is in progress.
+The Verifiers v1 integration passed [taskset and package checks in this repository](https://github.com/Venkat-RJ/RecursiveCal/actions/runs/44875871079). An earlier [host-side scripted interaction smoke](https://github.com/Venkat-RJ/openresearch/actions/runs/44873170003) also passed, but did not involve model inference. A separate [two-episode language-model smoke test](LLM_SMOKE.md) completed with invalid actions and zero rewards. No language model was RL-trained.
 
 **Limits:** no real-world hardware data, no sim-to-real testing, no language-model RL, no safety certification, one policy training seed, 60 tasks per held-out split.
