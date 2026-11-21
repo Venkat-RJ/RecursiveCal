@@ -146,8 +146,8 @@ See [contributing](CONTRIBUTING.md), [security and local operation](SECURITY.md)
 If you use RecursiveCal in your research or build on the code, please cite it:
 
 ```bibtex
-@software{Reddy_RecursiveCal_2026,
-  author = {Reddy, Venkateshwar},
+@software{Jambula_RecursiveCal_2026,
+  author = {Jambula, Venkateshwar Reddy},
   title = {{RecursiveCal: Reproducible Active Calibration and a Software-in-the-Loop Workbench}},
   version = {0.3.0},
   year = {2026},

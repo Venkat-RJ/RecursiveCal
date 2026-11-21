@@ -3,8 +3,8 @@ message: "If you use RecursiveCal or build on its software or synthetic experime
 title: "RecursiveCal: Reproducible Active Calibration and a Software-in-the-Loop Workbench"
 type: software
 authors:
-  - given-names: "Venkateshwar"
-    family-names: "Reddy"
+  - given-names: "Venkateshwar Reddy"
+    family-names: "Jambula"
     website: "https://github.com/Venkat-RJ"
 version: "0.3.0"
 date-released: "2026-11-21"
