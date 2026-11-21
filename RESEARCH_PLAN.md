@@ -6,7 +6,7 @@ This is a falsifiable research question, **not** a claim that RL already works.
 
 ## Current evidence
 
-- The first `SafeCal` environment is a synthetic single-axis actuator with seven shielded diagnostic probes, 150 legal final calibrations, a cost budget, and an independent terminal evaluator.
+- The first `RecursiveCal` environment is a synthetic single-axis actuator with seven shielded diagnostic probes, 150 legal final calibrations, a cost budget, and an independent terminal evaluator.
 - Classical Bayesian particle-based identification with a train-selected two-probe limit performs strongly on current single-fault, combined-fault, and one torque-deadzone shifted-dynamics split. See [RESULTS.md](RESULTS.md).
 - A 720-episode CPU policy-gradient pilot learned to use exactly one fixed probe. A hand-coded fixed-probe control reproduced its held-out scores; there is **no evidence of learned adaptive experiment selection**. See [RL_PILOT.md](RL_PILOT.md).
 - The Verifiers v1 interface passed taskset and scripted-interaction checks. A two-episode small-language-model smoke test completed but produced invalid action sequences and zero rewards. No language model has been fine-tuned with RL. See [LLM_SMOKE.md](LLM_SMOKE.md).

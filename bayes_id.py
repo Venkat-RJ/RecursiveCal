@@ -4,7 +4,7 @@ The particle prior and observation model are fixed independently of evaluation
 seeds. There is no access to the hidden plant, fault label, oracle, or scoring
 result when an action is chosen. This is a classical baseline, not RL.
 
-Requires NumPy. The core SafeCal simulator itself remains stdlib-only.
+Requires NumPy. The core RecursiveCal simulator itself remains stdlib-only.
 """
 from __future__ import annotations
 
@@ -15,9 +15,9 @@ import random
 
 import numpy as np
 
-from safecal import (
+from recursivecal import (
     CALIBRATIONS, DEFAULT_CALIBRATION, PROBES, PROBE_BY_NAME,
-    Calibration, Plant, SafeCalEnv, calibration_quality, measurement_prediction,
+    Calibration, Plant, RecursiveCalEnv, calibration_quality, measurement_prediction,
 )
 
 N_PARTICLES = 384
@@ -149,7 +149,7 @@ class BayesianID:
         return CALIBRATIONS[int(np.argmax(vals))]
 
 
-def policy_bayes(env: SafeCalEnv, *, max_probes: int = 4,
+def policy_bayes(env: RecursiveCalEnv, *, max_probes: int = 4,
                  min_gain: float = 0.03, samples: int = 20) -> Calibration:
     """Info-gain active identification + posterior-predictive calibration.
 

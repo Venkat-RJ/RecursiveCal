@@ -31,8 +31,8 @@ jobs:
         run: |
           python - <<'PY'
           import verifiers.v1 as vf
-          from safecal_v1 import SafeCalTaskset, SafeCalVerifierEnv
-          assert issubclass(SafeCalTaskset, vf.Taskset)
-          assert issubclass(SafeCalVerifierEnv, vf.Env)
+          from recursivecal_v1 import RecursiveCalTaskset, RecursiveCalVerifierEnv
+          assert issubclass(RecursiveCalTaskset, vf.Taskset)
+          assert issubclass(RecursiveCalVerifierEnv, vf.Env)
           print("Verifiers v1 imports PASS")
           PY

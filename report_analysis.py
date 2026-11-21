@@ -12,7 +12,7 @@ FILES={
 }
 
 def run():
-    out={'protocol':'SafeCal v0.2, simulated-only, seed-paired, no RL training',
+    out={'protocol':'RecursiveCal v0.2, simulated-only, seed-paired, no RL training',
          'training_budget_selection':json.loads((ROOT/'budget_selection.json').read_text()),
          'splits':{}}
     for split,(a,b) in FILES.items():

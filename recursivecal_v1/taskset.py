@@ -1,4 +1,4 @@
-"""Prime Intellect Verifiers v1 integration for SafeCal.
+"""Prime Intellect Verifiers v1 integration for RecursiveCal.
 
 Architecture follows PrimeIntellect-ai/verifiers >=0.4.0:
   TaskData -> Taskset -> host-side Env.run() -> Trace.record_reward().
@@ -10,32 +10,32 @@ from typing import Iterator, Literal
 
 import verifiers.v1 as vf
 
-from safecal_v1.protocol import SYSTEM_PROMPT, SafeCalDialogue
+from recursivecal_v1.protocol import SYSTEM_PROMPT, RecursiveCalDialogue
 
 
-class SafeCalTaskData(vf.TaskData):
+class RecursiveCalTaskData(vf.TaskData):
     info: dict
 
 
-class SafeCalTask(vf.Task[SafeCalTaskData, vf.State, vf.TaskConfig]):
+class RecursiveCalTask(vf.Task[RecursiveCalTaskData, vf.State, vf.TaskConfig]):
     pass
 
 
-class SafeCalTasksetConfig(vf.TasksetConfig):
+class RecursiveCalTasksetConfig(vf.TasksetConfig):
     split: Literal["train", "heldout", "combined", "shifted"] = "train"
 
 
-class SafeCalTaskset(vf.Taskset[SafeCalTask, SafeCalTasksetConfig]):
+class RecursiveCalTaskset(vf.Taskset[RecursiveCalTask, RecursiveCalTasksetConfig]):
     INFINITE = True
 
-    def load(self) -> Iterator[SafeCalTask]:
+    def load(self) -> Iterator[RecursiveCalTask]:
         config = self.config
         base = {"train": 1000, "heldout": 900000,
                 "combined": 1200000, "shifted": 1500000}[config.split]
         for index in itertools.count():
-            yield SafeCalTask(
-                SafeCalTaskData(
-                    name=f"safecal-{config.split}-{index}",
+            yield RecursiveCalTask(
+                RecursiveCalTaskData(
+                    name=f"recursivecal-{config.split}-{index}",
                     prompt="Start the diagnostic episode. Submit one JSON action.",
                     system_prompt=SYSTEM_PROMPT,
                     info={"seed": base + index, "split": config.split},
@@ -44,16 +44,16 @@ class SafeCalTaskset(vf.Taskset[SafeCalTask, SafeCalTasksetConfig]):
             )
 
 
-class SafeCalVerifierConfig(vf.SingleAgentEnvConfig):
+class RecursiveCalVerifierConfig(vf.SingleAgentEnvConfig):
     # The 4-probe task needs five model turns; two malformed responses
     # are tolerated. The host also enforces an explicit seven-turn cap.
     pass
 
 
-class SafeCalVerifierEnv(vf.Env[SafeCalVerifierConfig]):
-    async def run(self, task: SafeCalTask, agents):
+class RecursiveCalVerifierEnv(vf.Env[RecursiveCalVerifierConfig]):
+    async def run(self, task: RecursiveCalTask, agents):
         info = task.data.info
-        dialogue = SafeCalDialogue(
+        dialogue = RecursiveCalDialogue(
             info["seed"],
             combined=info["split"] == "combined",
             novel=info["split"] == "shifted",
@@ -68,7 +68,7 @@ class SafeCalVerifierEnv(vf.Env[SafeCalVerifierConfig]):
                     break
                 segment = await interaction.turn(observation)
         trace = interaction.trace
-        trace.record_reward("safecal_net_reward", dialogue.reward(), 1.0)
+        trace.record_reward("recursivecal_net_reward", dialogue.reward(), 1.0)
         trace.record_metric("completed", float(dialogue.outcome is not None))
         trace.record_metric("invalid_actions", float(dialogue.invalid))
         trace.record_metric("diagnostic_cost", float(dialogue.env.spent))

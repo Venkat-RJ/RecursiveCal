@@ -41,7 +41,7 @@ for name,value in {
     setattr(fake,name,value)
 sys.modules['verifiers']=ModuleType('verifiers')
 sys.modules['verifiers.v1']=fake
-from safecal_v1.taskset import SafeCalTaskset, SafeCalVerifierEnv
+from recursivecal_v1.taskset import RecursiveCalTaskset, RecursiveCalVerifierEnv
 
 class Trace:
     def __init__(self):
@@ -69,12 +69,12 @@ class Agent:
     def interaction(self,task):return self.i
 
 async def main():
-    ts=SafeCalTaskset(Config())
+    ts=RecursiveCalTaskset(Config())
     task=next(ts.load())
     agent=Agent()
-    await SafeCalVerifierEnv().run(task,SimpleNamespace(agent=agent))
+    await RecursiveCalVerifierEnv().run(task,SimpleNamespace(agent=agent))
     trace=agent.i.trace
-    assert trace.rewards['safecal_net_reward'][0] > 0.0
+    assert trace.rewards['recursivecal_net_reward'][0] > 0.0
     assert trace.metrics['completed']==1.0
     assert trace.metrics['num_probes']==1.0
     assert len(agent.i.observations)==2

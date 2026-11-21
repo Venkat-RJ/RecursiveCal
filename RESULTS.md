@@ -1,4 +1,4 @@
-# RecursiveCal / SafeCal classical benchmark, November 2026
+# RecursiveCal / RecursiveCal classical benchmark, November 2026
 
 These are **classical-policy simulation results**, not reinforcement-learning results. All means are over 60 seeded tasks per evaluation split. Higher terminal net reward is better. `net reward = frozen calibration quality - 0.012 * diagnostic cost`.
 

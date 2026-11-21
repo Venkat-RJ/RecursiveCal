@@ -1,10 +1,10 @@
-# RecursiveCal / SafeCal neural diagnostic policy pilot (21 November 2026)
+# RecursiveCal / RecursiveCal neural diagnostic policy pilot (21 November 2026)
 
 **Result:** A small model-free policy-gradient experiment ran end-to-end, but did **not** establish adaptive RL capability. The learned policy always chose the same one-probe action (`pulse_neg_low`) and then stopped. A hand-coded one-probe policy produced **exactly identical** held-out rewards. This is an important negative control.
 
 ## What was trained
 
-A two-layer MLP (48 hidden units) receives features derived solely from visible probe observations and a fixed 384-particle Bayesian posterior. It chooses among seven shielded diagnostic probes or `STOP`. It is allowed at most two probes. A **fixed classical BayesianID** model makes the final calibration choice. The terminal reward is the original SafeCal net reward (calibration quality minus normalized diagnostic cost). Training uses REINFORCE with a learned value baseline and Adam. This is **not** RL fine-tuning of a language model and not an end-to-end learned calibration controller.
+A two-layer MLP (48 hidden units) receives features derived solely from visible probe observations and a fixed 384-particle Bayesian posterior. It chooses among seven shielded diagnostic probes or `STOP`. It is allowed at most two probes. A **fixed classical BayesianID** model makes the final calibration choice. The terminal reward is the original RecursiveCal net reward (calibration quality minus normalized diagnostic cost). Training uses REINFORCE with a learned value baseline and Adam. This is **not** RL fine-tuning of a language model and not an end-to-end learned calibration controller.
 
 Training was precommitted to 720 CPU-only episodes, RNG seed `20261121`, with equal sampling from synthetic single and compound fault families (seeds 1000 to 300000 and 50000 to 500000). The final checkpoint was fixed before opening held-out results. No shifted deadzone dynamics were used for training. Training occurred in 96-episode sequential chunks using restored optimizer and RNG states. No cloud GPU was used.
 

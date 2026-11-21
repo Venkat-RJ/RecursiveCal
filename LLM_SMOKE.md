@@ -1,8 +1,8 @@
-# RecursiveCal / SafeCal small open-weight language-model rollout smoke
+# RecursiveCal / RecursiveCal small open-weight language-model rollout smoke
 
 **Date:** 21 November 2026
 
-**Execution:** [GitHub Actions run 44873611480](https://github.com/Venkat-RJ/openresearch/actions/runs/44873611480) using the actual installed Verifiers v1 package, `SafeCalTaskset`, and `SafeCalVerifierEnv.run`. Model-generated dialogue was produced through local Hugging Face Transformers CPU inference with a custom interaction wrapper, **not** the native `vf-eval` model-provider client. Model: `Qwen/Qwen2.5-0.5B-Instruct`, greedy decoding, up to 96 new tokens per turn.
+**Execution:** [GitHub Actions run 44873611480](https://github.com/Venkat-RJ/openresearch/actions/runs/44873611480) using the actual installed Verifiers v1 package, `RecursiveCalTaskset`, and `RecursiveCalVerifierEnv.run`. Model-generated dialogue was produced through local Hugging Face Transformers CPU inference with a custom interaction wrapper, **not** the native `vf-eval` model-provider client. Model: `Qwen/Qwen2.5-0.5B-Instruct`, greedy decoding, up to 96 new tokens per turn.
 
 **Result:** Two real model-generated episodes executed in the environment. Neither completed a valid calibration. Both scored zero because the agent broke the one-action JSON protocol.
 

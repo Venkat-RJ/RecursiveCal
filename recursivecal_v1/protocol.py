@@ -1,4 +1,4 @@
-"""SafeCal multi-turn dialogue contract, independent of Verifiers.
+"""RecursiveCal multi-turn dialogue contract, independent of Verifiers.
 
 The model chooses JSON actions; the host environment owns the hidden physics.
 This module exposes no private plant parameters or evaluation outcomes to
@@ -9,9 +9,9 @@ import json
 import math
 from typing import Any
 
-from safecal import (
+from recursivecal import (
     BIAS_CORRECTIONS, FRICTION_FF, GAINS, PROBES,
-    Calibration, SafeCalEnv,
+    Calibration, RecursiveCalEnv,
 )
 
 SYSTEM_PROMPT = """You are calibrating a SIMULATED single-axis actuator.
@@ -36,12 +36,12 @@ The evaluator checks multiple unseen motion trajectories, not your explanation.
 """
 
 
-class SafeCalDialogue:
+class RecursiveCalDialogue:
     """Per-episode state. Any invalid action consumes an agent turn."""
     MAX_INVALID = 2
 
     def __init__(self, seed: int, *, combined: bool = False, novel: bool = False):
-        self.env = SafeCalEnv(seed, combined=combined, novel=novel)
+        self.env = RecursiveCalEnv(seed, combined=combined, novel=novel)
         self.invalid = 0
         self.completed = False
         self.outcome: dict[str, float | int] | None = None

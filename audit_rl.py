@@ -6,13 +6,13 @@ from collections import Counter
 from pathlib import Path
 
 from bayes_id import BayesianID
-from safecal import SafeCalEnv
+from recursivecal import RecursiveCalEnv
 
 BASE = Path(__file__).parent
 
 
 def fixed_one_probe(seed, split, name):
-    env = SafeCalEnv(seed, combined=split == 'combined', novel=split == 'shifted')
+    env = RecursiveCalEnv(seed, combined=split == 'combined', novel=split == 'shifted')
     model = BayesianID(samples=8, seed=seed * 31 + 379)
     model.update(env.step(name))
     outcome=env.finish(model.choose_calibration())

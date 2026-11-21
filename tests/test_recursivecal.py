@@ -1,18 +1,18 @@
 import unittest
-from safecal import (SafeCalEnv, Probe, Plant, Calibration, PROBES, CALIBRATIONS,
+from recursivecal import (RecursiveCalEnv, Probe, Plant, Calibration, PROBES, CALIBRATIONS,
                      TEST_BUDGET, integrate_pulse, measurement_prediction,
                      DEFAULT_CALIBRATION, policy_calibration, calibration_quality)
 
 
-class SafeCalTests(unittest.TestCase):
+class RecursiveCalTests(unittest.TestCase):
     def test_deterministic_probe_sequence(self):
-        a, b = SafeCalEnv(123), SafeCalEnv(123)
+        a, b = RecursiveCalEnv(123), RecursiveCalEnv(123)
         for name in ("reference_check", "pulse_pos_low", "pulse_neg_high"):
             self.assertEqual(a.step(name), b.step(name))
         self.assertEqual(a.finish(DEFAULT_CALIBRATION), b.finish(DEFAULT_CALIBRATION))
 
     def test_budget_and_duplicate_enforced(self):
-        env = SafeCalEnv(44)
+        env = RecursiveCalEnv(44)
         env.step("reference_check")
         with self.assertRaises(ValueError):
             env.step("reference_check")
@@ -31,14 +31,14 @@ class SafeCalTests(unittest.TestCase):
             integrate_pulse(Plant(), 0.5, 0, 2.0)
 
     def test_hidden_truth_not_in_observation(self):
-        env = SafeCalEnv(99)
+        env = RecursiveCalEnv(99)
         v = env.step("pulse_pos_high")
         self.assertEqual(set(v), {"probe", "observed", "cost"})
         self.assertNotIn("motor", str(v))
         self.assertNotIn("fault", str(v))
 
     def test_terminal_action_guard(self):
-        env = SafeCalEnv(43)
+        env = RecursiveCalEnv(43)
         with self.assertRaises(ValueError):
             env.finish(Calibration(5, 1, 1))
         env.finish(DEFAULT_CALIBRATION)
@@ -53,7 +53,7 @@ class SafeCalTests(unittest.TestCase):
             measurement_prediction(plant, probe)
 
     def test_shifted_physics_differs_and_has_valid_oracle(self):
-        from safecal import plant_for_seed, oracle_quality
+        from recursivecal import plant_for_seed, oracle_quality
         a, fam = plant_for_seed(1500000, novel=True)
         b, _ = plant_for_seed(1500000)
         self.assertEqual(fam, "deadzone_shift")
@@ -63,7 +63,7 @@ class SafeCalTests(unittest.TestCase):
 
     def test_baselines_finish(self):
         for policy in ("default", "random", "fixed", "greedy"):
-            env = SafeCalEnv(54)
+            env = RecursiveCalEnv(54)
             cal = policy_calibration(env, policy)
             self.assertIn(cal, CALIBRATIONS)
             r = env.finish(cal)

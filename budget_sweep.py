@@ -10,14 +10,14 @@ import statistics
 from time import perf_counter
 
 from bayes_id import policy_bayes
-from safecal import SafeCalEnv
+from recursivecal import RecursiveCalEnv
 
 
 def evaluate(seed_start: int, count: int, combined: bool, novel: bool,
              max_probes: int) -> dict:
     rewards, qualities, costs = [], [], []
     for seed in range(seed_start, seed_start + count):
-        env = SafeCalEnv(seed, combined=combined, novel=novel)
+        env = RecursiveCalEnv(seed, combined=combined, novel=novel)
         cal = policy_bayes(env, max_probes=max_probes)
         r = env.finish(cal)
         rewards.append(r["reward"])

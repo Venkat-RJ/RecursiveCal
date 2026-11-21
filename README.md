@@ -4,7 +4,7 @@
 
 RecursiveCal studies a specific decision problem: **which experiment should an agent run next, and when does it know enough to stop?**
 
-The first task, `SafeCal`, is a synthetic single-axis actuator. Its dynamics are hidden. An agent can perform bounded diagnostic tests, observe noisy results, and select a final calibration. The environment scores the calibration on unseen trajectories.
+The current task is a synthetic single-axis actuator. Its dynamics are hidden. An agent can perform bounded diagnostic tests, observe noisy results, and select a final calibration. The environment scores the calibration on unseen trajectories.
 
 This is a **research simulator**, not an industrial calibration product, real-hardware controller, or certified safety system.
 
@@ -90,7 +90,7 @@ The summary in [PUBLIC_RESULTS.json](PUBLIC_RESULTS.json) records the classical 
 
 ### Verifiers v1 integration
 
-`safecal_v1/` implements a multi-turn taskset and host-side environment for [Prime Intellect Verifiers](https://github.com/PrimeIntellect-ai/verifiers).
+`recursivecal_v1/` implements a multi-turn taskset and host-side environment for [Prime Intellect Verifiers](https://github.com/PrimeIntellect-ai/verifiers).
 
 ```bash
 python -m pip install -e '.[bayes,verifiers]'
@@ -102,17 +102,17 @@ Taskset initialization, scripted interaction, and package imports passed against
 
 | Path | Purpose |
 |---|---|
-| `safecal.py` | Synthetic plant, diagnostic action shield, and independent terminal score |
+| `recursivecal.py` | Synthetic plant, diagnostic action shield, and independent terminal score |
 | `bayes_id.py` | Particle-based Bayesian identification and classical probe selection |
-| `safecal_v1/` | Verifiers v1 taskset, protocol, and environment |
+| `recursivecal_v1/` | Verifiers v1 taskset, protocol, and environment |
 | `benchmark.py`, `budget_sweep.py` | Seeded evaluations and probe-budget comparisons |
 | `train_probe_rl.py`, `audit_rl.py` | CPU RL pilot and fixed-probe audit |
 | `tests/` | Unit and protocol tests |
 
-The names `safecal` and `safecal_v1` are retained as module and task identifiers for compatibility. **RecursiveCal** is the research-project name; **SafeCal** is its first task.
+The Python module is `recursivecal` and the Verifiers taskset is `recursivecal_v1`.
 
 ## Scope
 
 All dynamics, faults, and measurements are synthetic and normalized. There is no proprietary industrial data, hardware validation, sim-to-real claim, or evidence of safe deployment. Strong classical methods may remain the best approach, and negative findings are part of the result.
 
-MIT licensed. Earlier work and run provenance are preserved in the [original SafeCal research archive](https://github.com/Venkat-RJ/openresearch/tree/main/safecal).
+MIT licensed. Earlier experiment provenance is retained in the project's Git history.

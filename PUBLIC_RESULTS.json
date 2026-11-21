@@ -1,5 +1,5 @@
 {
-  "protocol": "SafeCal v0.2, simulated-only, seed-paired, no RL training",
+  "protocol": "RecursiveCal v0.2, simulated-only, seed-paired, no RL training",
   "splits": {
     "combined": {
       "comparisons": {

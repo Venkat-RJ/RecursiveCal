@@ -1,6 +1,6 @@
-from safecal import SafeCalEnv, policy_calibration
+from recursivecal import RecursiveCalEnv, policy_calibration
 
-env = SafeCalEnv(seed=900003)
+env = RecursiveCalEnv(seed=900003)
 print("Available diagnostics:", ", ".join(env.available_actions()))
 cal = policy_calibration(env, "greedy")
 for obs in env.records:

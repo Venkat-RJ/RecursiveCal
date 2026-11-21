@@ -1,4 +1,4 @@
-"""SafeCal v0: CPU-only, reproducible research environment for safe actuator diagnosis.
+"""RecursiveCal v0: CPU-only, reproducible research environment for safe actuator diagnosis.
 
 Synthetic normalized physics. No real-hardware control and no safety certification.
 Uses only Python's standard library.
@@ -218,7 +218,7 @@ def plant_for_seed(seed: int, combined: bool = False,
     return Plant(**params), kind
 
 
-class SafeCalEnv:
+class RecursiveCalEnv:
     """Gym-like episodic API: choose diagnostic probes, then calibration.
 
     No hidden parameter, label, oracle score or held-out trajectory leaks into
@@ -312,7 +312,7 @@ def greedy_probe(weights: list[float], available: list[str]) -> str:
     return max(available, key=lambda name: (value(name), name))
 
 
-def policy_calibration(env: SafeCalEnv, policy: str) -> Calibration:
+def policy_calibration(env: RecursiveCalEnv, policy: str) -> Calibration:
     if policy == "default":
         return DEFAULT_CALIBRATION
     if policy == "fixed":

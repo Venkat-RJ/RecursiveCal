@@ -1,10 +1,10 @@
-"""Deterministic CPU benchmark for SafeCal diagnostic policies."""
+"""Deterministic CPU benchmark for RecursiveCal diagnostic policies."""
 import argparse
 import json
 import statistics
 import random
 from collections import defaultdict
-from safecal import SafeCalEnv, policy_calibration, plant_for_seed, oracle_quality
+from recursivecal import RecursiveCalEnv, policy_calibration, plant_for_seed, oracle_quality
 from bayes_id import policy_bayes
 
 POLICIES = ("default", "random", "fixed", "greedy", "bayes", "bayes2")
@@ -24,7 +24,7 @@ def run(count: int = 60, split: str = "heldout", policies: tuple[str, ...] = POL
         results["oracle"].append(oracle_quality(plant))
         seed_row = {"seed": seed, "family": family, "oracle_quality": results["oracle"][-1], "policies": {}}
         for policy in policies:
-            env = SafeCalEnv(seed, combined=combined, novel=novel)
+            env = RecursiveCalEnv(seed, combined=combined, novel=novel)
             cal = (policy_bayes(env, max_probes=2) if policy == "bayes2"
                    else policy_bayes(env) if policy == "bayes"
                    else policy_calibration(env, policy))
@@ -65,7 +65,7 @@ def main() -> None:
     parser.add_argument("--policies", nargs="+", choices=POLICIES, default=POLICIES)
     args = parser.parse_args()
     report = run(args.tasks, args.split, tuple(dict.fromkeys(["default", *args.policies])))
-    print(f"SafeCal v0 | {args.split} | {args.tasks} tasks | higher reward is better")
+    print(f"RecursiveCal v0 | {args.split} | {args.tasks} tasks | higher reward is better")
     print("policy        reward       quality      test_cost")
     for name in report["policies"]:
         s = report["summary"]
