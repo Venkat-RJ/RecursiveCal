@@ -1,4 +1,4 @@
-# SafeCal small open-weight language-model rollout smoke
+# RecursiveCal / SafeCal small open-weight language-model rollout smoke
 
 **Date:** 21 November 2026
 
