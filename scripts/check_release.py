@@ -1,5 +1,7 @@
 """Verify local documentation, frozen source, and bundled evidence consistency."""
 import argparse
+import base64
+import gzip
 import hashlib
 import json
 from pathlib import Path
@@ -59,6 +61,21 @@ if audit["provenance"]["model_source_sha256"] != hashlib.sha256((ROOT / "recursi
     errors.append("physical audit source differs from implementation")
 if (ROOT / "docs/EXPERIMENT_PROTOCOL.md").read_bytes() != (ROOT / "recursivecal_lab/data/EXPERIMENT_PROTOCOL.md").read_bytes():
     errors.append("installed experiment protocol differs from documentation")
+from recursivecal_lab.inquiry import verify_report
+recorded_asset = (ROOT / "recursivecal_lab/web/inquiry-reference.js").read_text()
+match = re.search(r'window\.RecursiveCalInquiryReferenceGzip = "([A-Za-z0-9+/=]+)";', recorded_asset)
+if not match:
+    errors.append("physical inquiry recorded report is missing")
+else:
+    inquiry_report = json.loads(gzip.decompress(base64.b64decode(match.group(1))))
+    if not verify_report(inquiry_report)["valid"]:
+        errors.append("physical inquiry recorded report failed integrity or protocol checks")
+    for name, expected in inquiry_report["provenance"]["source_sha256"].items():
+        if hashlib.sha256((ROOT / "recursivecal_lab" / name).read_bytes()).hexdigest() != expected:
+            errors.append(f"physical inquiry recorded source drifted: {name}")
+for authored, bundled in (("cad_mesh.js", "inquiry-cad.js"), ("cad_renderer.js", "inquiry-renderer.js")):
+    if (ROOT / "mechanics/cad_v1/viewer" / authored).read_bytes() != (ROOT / "recursivecal_lab/web" / bundled).read_bytes():
+        errors.append(f"physical inquiry CAD asset drifted from authored source: {authored}")
 archive_files_checked = 0
 if args.archive:
     required = [ROOT / name for name in ("LICENSE", "README.md", "CITATION.cff", "CITATION.bib", "MANIFEST.in", "pyproject.toml")]

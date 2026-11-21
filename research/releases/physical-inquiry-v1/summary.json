@@ -1,0 +1,545 @@
+{
+  "hardware_validated": false,
+  "policy_runs": 27,
+  "results": [
+    {
+      "actions": [
+        "hold",
+        "high_sweep",
+        "low_sweep"
+      ],
+      "after_mean_rmse_deg": 0.9145331858988017,
+      "before_mean_rmse_deg": 0.9145331858988017,
+      "case": "nominal",
+      "cost": 4.5,
+      "directions_observed": [
+        "closing",
+        "opening"
+      ],
+      "model_mismatch": false,
+      "outcome": "verified_in_simulation",
+      "passed_profiles": 4,
+      "policy": "bayes",
+      "reason": "belief concentrated after both opening and closing observations",
+      "seed": 7,
+      "tests": 3
+    },
+    {
+      "actions": [
+        "high_sweep",
+        "low_sweep",
+        "mid_sweep"
+      ],
+      "after_mean_rmse_deg": 0.9145331858988017,
+      "before_mean_rmse_deg": 0.9145331858988017,
+      "case": "nominal",
+      "cost": 5.6,
+      "directions_observed": [
+        "closing",
+        "opening"
+      ],
+      "model_mismatch": false,
+      "outcome": "verified_in_simulation",
+      "passed_profiles": 4,
+      "policy": "fixed",
+      "reason": "declared fixed high-low-mid schedule",
+      "seed": 7,
+      "tests": 3
+    },
+    {
+      "actions": [],
+      "after_mean_rmse_deg": 0.9145331858988017,
+      "before_mean_rmse_deg": 0.9145331858988017,
+      "case": "nominal",
+      "cost": 0.0,
+      "directions_observed": [],
+      "model_mismatch": false,
+      "outcome": "abstained",
+      "passed_profiles": 4,
+      "policy": "no_probe",
+      "reason": "nominal controller baseline with no diagnostic calibration",
+      "seed": 7,
+      "tests": 0
+    },
+    {
+      "actions": [
+        "hold",
+        "high_sweep",
+        "low_sweep"
+      ],
+      "after_mean_rmse_deg": 0.914533185898802,
+      "before_mean_rmse_deg": 7.185372394487399,
+      "case": "weak_motor",
+      "cost": 4.5,
+      "directions_observed": [
+        "closing",
+        "opening"
+      ],
+      "model_mismatch": false,
+      "outcome": "verified_in_simulation",
+      "passed_profiles": 4,
+      "policy": "bayes",
+      "reason": "belief concentrated after both opening and closing observations",
+      "seed": 7,
+      "tests": 3
+    },
+    {
+      "actions": [
+        "high_sweep",
+        "low_sweep",
+        "mid_sweep"
+      ],
+      "after_mean_rmse_deg": 0.914533185898802,
+      "before_mean_rmse_deg": 7.185372394487399,
+      "case": "weak_motor",
+      "cost": 5.6,
+      "directions_observed": [
+        "closing",
+        "opening"
+      ],
+      "model_mismatch": false,
+      "outcome": "verified_in_simulation",
+      "passed_profiles": 4,
+      "policy": "fixed",
+      "reason": "declared fixed high-low-mid schedule",
+      "seed": 7,
+      "tests": 3
+    },
+    {
+      "actions": [],
+      "after_mean_rmse_deg": 7.185372394487399,
+      "before_mean_rmse_deg": 7.185372394487399,
+      "case": "weak_motor",
+      "cost": 0.0,
+      "directions_observed": [],
+      "model_mismatch": false,
+      "outcome": "abstained",
+      "passed_profiles": 0,
+      "policy": "no_probe",
+      "reason": "nominal controller baseline with no diagnostic calibration",
+      "seed": 7,
+      "tests": 0
+    },
+    {
+      "actions": [
+        "hold",
+        "high_sweep",
+        "low_sweep"
+      ],
+      "after_mean_rmse_deg": 1.0589371417069253,
+      "before_mean_rmse_deg": 5.862889384569809,
+      "case": "payload",
+      "cost": 4.5,
+      "directions_observed": [
+        "closing",
+        "opening"
+      ],
+      "model_mismatch": false,
+      "outcome": "verified_in_simulation",
+      "passed_profiles": 4,
+      "policy": "bayes",
+      "reason": "belief concentrated after both opening and closing observations",
+      "seed": 7,
+      "tests": 3
+    },
+    {
+      "actions": [
+        "high_sweep",
+        "low_sweep",
+        "mid_sweep"
+      ],
+      "after_mean_rmse_deg": 1.0589371417069253,
+      "before_mean_rmse_deg": 5.862889384569809,
+      "case": "payload",
+      "cost": 5.6,
+      "directions_observed": [
+        "closing",
+        "opening"
+      ],
+      "model_mismatch": false,
+      "outcome": "verified_in_simulation",
+      "passed_profiles": 4,
+      "policy": "fixed",
+      "reason": "declared fixed high-low-mid schedule",
+      "seed": 7,
+      "tests": 3
+    },
+    {
+      "actions": [],
+      "after_mean_rmse_deg": 5.862889384569809,
+      "before_mean_rmse_deg": 5.862889384569809,
+      "case": "payload",
+      "cost": 0.0,
+      "directions_observed": [],
+      "model_mismatch": false,
+      "outcome": "abstained",
+      "passed_profiles": 0,
+      "policy": "no_probe",
+      "reason": "nominal controller baseline with no diagnostic calibration",
+      "seed": 7,
+      "tests": 0
+    },
+    {
+      "actions": [
+        "hold",
+        "mid_sweep",
+        "low_sweep"
+      ],
+      "after_mean_rmse_deg": 0.8553133854067483,
+      "before_mean_rmse_deg": 3.0870965617321784,
+      "case": "friction",
+      "cost": 3.9,
+      "directions_observed": [
+        "closing",
+        "opening"
+      ],
+      "model_mismatch": false,
+      "outcome": "verified_in_simulation",
+      "passed_profiles": 4,
+      "policy": "bayes",
+      "reason": "belief concentrated after both opening and closing observations",
+      "seed": 7,
+      "tests": 3
+    },
+    {
+      "actions": [
+        "high_sweep",
+        "low_sweep",
+        "mid_sweep"
+      ],
+      "after_mean_rmse_deg": 0.8553133854067483,
+      "before_mean_rmse_deg": 3.0870965617321784,
+      "case": "friction",
+      "cost": 5.6,
+      "directions_observed": [
+        "closing",
+        "opening"
+      ],
+      "model_mismatch": false,
+      "outcome": "verified_in_simulation",
+      "passed_profiles": 4,
+      "policy": "fixed",
+      "reason": "declared fixed high-low-mid schedule",
+      "seed": 7,
+      "tests": 3
+    },
+    {
+      "actions": [],
+      "after_mean_rmse_deg": 3.0870965617321784,
+      "before_mean_rmse_deg": 3.0870965617321784,
+      "case": "friction",
+      "cost": 0.0,
+      "directions_observed": [],
+      "model_mismatch": false,
+      "outcome": "abstained",
+      "passed_profiles": 0,
+      "policy": "no_probe",
+      "reason": "nominal controller baseline with no diagnostic calibration",
+      "seed": 7,
+      "tests": 0
+    },
+    {
+      "actions": [
+        "hold",
+        "high_sweep",
+        "low_sweep"
+      ],
+      "after_mean_rmse_deg": 0.8766805453245593,
+      "before_mean_rmse_deg": 3.7154068763526347,
+      "case": "gas_loss",
+      "cost": 4.5,
+      "directions_observed": [
+        "closing",
+        "opening"
+      ],
+      "model_mismatch": false,
+      "outcome": "verified_in_simulation",
+      "passed_profiles": 4,
+      "policy": "bayes",
+      "reason": "belief concentrated after both opening and closing observations",
+      "seed": 7,
+      "tests": 3
+    },
+    {
+      "actions": [
+        "high_sweep",
+        "low_sweep",
+        "mid_sweep"
+      ],
+      "after_mean_rmse_deg": 0.8766805453245593,
+      "before_mean_rmse_deg": 3.7154068763526347,
+      "case": "gas_loss",
+      "cost": 5.6,
+      "directions_observed": [
+        "closing",
+        "opening"
+      ],
+      "model_mismatch": false,
+      "outcome": "verified_in_simulation",
+      "passed_profiles": 4,
+      "policy": "fixed",
+      "reason": "declared fixed high-low-mid schedule",
+      "seed": 7,
+      "tests": 3
+    },
+    {
+      "actions": [],
+      "after_mean_rmse_deg": 3.7154068763526347,
+      "before_mean_rmse_deg": 3.7154068763526347,
+      "case": "gas_loss",
+      "cost": 0.0,
+      "directions_observed": [],
+      "model_mismatch": false,
+      "outcome": "abstained",
+      "passed_profiles": 0,
+      "policy": "no_probe",
+      "reason": "nominal controller baseline with no diagnostic calibration",
+      "seed": 7,
+      "tests": 0
+    },
+    {
+      "actions": [
+        "hold",
+        "high_sweep",
+        "low_sweep"
+      ],
+      "after_mean_rmse_deg": 0.9145331858988017,
+      "before_mean_rmse_deg": 0.9200529637626665,
+      "case": "sensor_bias",
+      "cost": 4.5,
+      "directions_observed": [
+        "closing",
+        "opening"
+      ],
+      "model_mismatch": false,
+      "outcome": "verified_in_simulation",
+      "passed_profiles": 4,
+      "policy": "bayes",
+      "reason": "belief concentrated after both opening and closing observations",
+      "seed": 7,
+      "tests": 3
+    },
+    {
+      "actions": [
+        "high_sweep",
+        "low_sweep",
+        "mid_sweep"
+      ],
+      "after_mean_rmse_deg": 0.9145331858988017,
+      "before_mean_rmse_deg": 0.9200529637626665,
+      "case": "sensor_bias",
+      "cost": 5.6,
+      "directions_observed": [
+        "closing",
+        "opening"
+      ],
+      "model_mismatch": false,
+      "outcome": "verified_in_simulation",
+      "passed_profiles": 4,
+      "policy": "fixed",
+      "reason": "declared fixed high-low-mid schedule",
+      "seed": 7,
+      "tests": 3
+    },
+    {
+      "actions": [],
+      "after_mean_rmse_deg": 0.9200529637626665,
+      "before_mean_rmse_deg": 0.9200529637626665,
+      "case": "sensor_bias",
+      "cost": 0.0,
+      "directions_observed": [],
+      "model_mismatch": false,
+      "outcome": "abstained",
+      "passed_profiles": 4,
+      "policy": "no_probe",
+      "reason": "nominal controller baseline with no diagnostic calibration",
+      "seed": 7,
+      "tests": 0
+    },
+    {
+      "actions": [
+        "hold",
+        "high_sweep",
+        "low_sweep"
+      ],
+      "after_mean_rmse_deg": 1.2288254273821624,
+      "before_mean_rmse_deg": 14.145214952233598,
+      "case": "compound",
+      "cost": 4.5,
+      "directions_observed": [
+        "closing",
+        "opening"
+      ],
+      "model_mismatch": false,
+      "outcome": "verification_failed",
+      "passed_profiles": 3,
+      "policy": "bayes",
+      "reason": "belief concentrated after both opening and closing observations",
+      "seed": 7,
+      "tests": 3
+    },
+    {
+      "actions": [
+        "high_sweep",
+        "low_sweep",
+        "mid_sweep"
+      ],
+      "after_mean_rmse_deg": 1.2288254273821624,
+      "before_mean_rmse_deg": 14.145214952233598,
+      "case": "compound",
+      "cost": 5.6,
+      "directions_observed": [
+        "closing",
+        "opening"
+      ],
+      "model_mismatch": false,
+      "outcome": "verification_failed",
+      "passed_profiles": 3,
+      "policy": "fixed",
+      "reason": "declared fixed high-low-mid schedule",
+      "seed": 7,
+      "tests": 3
+    },
+    {
+      "actions": [],
+      "after_mean_rmse_deg": 14.145214952233598,
+      "before_mean_rmse_deg": 14.145214952233598,
+      "case": "compound",
+      "cost": 0.0,
+      "directions_observed": [],
+      "model_mismatch": false,
+      "outcome": "abstained",
+      "passed_profiles": 0,
+      "policy": "no_probe",
+      "reason": "nominal controller baseline with no diagnostic calibration",
+      "seed": 7,
+      "tests": 0
+    },
+    {
+      "actions": [
+        "hold",
+        "high_sweep",
+        "low_sweep",
+        "reference"
+      ],
+      "after_mean_rmse_deg": 4.252719404557347,
+      "before_mean_rmse_deg": 4.252719404557347,
+      "case": "directional_friction",
+      "cost": 6.0,
+      "directions_observed": [
+        "closing",
+        "opening"
+      ],
+      "model_mismatch": true,
+      "outcome": "abstained",
+      "passed_profiles": 2,
+      "policy": "bayes",
+      "reason": "model mismatch: no declared hypothesis explains the measurements",
+      "seed": 7,
+      "tests": 4
+    },
+    {
+      "actions": [
+        "high_sweep",
+        "low_sweep",
+        "mid_sweep"
+      ],
+      "after_mean_rmse_deg": 4.252719404557347,
+      "before_mean_rmse_deg": 4.252719404557347,
+      "case": "directional_friction",
+      "cost": 5.6,
+      "directions_observed": [
+        "closing",
+        "opening"
+      ],
+      "model_mismatch": true,
+      "outcome": "abstained",
+      "passed_profiles": 2,
+      "policy": "fixed",
+      "reason": "model mismatch: no declared hypothesis explains the measurements",
+      "seed": 7,
+      "tests": 3
+    },
+    {
+      "actions": [],
+      "after_mean_rmse_deg": 4.252719404557347,
+      "before_mean_rmse_deg": 4.252719404557347,
+      "case": "directional_friction",
+      "cost": 0.0,
+      "directions_observed": [],
+      "model_mismatch": false,
+      "outcome": "abstained",
+      "passed_profiles": 2,
+      "policy": "no_probe",
+      "reason": "nominal controller baseline with no diagnostic calibration",
+      "seed": 7,
+      "tests": 0
+    },
+    {
+      "actions": [
+        "hold",
+        "reference"
+      ],
+      "after_mean_rmse_deg": 18.43527224135045,
+      "before_mean_rmse_deg": 18.43527224135045,
+      "case": "overload",
+      "cost": 2.2,
+      "directions_observed": [],
+      "model_mismatch": true,
+      "outcome": "abstained",
+      "passed_profiles": 0,
+      "policy": "bayes",
+      "reason": "model mismatch: no declared hypothesis explains the measurements",
+      "seed": 7,
+      "tests": 2
+    },
+    {
+      "actions": [
+        "high_sweep",
+        "low_sweep",
+        "mid_sweep"
+      ],
+      "after_mean_rmse_deg": 18.43527224135045,
+      "before_mean_rmse_deg": 18.43527224135045,
+      "case": "overload",
+      "cost": 5.6,
+      "directions_observed": [
+        "closing",
+        "opening"
+      ],
+      "model_mismatch": true,
+      "outcome": "abstained",
+      "passed_profiles": 0,
+      "policy": "fixed",
+      "reason": "model mismatch: no declared hypothesis explains the measurements",
+      "seed": 7,
+      "tests": 3
+    },
+    {
+      "actions": [],
+      "after_mean_rmse_deg": 18.43527224135045,
+      "before_mean_rmse_deg": 18.43527224135045,
+      "case": "overload",
+      "cost": 0.0,
+      "directions_observed": [],
+      "model_mismatch": false,
+      "outcome": "abstained",
+      "passed_profiles": 0,
+      "policy": "no_probe",
+      "reason": "nominal controller baseline with no diagnostic calibration",
+      "seed": 7,
+      "tests": 0
+    }
+  ],
+  "schema_version": "recursivecal.physical-fixture-audit/1",
+  "scope": "Synthetic development fixture suite. No population inference, preregistration or RL advantage claim.",
+  "seed": 7,
+  "source_sha256": {
+    "inquiry.py": "05be82e64f5b75fc95749fb63f7478b321b702b48ce0a7bba93548e36d9fa09e",
+    "physical_rig.py": "6cad9dfbfd1b40873934ade184ac349c78a61871b67d5b781f6fe18977808381",
+    "physics.py": "f3a459018a8c9567c89ec8b3d5dc014783a16844e8d2f2a137531774e8553a6c"
+  },
+  "summary_sha256": "667a122c18e1cf44530ee1edbb8f8e3be339ada39c8fd3d68cdc506a57f93151",
+  "unique_physical_conditions": 9,
+  "wall_seconds": 80.954
+}

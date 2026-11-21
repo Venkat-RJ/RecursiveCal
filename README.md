@@ -2,14 +2,16 @@
 
 # RecursiveCal
 
-**Open source tools for diagnostic experiment selection, calibration research, and software-in-the-loop testing.**
+**Can an agent learn to investigate a physical system?**
 
 [![Product checks](https://github.com/Venkat-RJ/RecursiveCal/actions/workflows/product.yml/badge.svg)](https://github.com/Venkat-RJ/RecursiveCal/actions/workflows/product.yml)
 [![Legacy benchmark checks](https://github.com/Venkat-RJ/RecursiveCal/actions/workflows/verify.yml/badge.svg)](https://github.com/Venkat-RJ/RecursiveCal/actions/workflows/verify.yml)
 [![Research numerical audit](https://github.com/Venkat-RJ/RecursiveCal/actions/workflows/research-audit.yml/badge.svg)](https://github.com/Venkat-RJ/RecursiveCal/actions/workflows/research-audit.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-RecursiveCal asks a concrete question: **which diagnostic test should we run next, and when is another test no longer worth its cost?** Version 0.3 provides an installable local workbench, a reproducible diagnostic experiment, and an executable path from CSV measurements to model fitting and trajectory comparison.
+RecursiveCal connects a physical simulator to an investigator that chooses experiments, observes the response, updates its belief and commits a calibration. An independent verifier then tests that commitment on new motion profiles. The core is a dimensioned, persistent liftgate rig with CAD replay, instrument observations, bounded tests and an auditable Bayesian baseline.
+
+The [physical inquiry foundation](docs/PHYSICAL_INQUIRY.md) is the main development path. The earlier normalized benchmark, learned-policy pilots, v0.3 release evidence and manuscript remain reproducible research records. The connected physical investigator currently uses Bayesian inference, not a learned RL policy.
 
 [Open recorded workbench](https://venkat-rj.github.io/recursivecal-lab/) · [User guide](docs/USER_GUIDE.md) · [Experiment protocol](docs/EXPERIMENT_PROTOCOL.md) · [Paper draft](paper/README.md) · [Citation](#citation) · [Legacy 3D CAD explorer](https://venkat-rj.github.io/recursivecal/)
 
@@ -31,10 +33,21 @@ recursivecal serve
 
 Open `http://127.0.0.1:8765`. The server runs in the current terminal; Ctrl+C stops it. NumPy is the only required third-party runtime dependency. The new suite needs no GPU, API key, paid service, or CAD installation.
 
+For the complete physical investigation, open **`http://127.0.0.1:8765/inquiry.html`**, or run:
+
+```bash
+recursivecal inquire --case weak_motor --seed 7 --output runs/physical-inquiry.json
+recursivecal verify-inquiry runs/physical-inquiry.json
+```
+
+The workbench shows the actual diagnostic sequence, belief updates, a sealed calibration, before/after CAD motion and four independent motion checks. A correct diagnosis can still produce a rejected calibration. A model mismatch can trigger a fixture check and abstention. Full reports retain sensor readings, source hashes and evaluator-only truth.
+
 ## What you can use now
 
 | Capability | Implemented behavior |
 | --- | --- |
+| Physical inquiry | Persistent SI plant, observation-only session, adaptive Bayesian tests, fixed/no-probe comparisons, calibration commitment and independent verification |
+| CAD investigation view | Authored assembly driven by actual saved traces, decision journal, parameter belief, limits, report import/export and explicit recorded mode |
 | SI liftgate simulation | Explicit geometry, gravity, force lag, gas assistance, friction and stiction, stops, sensor assumptions, power loss, and holding architecture |
 | Workbench | Configure and run the model, inspect signals, replay time, pin comparisons, import results, export complete JSON and CSV |
 | Force fitting | Read SI CSVs with provenance, fit training rows, report held-out residuals, apply a curve only within its measured-length support |
@@ -43,7 +56,7 @@ Open `http://127.0.0.1:8765`. The server runs in the current terminal; Ctrl+C st
 | Reproducibility | Raw trial records, observations, frozen selection, checkpoints, source hashes, and an artifact verifier |
 | Research handoff | Numerical audit, explicit negative results, manuscript source, generated figures, citation file, and measurement protocol |
 
-The SI liftgate model and normalized diagnostic benchmark have separate identifiers. A policy trained in the normalized benchmark is not presented as a learned liftgate controller. Default physical coefficients and bundled example data are synthetic. **Independent hardware accuracy and safe real-world operation have not been established.**
+The connected physical rig, original SI model and normalized diagnostic benchmark have separate identifiers. A policy trained in the normalized benchmark is not presented as a learned liftgate controller. Default physical coefficients and bundled example data are synthetic. **Independent hardware accuracy and safe real-world operation have not been established.**
 
 ## Run the workflows
 
@@ -149,7 +162,7 @@ If you use RecursiveCal in your research or build on the code, please cite it:
 @software{Jambula_RecursiveCal_2026,
   author = {Jambula, Venkateshwar Reddy},
   title = {{RecursiveCal: Reproducible Active Calibration and a Software-in-the-Loop Workbench}},
-  version = {0.3.0},
+  version = {0.4.0},
   year = {2026},
   month = nov,
   url = {https://github.com/Venkat-RJ/RecursiveCal},

@@ -44,6 +44,14 @@ def _allowed(payload: dict[str, Any], keys: set[str]) -> None:
 
 def dispatch(path: str, payload: Any) -> dict[str, Any]:
     body = _object(payload, "request")
+    if path == "/api/inquiry":
+        from .inquiry import run_study
+        _allowed(body, {"case", "seed", "policy", "max_tests", "budget"})
+        return run_study(**body)
+    if path == "/api/verify-inquiry":
+        from .inquiry import verify_report
+        _allowed(body, {"report"})
+        return verify_report(body.get("report"))
     if path == "/api/simulate":
         _allowed(body, {"parameters", "duration_s", "dt_s", "seed", "scenario", "controller",
                         "initial_angle_rad", "initial_velocity_rad_s", "abort_on_limit", "controller_parameters", "parameter_provenance"})

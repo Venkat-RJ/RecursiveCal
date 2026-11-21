@@ -24,6 +24,8 @@ The SI model and normalized benchmark do not exchange physics or trained motor p
 | Module | Responsibility |
 | --- | --- |
 | `physics.py` | Validated physical parameters, geometry, force balance, integration, scenarios, traces, and events |
+| `physical_rig.py` | Persistent dimensioned plant, instrument model, bounded motions and a separate estimated-parameter controller |
+| `inquiry.py` | Observation-only session, Bayesian investigation, sealed calibration, independent verification and report checks |
 | `measurements.py` | CSV contracts, source metadata, force fit, bounded application, and trajectory residuals |
 | `experiments.py` | Frozen normalized dynamics, observed-feature policies, data partitions, evaluation, and evidence verification |
 | `api.py` | JSON operation validation and temporary CSV ingestion |
@@ -40,6 +42,9 @@ All operation requests use `Content-Type: application/json`. The API serves the 
 | --- | --- | --- |
 | `GET /api/health` | None | Version, service status, hardware disconnected |
 | `GET /api/capabilities` | None | Model defaults, parameter schema, scenarios, computation bounds, passive support calculation |
+| `GET /api/inquiry/capabilities` | None | Connected physical protocol, cases, actions, budgets and acceptance limits |
+| `POST /api/inquiry` | Optional `case`, `policy`, `seed`, `max_tests`, `budget` | Complete sealed `recursivecal.physical-inquiry/1` report |
+| `POST /api/verify-inquiry` | `report` | Integrity, trace metric and protocol checks |
 | `POST /api/simulate` | Parameters, controller parameters, provenance, scenario, duration, step, seed, initial state, limit behavior | `recursivecal.run/1` |
 | `POST /api/fit-force` | `csv_text`, `metadata` | `recursivecal.force-fit/1` |
 | `POST /api/apply-force-fit` | `fit`, optional `parameters` | `recursivecal.parameter-set/1` |
@@ -53,5 +58,5 @@ An eventful simulation still returns HTTP 200 because its trace is a valid resul
 
 Changes to equations or reward definitions require a new model identifier and separately generated evidence. A measurement backend can supply files satisfying the data contract without modifying the simulator. Actual hardware integration would need a separately reviewed driver and independent physical safety system; this release contains neither a dummy driver presented as functional hardware nor an automatic actuation path.
 
-The server never spawns training or long-running background jobs. Experiments run in the terminal. The workbench reads their completed summary artifacts. This keeps compute, model version, and outputs inspectable.
+The server never spawns training or detached jobs. A physical inquiry API request runs synchronously with bounded tests; the terminal CLI reports its actual steps. Normalized research experiments run in the terminal and their completed artifacts can be imported. See the [physical inquiry contract](PHYSICAL_INQUIRY.md) for the connected plant, observation boundary and verifier.
 
