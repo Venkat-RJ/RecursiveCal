@@ -1,0 +1,388 @@
+{
+  "schema_version": "recursivecal.physical-audit/1",
+  "model_id": "recursivecal.si-liftgate/1",
+  "provenance": {
+    "all_experiments_synthetic": true,
+    "hardware_validated": false,
+    "python": "3.12.14",
+    "model_source_sha256": "f3a459018a8c9567c89ec8b3d5dc014783a16844e8d2f2a137531774e8553a6c",
+    "measurement_source_sha256": "a44a5528e15f3a98cd7817860b1117f0a8739afd888694da3e3eb22ed543e193",
+    "audit_source_sha256": "53fab0ec4bec4b56e5ed8062e8085657d72f4829ea90f4040b84912c2ada8d74"
+  },
+  "numerical_verification": {
+    "geometry_derivative_max_absolute_residual_m": 4.896116845287679e-11,
+    "constant_force_work_analytic_J": 62.05728128183916,
+    "constant_force_work_quadrature_J": 62.05728196785207,
+    "constant_force_work_residual_J": 6.860129104779844e-07,
+    "trajectory_refinement": [
+      {
+        "dt_s": 0.02,
+        "completed_time_s": 2.553,
+        "final_angle_rad": 0.7334100948247242,
+        "tracking_rmse_deg": 1.3187412839172161,
+        "final_angle_difference_from_finest_rad": 0.003094005992739013
+      },
+      {
+        "dt_s": 0.01,
+        "completed_time_s": 2.553,
+        "final_angle_rad": 0.7351579051436146,
+        "tracking_rmse_deg": 1.282328164930682,
+        "final_angle_difference_from_finest_rad": 0.001346195673848638
+      },
+      {
+        "dt_s": 0.005,
+        "completed_time_s": 2.553,
+        "final_angle_rad": 0.7360519156229334,
+        "tracking_rmse_deg": 1.2629321889261942,
+        "final_angle_difference_from_finest_rad": 0.0004521851945298305
+      },
+      {
+        "dt_s": 0.0025,
+        "completed_time_s": 2.553,
+        "final_angle_rad": 0.7365041008174632,
+        "tracking_rmse_deg": 1.2531660079233518,
+        "final_angle_difference_from_finest_rad": 0.0
+      }
+    ],
+    "conservative_energy_refinement": [
+      {
+        "dt_s": 0.02,
+        "duration_s": 0.2,
+        "mechanical_energy_drift_J": 0.013779067611764617,
+        "contact_events": 0
+      },
+      {
+        "dt_s": 0.01,
+        "duration_s": 0.2,
+        "mechanical_energy_drift_J": 0.0034437034990304483,
+        "contact_events": 0
+      },
+      {
+        "dt_s": 0.005,
+        "duration_s": 0.2,
+        "mechanical_energy_drift_J": 0.0008608592729046904,
+        "contact_events": 0
+      },
+      {
+        "dt_s": 0.0025,
+        "duration_s": 0.2,
+        "mechanical_energy_drift_J": 0.00021521065345098123,
+        "contact_events": 0
+      }
+    ],
+    "dissipative_case": {
+      "initial_energy_J": -78.43498395275115,
+      "final_energy_J": -80.31889774772536,
+      "energy_change_J": -1.8839137949742053
+    }
+  },
+  "scenarios": {
+    "open": {
+      "metrics": {
+        "tracking_rmse_deg": 1.0715695703134867,
+        "final_angle_deg": 77.55701898943882,
+        "final_tracking_error_deg": 0.44298101056117595,
+        "peak_speed_rad_s": 0.5245294020563026,
+        "peak_motor_force_N_each": 188.75422782353456,
+        "mechanical_work_abs_J": 54.770063309171654,
+        "mechanical_work_signed_J": -4.665951194993151,
+        "force_saturation_fraction": 0.0,
+        "completed_duration_s": 6.5,
+        "termination": "completed",
+        "passive_hold": {
+          "angle_deg": 78.0,
+          "lever_m": 0.20864947019688138,
+          "gas_opening_torque_Nm": 68.85432516497086,
+          "gravity_closing_torque_Nm": 134.60330649029012,
+          "closing_torque_deficit_Nm": 65.74898132531926,
+          "static_friction_and_brake_capacity_Nm": 8.0,
+          "holding_margin_Nm": -57.748981325319264,
+          "gas_alone_holds_open": false,
+          "can_hold_open_without_motor": false,
+          "additional_holding_torque_required_Nm": 57.748981325319264,
+          "gas_force_for_gravity_balance_N_each": 322.55846699078273,
+          "scope": "Synthetic static calculation at the upper stop; not a hardware safety certification."
+        },
+        "event_count": 0
+      },
+      "events": []
+    },
+    "close": {
+      "metrics": {
+        "tracking_rmse_deg": 0.9352767701835111,
+        "final_angle_deg": 0.4779658208025458,
+        "final_tracking_error_deg": -0.4779658208025458,
+        "peak_speed_rad_s": 0.5227579453606551,
+        "peak_motor_force_N_each": 177.85420589813944,
+        "mechanical_work_abs_J": 57.37744443338068,
+        "mechanical_work_signed_J": 26.055301542377872,
+        "force_saturation_fraction": 0.0,
+        "completed_duration_s": 6.5,
+        "termination": "completed",
+        "passive_hold": {
+          "angle_deg": 78.0,
+          "lever_m": 0.20864947019688138,
+          "gas_opening_torque_Nm": 68.85432516497086,
+          "gravity_closing_torque_Nm": 134.60330649029012,
+          "closing_torque_deficit_Nm": 65.74898132531926,
+          "static_friction_and_brake_capacity_Nm": 8.0,
+          "holding_margin_Nm": -57.748981325319264,
+          "gas_alone_holds_open": false,
+          "can_hold_open_without_motor": false,
+          "additional_holding_torque_required_Nm": 57.748981325319264,
+          "gas_force_for_gravity_balance_N_each": 322.55846699078273,
+          "scope": "Synthetic static calculation at the upper stop; not a hardware safety certification."
+        },
+        "event_count": 0
+      },
+      "events": []
+    },
+    "passive_hold": {
+      "metrics": {
+        "tracking_rmse_deg": 4.166784534173771,
+        "final_angle_deg": 68.42865566142935,
+        "final_tracking_error_deg": 9.571344338570643,
+        "peak_speed_rad_s": 1.1605692535676844,
+        "peak_motor_force_N_each": 0.0,
+        "mechanical_work_abs_J": 0.0,
+        "mechanical_work_signed_J": 0.0,
+        "force_saturation_fraction": 0.0,
+        "completed_duration_s": 0.2700000000000001,
+        "termination": "aborted_speed_limit",
+        "passive_hold": {
+          "angle_deg": 78.0,
+          "lever_m": 0.20864947019688138,
+          "gas_opening_torque_Nm": 68.85432516497086,
+          "gravity_closing_torque_Nm": 134.60330649029012,
+          "closing_torque_deficit_Nm": 65.74898132531926,
+          "static_friction_and_brake_capacity_Nm": 8.0,
+          "holding_margin_Nm": -57.748981325319264,
+          "gas_alone_holds_open": false,
+          "can_hold_open_without_motor": false,
+          "additional_holding_torque_required_Nm": 57.748981325319264,
+          "gas_force_for_gravity_balance_N_each": 322.55846699078273,
+          "scope": "Synthetic static calculation at the upper stop; not a hardware safety certification."
+        },
+        "event_count": 1
+      },
+      "events": [
+        {
+          "time_s": 0.2700000000000001,
+          "type": "speed_limit",
+          "details": {
+            "actual_rad_s": 1.1605692535676844,
+            "limit_rad_s": 1.15
+          }
+        }
+      ]
+    },
+    "power_loss": {
+      "metrics": {
+        "tracking_rmse_deg": 1.6888556255136193,
+        "final_angle_deg": 66.8797650576205,
+        "final_tracking_error_deg": 11.12023494237949,
+        "peak_speed_rad_s": 1.172075703424839,
+        "peak_motor_force_N_each": 188.75422782353456,
+        "mechanical_work_abs_J": 55.265330388588104,
+        "mechanical_work_signed_J": -5.1612182744095945,
+        "force_saturation_fraction": 0.0,
+        "completed_duration_s": 5.149999999999992,
+        "termination": "aborted_speed_limit",
+        "passive_hold": {
+          "angle_deg": 78.0,
+          "lever_m": 0.20864947019688138,
+          "gas_opening_torque_Nm": 68.85432516497086,
+          "gravity_closing_torque_Nm": 134.60330649029012,
+          "closing_torque_deficit_Nm": 65.74898132531926,
+          "static_friction_and_brake_capacity_Nm": 8.0,
+          "holding_margin_Nm": -57.748981325319264,
+          "gas_alone_holds_open": false,
+          "can_hold_open_without_motor": false,
+          "additional_holding_torque_required_Nm": 57.748981325319264,
+          "gas_force_for_gravity_balance_N_each": 322.55846699078273,
+          "scope": "Synthetic static calculation at the upper stop; not a hardware safety certification."
+        },
+        "event_count": 2
+      },
+      "events": [
+        {
+          "time_s": 4.8,
+          "type": "power_loss",
+          "details": "Motor demand disabled; residual force decays with actuator lag."
+        },
+        {
+          "time_s": 5.149999999999992,
+          "type": "speed_limit",
+          "details": {
+            "actual_rad_s": 1.172075703424839,
+            "limit_rad_s": 1.15
+          }
+        }
+      ]
+    }
+  },
+  "explicit_70Nm_brake_passive_hold": {
+    "metrics": {
+      "tracking_rmse_deg": 0.0,
+      "final_angle_deg": 78.0,
+      "final_tracking_error_deg": 0.0,
+      "peak_speed_rad_s": 0.0,
+      "peak_motor_force_N_each": 0.0,
+      "mechanical_work_abs_J": 0.0,
+      "mechanical_work_signed_J": 0.0,
+      "force_saturation_fraction": 0.0,
+      "completed_duration_s": 6.5,
+      "termination": "completed",
+      "passive_hold": {
+        "angle_deg": 78.0,
+        "lever_m": 0.20864947019688138,
+        "gas_opening_torque_Nm": 68.85432516497086,
+        "gravity_closing_torque_Nm": 134.60330649029012,
+        "closing_torque_deficit_Nm": 65.74898132531926,
+        "static_friction_and_brake_capacity_Nm": 78.0,
+        "holding_margin_Nm": 12.251018674680736,
+        "gas_alone_holds_open": false,
+        "can_hold_open_without_motor": true,
+        "additional_holding_torque_required_Nm": 0.0,
+        "gas_force_for_gravity_balance_N_each": 322.55846699078273,
+        "scope": "Synthetic static calculation at the upper stop; not a hardware safety certification."
+      },
+      "event_count": 0
+    },
+    "events": []
+  },
+  "data_path": {
+    "force_validation": {
+      "n": 7,
+      "rmse": 1.1236778814931974,
+      "mae": 0.8513060929547009,
+      "bias": 0.11108368222210986,
+      "max_abs": 2.3526731166532784,
+      "p95_abs": 2.3526731166532784
+    },
+    "trajectory_comparison": {
+      "angle_rad": {
+        "n": 131,
+        "rmse": 0.0013016555647063673,
+        "mae": 0.0012106748068086532,
+        "bias": -0.0012073243362529056,
+        "max_abs": 0.0021553253565274044,
+        "p95_abs": 0.0020147318505272516
+      }
+    },
+    "data_kind": "synthetic examples from the same simulator; not independent validation"
+  },
+  "gates": [
+    {
+      "name": "geometry_derivative",
+      "passed": true,
+      "observed": 4.896116845287679e-11,
+      "criterion": "maximum finite-difference residual <= 1e-8 m"
+    },
+    {
+      "name": "constant_force_virtual_work",
+      "passed": true,
+      "observed": 6.860129104779844e-07,
+      "criterion": "absolute quadrature/analytic work difference <= 1e-5 J"
+    },
+    {
+      "name": "exact_final_duration",
+      "passed": true,
+      "observed": [
+        2.553,
+        2.553,
+        2.553,
+        2.553
+      ],
+      "criterion": "each refinement run reports exactly 2.553 s"
+    },
+    {
+      "name": "trajectory_refinement",
+      "passed": true,
+      "observed": [
+        0.003094005992739013,
+        0.001346195673848638,
+        0.0004521851945298305,
+        0.0
+      ],
+      "criterion": "20 ms endpoint difference from 2.5 ms <0.004 rad and decreases at each refinement"
+    },
+    {
+      "name": "conservative_energy_refinement",
+      "passed": true,
+      "observed": [
+        0.013779067611764617,
+        0.0034437034990304483,
+        0.0008608592729046904,
+        0.00021521065345098123
+      ],
+      "criterion": "contact-free absolute energy drift falls by >3x at each halving; finest <0.001 J"
+    },
+    {
+      "name": "dissipation",
+      "passed": true,
+      "observed": -1.8839137949742053,
+      "criterion": "mechanical energy decreases in the unpowered dissipative case"
+    },
+    {
+      "name": "powered_scenarios_complete",
+      "passed": true,
+      "observed": {
+        "open": {
+          "termination": "completed",
+          "duration_s": 6.5
+        },
+        "close": {
+          "termination": "completed",
+          "duration_s": 6.5
+        }
+      },
+      "criterion": "both nominal powered scenarios complete 6.5 s"
+    },
+    {
+      "name": "known_passive_hold_failure_preserved",
+      "passed": true,
+      "observed": {
+        "termination": "aborted_speed_limit",
+        "static_hold": false
+      },
+      "criterion": "the assumed default architecture fails static hold and the falling run triggers a speed abort"
+    },
+    {
+      "name": "explicit_brake_holds",
+      "passed": true,
+      "observed": {
+        "termination": "completed",
+        "peak_speed_rad_s": 0.0,
+        "final_angle_deg": 78.0
+      },
+      "criterion": "explicit 70 Nm brake maintains 78 degrees without motion for 6.5 s"
+    },
+    {
+      "name": "power_loss_boundary_and_failure",
+      "passed": true,
+      "observed": {
+        "event_times_s": [
+          4.8
+        ],
+        "termination": "aborted_speed_limit"
+      },
+      "criterion": "power loss is recorded exactly at 4.8 s and the unsupported hatch triggers a speed abort"
+    },
+    {
+      "name": "synthetic_force_import_regression",
+      "passed": true,
+      "observed": 1.1236778814931974,
+      "criterion": "bundled synthetic force validation RMSE <3 N; a software example tolerance"
+    },
+    {
+      "name": "synthetic_trajectory_import_regression",
+      "passed": true,
+      "observed": 0.0013016555647063673,
+      "criterion": "bundled synthetic trajectory RMSE <0.005 rad; a software example tolerance"
+    }
+  ],
+  "software_checks_passed": true,
+  "gate_scope": "Explicit regression tolerances for these synthetic examples, selected during software development. Not empirical accuracy limits or independently preregistered criteria.",
+  "interpretation": "Software numerical/regression gates passed, including preservation of the default passive-hold failure. This is not a physical-accuracy or hardware-safety pass."
+}

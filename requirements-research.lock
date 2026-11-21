@@ -1,0 +1,5 @@
+# Exact numerical/figure environment for the v0.3 recorded run, Python 3.12.
+# Runtime support is broader; CI covers NumPy 1.24.4 and 2.3.5.
+numpy==2.3.5
+matplotlib==3.10.8
+

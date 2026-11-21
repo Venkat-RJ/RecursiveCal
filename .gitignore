@@ -11,3 +11,11 @@ budget_3to4.json
 budget_selection.json
 # PUBLIC_RESULTS.json is a committed, recomputable aggregate; raw local traces are omitted.
 !PUBLIC_RESULTS.json
+artifacts/
+runs/
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.toc
+paper/*.bbl
+paper/*.blg

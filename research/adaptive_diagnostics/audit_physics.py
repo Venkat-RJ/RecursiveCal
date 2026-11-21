@@ -16,7 +16,7 @@ from pathlib import Path
 import numpy as np
 import recursivecal as rc
 try:
-    import cad_simulation_physics_v2 as cad
+    from mechanics.cad_v1.simulation import physics_v2 as cad
 except ModuleNotFoundError:
     import sys
     sys.path.insert(0, str(_PROJECT_ROOT / "mechanics" / "cad_v1" / "simulation"))
@@ -99,7 +99,10 @@ def cad_precision():
     motor_force=100.0
     work_via_length=2*motor_force*(cad.geometry(cad.MAX_Q)['length_m']-cad.geometry(0)['length_m'])
     levers=np.array([cad.geometry(q)['lever_m'] for q in np.linspace(0,cad.MAX_Q,20001)])
-    integral=float(np.trapezoid(2*motor_force*levers,np.linspace(0,cad.MAX_Q,20001)))
+    # NumPy 1.24 is supported. np.trapezoid was introduced in NumPy 2.0.
+    coordinates=np.linspace(0,cad.MAX_Q,20001)
+    values=2*motor_force*levers
+    integral=float(np.sum(.5*(values[1:]+values[:-1])*np.diff(coordinates)))
     return {'lever_derivative_max_abs_m_per_rad':max(errs),
             'constant_strut_work_via_stroke_J':work_via_length,
             'constant_strut_work_via_torque_J':integral,
@@ -108,7 +111,7 @@ def cad_precision():
             'mechanics_scope':'single rigid hinge and synthetic force assumptions, no hardware validation'}
 
 def run():
-    return {'source':'GitHub RecursiveCal main, core equations reproduced locally; CAD physics extracted from prior generated source zip',
+    return {'source':'Imported frozen RecursiveCal core and CAD simulation files from this repository checkout',
             'linear_time_step':linear_energetics(),
             'observability':rank_identifiability(),
             'mirror_symmetry':mirrored_probes(),

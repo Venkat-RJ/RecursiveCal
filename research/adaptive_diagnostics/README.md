@@ -1,10 +1,19 @@
-# RecursiveCal | Independent physical-model and adaptive-RL audit
+# RecursiveCal | Historical physical-model and adaptive-policy audit
 
 **21 November 2026. Exploratory synthetic research. All experiments executed in the assistant's CPU environment. No user Mac, no paid GPU, no vehicle hardware, and no OEM calibration data.**
 
+This is the historical pilot report. Its result JSONs are retained unchanged.
+For the installed experiment runner, saved checkpoints, raw paired episodes,
+structural-shift evaluation, and artifact verification, see the
+[v0.3 experiment protocol](../../docs/EXPERIMENT_PROTOCOL.md).
+The original JSON `source` string incorrectly called the mixture preregistered.
+That wording is corrected in the source code and this report; it is not a valid
+description of the historical study. The audit was performed within the project,
+not by an independent external replication team.
+
 ## Decision
 
-The original v0.2 task runs but is not precision-validated and did not produce an adaptive RL policy. A newly defined finite-model task does: small reward-learning policies choose different second experiments based on measured outcomes. This result is reproducible on matched synthetic tasks, but it is **not** evidence of an RL advantage over strong classical Bayesian design or of physical generalization. A previously unseen high-load test reveals a serious failure: diagnostics can be worse than doing nothing.
+The original v0.2 task runs but is not precision-validated and did not produce an adaptive RL policy. A newly defined finite-model task does: small reward-learning policies choose different second experiments based on simulated observations. This result is reproducible on matched synthetic tasks, but it is **not** evidence of an RL advantage over strong classical Bayesian design or of physical generalization. A previously unseen high-load test reveals a serious failure: diagnostics can score worse than the prior-optimal calibration chosen without a test.
 
 ## Physics and data provenance
 
@@ -33,7 +42,7 @@ Ten synthetic plant hypotheses, equally weighted, represent nominal, sensor-bias
 
 The first test for adaptive policies is always `pulse_pos_low`. After seeing its two noisy outputs, an agent may STOP, run any other permitted pulse, or run `reference_check` at its higher cost. All strategies use the **same 150 final calibration candidates**, the same Bayesian terminal calibration selection, and identical hidden task and noise realizations per evaluation episode. The net score is calibration quality minus 0.012 per probe-cost unit. The 1,024-episode training split alone selects the best fixed schedule among no test, seven single tests and 21 unordered pairs. The 2,048-episode test split is evaluated separately. A 256-episode jitter split varies continuous physical parameters absent from the inference bank. Two 256-episode stress splits use load or deadzone ranges absent from the bank. This is not unseen new physics equations, only parameter-family mismatch.
 
-The second-stage **Bayesian value-of-information** comparator computes posterior-predictive Monte Carlo utility (40 samples per candidate probe) and compares against stopping. It is decision-focused, approximately model-optimal, and stronger than a variance heuristic. A forced-two-test ablation checks whether gains survive without early stopping. Shuffling the proposed second action across tasks preserves how often each test is run but breaks its link to the actual observation.
+The second-stage **Bayesian value-of-information** comparator computes posterior-predictive Monte Carlo utility (40 samples per candidate probe) and compares against stopping. It is a decision-focused numerical approximation; its finite sample count is not a proof of model optimality. A forced-two-test ablation checks whether gains survive without early stopping. Shuffling the proposed second action across tasks preserves how often each test is run but breaks its link to the actual observation.
 
 ## Evaluation outcomes
 
@@ -44,9 +53,9 @@ The second-stage **Bayesian value-of-information** comparator computes posterior
 | Unseen high-load, n=256 | 0.933216 | 0.883843 | 0.896695 | +0.012853 | [+0.010930, +0.014671] |
 | Unseen extreme deadzone, n=256 | 0.527863 | 0.516244 | 0.534244 | +0.018000 | [+0.018000, +0.018000] |
 
-Forcing an adaptive second test still improves over the best fixed two-test schedule by **+0.008207** (paired bootstrap 95% CI [0.007313, 0.009158]) on the finite-model test, so this is not solely an early-stopping advantage. The second action varies meaningfully with observations (STOP, reference check, higher-amplitude pulse). The shuffled second-action control drops the in-model reward to **0.861949**.
+Forcing an adaptive second test improves over the best fixed two-test schedule by **+0.008207** (paired bootstrap 95% CI [0.007313, 0.009158]) on the finite-model test. This removes early stopping but does not equalize diagnostic cost: the reference costs 1.5 and a pulse costs 1.0. The second action varies with observations (STOP, reference check, higher-amplitude pulse). The shuffled second-action control, which preserves aggregate action cost, drops the in-model reward to **0.861949**.
 
-At a **10 ms** integration step rather than the frozen **20 ms**, a separate 1,024-episode in-model run still finds an adaptive advantage of **+0.011491**; this is a robustness check, not a retroactive replacement for the frozen results.
+At a **10 ms** integration step, a separate 1,024-episode in-model run finds an adaptive advantage of **+0.011491**. Training/evaluation counts also differ, so this is a separate sensitivity run, not an isolated timestep comparison or a replacement for the frozen results.
 
 ## Small learned-policy experiment
 
@@ -71,7 +80,7 @@ First-pulse discrepancy is the Euclidean distance to the closest prior predictio
 | Unseen high-load | 33.8% | 1.874 |
 | Unseen extreme deadzone | 90.6% | 3.748 |
 
-The check flags some model inadequacy, but **misses most unseen high-load cases**. On unseen high-load tasks, not testing scored **0.933216**, whereas the nominal adaptive Bayesian policy scored **0.896695**. The posterior can be falsely confident about an incorrect calibration. On the extreme deadzone split, all second decisions collapsed to STOP. These tests are a warning against real-hardware claims and against measuring only relative improvement over a weak fixed diagnostic schedule.
+The check flags some model inadequacy, but **misses most unseen high-load cases**. On unseen high-load tasks, the prior-optimal fixed calibration with no diagnostic test scored **0.933216**, whereas the nominal adaptive Bayesian policy scored **0.896695**. This baseline is not necessarily the factory calibration or leaving a physical system unchanged. The posterior can be falsely confident about an incorrect calibration. On the extreme deadzone split, all second decisions collapsed to STOP. These tests limit real-hardware claims and comparisons against a fixed diagnostic schedule alone.
 
 ## Independent liftgate evidence and a physical requirement our model fails
 
@@ -88,19 +97,28 @@ No sensor or actuator measurements from our own CAD/test bench were used in thes
 ## Reproduce in a clean Python environment
 
 ```bash
+# Start from the repository root. Keep recomputed output separate from history.
 python -m pip install 'numpy>=1.24' 'torch>=2'
-python TESTS.py
-python audit_physics.py --output physics_audit.json
-python test_exact_duration.py
-python adaptive_benchmark.py --train 1024 --eval 2048 --transfer 256 --dt .02 --output adaptive_results.json
-python adaptive_benchmark.py --train 512 --eval 1024 --transfer 128 --dt .01 --output adaptive_dt_0_01_results.json
-python train_adaptive_rl.py --train 15000 --steps 450 --eval 2048 --transfer 256 --out rl_adaptive_results.json
-python check_mismatch.py
+mkdir -p runs/historical_reproduction
+python research/adaptive_diagnostics/TESTS.py
+python research/adaptive_diagnostics/audit_physics.py --output runs/historical_reproduction/physics_audit.json
+python research/adaptive_diagnostics/test_exact_duration.py --output runs/historical_reproduction/exact_pulse_audit.json
+python research/adaptive_diagnostics/physical_requirements.py --output runs/historical_reproduction/physical_requirements.json
+python research/adaptive_diagnostics/adaptive_benchmark.py --train 1024 --eval 2048 --transfer 256 --dt .02 --output runs/historical_reproduction/adaptive_results.json
+python research/adaptive_diagnostics/adaptive_benchmark.py --train 512 --eval 1024 --transfer 128 --dt .01 --output runs/historical_reproduction/adaptive_dt_0_01_results.json
+python research/adaptive_diagnostics/train_adaptive_rl.py --train 15000 --steps 450 --eval 2048 --transfer 256 --out runs/historical_reproduction/rl_adaptive_results.json
+python research/adaptive_diagnostics/check_mismatch.py --output runs/historical_reproduction/mismatch_detection.json
 ```
 
-All numbers above are deterministic for these seeds under the tested Python/NumPy/PyTorch versions. Cross-platform floating-point variation is possible. `adaptive_benchmark.py` uses a local copy of the published RecursiveCal v0.2 equations; it does not change the original frozen benchmark. The CAD test physics is copied from the previously generated mechanical CAD source kit. Output JSON contains model assumptions, per-policy metrics and paired confidence intervals (but not every episode-level trace). This is exploratory evidence, not an external independent replication.
+These commands import the actual repository source files. The initial historical run used a local reconstruction, as disclosed above; reproducing three means was not byte-for-byte source validation. Cross-platform floating-point variation is possible. Historical output JSON contains model assumptions, per-policy metrics and paired confidence intervals, but no saved neural checkpoints or episode-level traces. This limitation is fixed for new v0.3 runs, not retroactively for these old artifacts. This is exploratory evidence, not an external independent replication.
 
-## Next research gates
+## Historical research gates and current scope
+
+The points below describe the remaining empirical questions from the original
+pilot. The software now implements a separately versioned SI model, measurement
+contracts, held-out trace comparison, mismatch fallback, multiple trained seeds,
+and reproducible artifacts. Those implementations do not supply missing physical
+measurements or make the old normalized score a validated engineering metric.
 
 1. Fix exact pulse duration and assess integration tolerance in a versioned v0.3 simulator, then **re-run all v0.2 baseline scores** before adopting any new numbers.
 2. Replace bespoke hypothesis families with a representative fault taxonomy and physical parameters supported by independently documented data. Add geometry and noisy measurements separately; keep provenance.

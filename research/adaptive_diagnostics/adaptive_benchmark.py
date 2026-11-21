@@ -4,7 +4,7 @@ Classical Bayesian, not RL. In-simulator evidence only, no real hardware data.
 
 Uses true pre-generated observation arrays for all strategies (common random numbers).
 Fixed schedules are selected using independent training episodes only.
-Evaluates the predeclared 4-family task and out-of-prior continuous jitter.
+Evaluates an exploratory five-family task and out-of-prior continuous jitter.
 
 Run: python adaptive_benchmark.py --output adaptive_results.json
 """
@@ -25,7 +25,7 @@ from dataclasses import replace
 from typing import Sequence
 import recursivecal as rc
 
-# Predeclared study of uncertainty about a *sensor*, motor/friction and torque deadzone.
+# Exploratory study of uncertainty about a sensor, motor/friction and torque deadzone.
 # The first low-torque pulse may classify mechanical vs near-nominal response,
 # whereas reference and high-torque measurements target different remaining uncertainties.
 # These are synthetic scenario assumptions, not an automotive empirical distribution.
@@ -127,7 +127,7 @@ def make_dataset(n,seed,mu,jitter=False):
     return hidden,probes,truthQ
 
 def make_ood_dataset(n,seed,mu,family):
-    """Structurally out-of-bank parameter classes. No corresponding prior mode."""
+    """Out-of-bank parameter ranges under the same equations, not new physics."""
     rng=np.random.default_rng(seed)
     hidden=np.zeros(n,dtype=int)
     observations=np.zeros((n,NPROBES,2),dtype=float)
@@ -250,7 +250,7 @@ def experiment(ntrain,neval,ntransfer):
             'note':'All policies receive same probe observations on each task and use same Bayes calibration table.'}
         print(split,summary,'adaptive advantage',results[split]['adaptive_minus_fixed'],
               'actions',distribution,flush=True)
-    return {'source':'Original RecursiveCal normalized dynamics, custom preregistered finite mixture, NOT empirically validated physics',
+    return {'source':'Original RecursiveCal normalized dynamics, custom exploratory finite mixture, NOT empirically validated physics',
             'hypotheses':[{ 'name':n,'plant':vars(p)} for n,p in HYPOTHESES],
             'train_count':ntrain,'first_probe':rc.PROBES[FIRST].name,
             'model_predictions':[{'probe':pr.name,'mu':[list(x) for x in mu[:,i,:]]} for i,pr in enumerate(rc.PROBES)],

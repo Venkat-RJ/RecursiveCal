@@ -1,0 +1,11 @@
+{
+  "source_kind": "synthetic",
+  "source": "generate_examples.py, seed 7112026; default SI simulation with artificial observation error",
+  "units": {
+    "time_s": "s",
+    "angle_rad": "rad"
+  },
+  "noise": "angle bias 0.0012 rad plus Gaussian standard deviation 0.0005 rad",
+  "independence": "Same simulator as the comparison model. This is an import demo, not independent validation.",
+  "license": "MIT"
+}

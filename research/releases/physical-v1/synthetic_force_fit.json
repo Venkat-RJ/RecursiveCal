@@ -1,0 +1,245 @@
+{
+  "schema_version": "recursivecal.force-fit/1",
+  "method": "ordinary least squares on explicit training rows only; fixed ideal-gas temperature normalization",
+  "provenance": {
+    "source_kind": "synthetic",
+    "metadata": {
+      "source_kind": "synthetic",
+      "source": "generate_examples.py, seed 7112026; no hardware measurements",
+      "units": {
+        "length_m": "m",
+        "force_N_each": "N",
+        "temperature_C": "degC"
+      },
+      "split_definition": "13 training locations and 7 separate validation locations chosen before generation",
+      "noise": "independent Gaussian force noise with standard deviation 1.5 N per strut",
+      "parameter_origin": "illustrative SI model defaults",
+      "license": "MIT"
+    },
+    "source": "generate_examples.py, seed 7112026; no hardware measurements",
+    "csv_sha256": "e76403dd9f2c0f87dcf41c6de5d26a9505d29aca9256dd3cea799c2a291191c0",
+    "filename": "synthetic_force.csv",
+    "hardware_validated": false,
+    "verification": "provider declaration, not independent provenance verification"
+  },
+  "curve": {
+    "reference_length_m": 0.7617765473830769,
+    "force_at_reference_N_each": 187.38537842000002,
+    "slope_N_m": -124.96842997277291,
+    "reference_temperature_C": 20.0,
+    "training_length_range_m": [
+      0.567665394401,
+      0.941198494318
+    ]
+  },
+  "training_metrics_N_each": {
+    "n": 13,
+    "rmse": 1.526957883671524,
+    "mae": 1.1682843754656766,
+    "bias": 1.7490282726402467e-14,
+    "max_abs": 3.219740033376951,
+    "p95_abs": 3.219740033376951
+  },
+  "validation_metrics_N_each": {
+    "n": 7,
+    "rmse": 1.1236778814931974,
+    "mae": 0.8513060929547009,
+    "bias": 0.11108368222210986,
+    "max_abs": 2.3526731166532784,
+    "p95_abs": 2.3526731166532784
+  },
+  "validation_scope": "held-out rows under provider-supplied split; no claim of independent hardware/system validation",
+  "application": {
+    "can_apply_to_default_geometry": true,
+    "parameters": {
+      "gas_force_compressed_N_each": 211.64314444842364,
+      "gas_force_extended_N_each": 164.9632994089377,
+      "gas_reference_temperature_C": 20.0,
+      "gas_scale": 1.0
+    },
+    "reason": "Training range covers both default CAD endpoints."
+  },
+  "predictions": [
+    {
+      "split": "train",
+      "length_m": 0.567665394401,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 211.68794226,
+      "predicted_force_N_each": 211.64314444837493,
+      "residual_N_each": -0.04479781162507379,
+      "outside_training_length_range": false
+    },
+    {
+      "split": "train",
+      "length_m": 0.598947862031,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 209.65088961,
+      "predicted_force_N_each": 207.7338235829797,
+      "residual_N_each": -1.9170660270202973,
+      "outside_training_length_range": false
+    },
+    {
+      "split": "train",
+      "length_m": 0.631741637286,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 202.53732862,
+      "predicted_force_N_each": 203.6356369764824,
+      "residual_N_each": 1.0983083564823914,
+      "outside_training_length_range": false
+    },
+    {
+      "split": "train",
+      "length_m": 0.665433691796,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 200.24889454,
+      "predicted_force_N_each": 199.4251938218106,
+      "residual_N_each": -0.8237007181894,
+      "outside_training_length_range": false
+    },
+    {
+      "split": "train",
+      "length_m": 0.699492794406,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 194.52236037,
+      "predicted_force_N_each": 195.16888124235734,
+      "residual_N_each": 0.6465208723573426,
+      "outside_training_length_range": false
+    },
+    {
+      "split": "train",
+      "length_m": 0.733460527009,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 187.96373198,
+      "predicted_force_N_each": 190.92398702922546,
+      "residual_N_each": 2.9602550492254522,
+      "outside_training_length_range": false
+    },
+    {
+      "split": "train",
+      "length_m": 0.766941167688,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 186.5424085,
+      "predicted_force_N_each": 186.73996392908828,
+      "residual_N_each": 0.1975554290882826,
+      "outside_training_length_range": false
+    },
+    {
+      "split": "train",
+      "length_m": 0.799592128145,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 181.82767801,
+      "predicted_force_N_each": 182.6596246636739,
+      "residual_N_each": 0.8319466536738958,
+      "outside_training_length_range": false
+    },
+    {
+      "split": "train",
+      "length_m": 0.831115642267,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 181.93992063,
+      "predicted_force_N_each": 178.72018059662304,
+      "residual_N_each": -3.219740033376951,
+      "outside_training_length_range": false
+    },
+    {
+      "split": "train",
+      "length_m": 0.861251872128,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 174.88899559,
+      "predicted_force_N_each": 174.95410326559525,
+      "residual_N_each": 0.06510767559524311,
+      "outside_training_length_range": false
+    },
+    {
+      "split": "train",
+      "length_m": 0.889773347361,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 170.90060098,
+      "predicted_force_N_each": 171.38981928521991,
+      "residual_N_each": 0.4892183052199073,
+      "outside_training_length_range": false
+    },
+    {
+      "split": "train",
+      "length_m": 0.916480557144,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 169.64080506,
+      "predicted_force_N_each": 168.05226120968493,
+      "residual_N_each": -1.5885438503150624,
+      "outside_training_length_range": false
+    },
+    {
+      "split": "train",
+      "length_m": 0.941198494318,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 163.65836331,
+      "predicted_force_N_each": 164.9632994088845,
+      "residual_N_each": 1.3049360988844967,
+      "outside_training_length_range": false
+    },
+    {
+      "split": "validation",
+      "length_m": 0.594371035813,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 207.52602258,
+      "predicted_force_N_each": 208.3057823697014,
+      "residual_N_each": 0.7797597897014157,
+      "outside_training_length_range": false
+    },
+    {
+      "split": "validation",
+      "length_m": 0.650920098601,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 198.88626166,
+      "predicted_force_N_each": 201.23893477665328,
+      "residual_N_each": 2.3526731166532784,
+      "outside_training_length_range": false
+    },
+    {
+      "split": "validation",
+      "length_m": 0.709225579061,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 195.17507948,
+      "predicted_force_N_each": 193.95259042475888,
+      "residual_N_each": -1.2224890552411125,
+      "outside_training_length_range": false
+    },
+    {
+      "split": "validation",
+      "length_m": 0.766941167688,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 187.76837864,
+      "predicted_force_N_each": 186.73996392908828,
+      "residual_N_each": -1.0284147109117328,
+      "outside_training_length_range": false
+    },
+    {
+      "split": "validation",
+      "length_m": 0.822239769839,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 180.16925911,
+      "predicted_force_N_each": 179.8293844385888,
+      "residual_N_each": -0.3398746714112235,
+      "outside_training_length_range": false
+    },
+    {
+      "split": "validation",
+      "length_m": 0.873685317795,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 173.28079135,
+      "predicted_force_N_each": 173.4003150814385,
+      "residual_N_each": 0.11952373143850537,
+      "outside_training_length_range": false
+    },
+    {
+      "split": "validation",
+      "length_m": 0.920137281602,
+      "temperature_C": 20.0,
+      "observed_force_N_each": 167.47887852,
+      "predicted_force_N_each": 167.59528609532563,
+      "residual_N_each": 0.11640757532563839,
+      "outside_training_length_range": false
+    }
+  ],
+  "warnings": []
+}

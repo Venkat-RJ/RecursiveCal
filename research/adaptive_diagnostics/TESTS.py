@@ -1,4 +1,4 @@
-"""Small executable test suite for independent research bundle (python TESTS.py)."""
+"""Executable numerical checks for the historical exploratory research module."""
 import sys
 from pathlib import Path
 _PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -8,11 +8,23 @@ import math
 import unittest
 import numpy as np
 import recursivecal as rc
-import adaptive_benchmark as ab
-import audit_physics as ap
-import physical_requirements as pr
+if __package__:
+    from . import adaptive_benchmark as ab
+    from . import audit_physics as ap
+    from . import physical_requirements as pr
+    from . import test_exact_duration as exact
+    from . import check_mismatch
+else:
+    import adaptive_benchmark as ab
+    import audit_physics as ap
+    import physical_requirements as pr
+    import test_exact_duration as exact
+    import check_mismatch
 try:
-    import train_adaptive_rl as arl
+    if __package__:
+        from . import train_adaptive_rl as arl
+    else:
+        import train_adaptive_rl as arl
 except ModuleNotFoundError as error:
     if error.name != "torch":
         raise
@@ -52,6 +64,11 @@ class ResearchAuditTests(unittest.TestCase):
     def test_true_pulse_duration_not_roundable(self):
         # Deliberately captures the known v0.2 numerical limitation.
         self.assertAlmostEqual(int(round(.55/.02))*.02,.56)
+    def test_exact_duration_reports_accepted_time_on_abort(self):
+        _,duration=exact.pulse_exact(rc.Plant(motor=100),.85,0.,.55,.02)
+        self.assertEqual(duration,0.)
+        _,duration=exact.pulse_exact(rc.Plant(),.85,0.,.55,.02)
+        self.assertAlmostEqual(duration,.55)
     def test_adaptive_choices_vary_with_observation(self):
         mu,Q=ab.model_tables()
         h,obs,_=ab.make_dataset(128,99181,mu)
@@ -59,7 +76,7 @@ class ResearchAuditTests(unittest.TestCase):
         self.assertTrue(np.isfinite(values).all())
         self.assertGreaterEqual(len(set(second)),3)
     @unittest.skipIf(arl is None, "PyTorch optional for learned-policy checks")
-    def test_RL_observation_excludes_true_hidden_plant(self):
+    def test_RL_feature_and_reward_table_shapes(self):
         mu,Q=ab.model_tables();h,obs,_=ab.make_dataset(25,917,mu)
         features,table=arl.prepare_data(h,obs,mu,Q)
         self.assertEqual(features.shape,(25,ab.N+2))

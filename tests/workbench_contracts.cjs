@@ -1,0 +1,26 @@
+/* Run with node tests/workbench_contracts.cjs. No DOM or browser dependency. */
+"use strict";
+const assert = require("node:assert/strict");
+const { validateRun, validateEvidence, traceToCsv, csvCell } = require("../recursivecal_lab/web/app.js");
+const row = (time_s, angle_rad = 0) => ({time_s, angle_rad, target_angle_rad: 0, velocity_rad_s: 0, motor_force_N_each: -3, gas_force_N_each: 165, motor_torque_Nm: -1.2, stroke_m: 0, motor_powered: true});
+const run = {schema_version:"recursivecal.run/1", model_id:"recursivecal.si-liftgate/1", trace:[row(0),row(0.01,0.002)], metrics:{tracking_rmse_deg:0,peak_speed_rad_s:0,mechanical_work_abs_J:0,force_saturation_fraction:0,completed_duration_s:0.01,termination:"completed"}, parameters:{}, provenance:{source_kind:"synthetic"}};
+assert.equal(validateRun(run), run);
+assert.throws(() => validateRun({...run, schema_version:"untrusted"}), /schema_version/);
+assert.throws(() => validateRun({...run, model_id:"normalized"}), /SI liftgate/);
+assert.throws(() => validateRun({...run, trace:[row(0),row(0)]}), /strictly increasing/);
+assert.throws(() => validateRun({...run, trace:[row(0),row(0.01,Infinity)]}), /finite/);
+assert.throws(() => validateRun({...run, trace:[]}), /trace samples/);
+assert.throws(() => validateRun({...run, provenance:null}), /provenance/);
+assert.throws(() => validateRun({...run, events:[null]}), /Events/);
+assert.throws(() => validateRun({...run, metrics:{}}), /Metric/);
+assert.match(traceToCsv(run), /time_s,angle_rad/);
+assert.match(traceToCsv(run), /-3,165,-1.2/);
+assert.equal(csvCell('=2+3'), "'=2+3");
+assert.equal(csvCell(-3), '-3');
+assert.equal(csvCell('a,b'), '"a,b"');
+assert.equal(csvCell('a"b'), '"a""b"');
+const evidence = {schema_version:"recursivecal.experiment.v1",results:{finite:{policies:{fixed:{mean_reward:0.8}}}}};
+assert.equal(validateEvidence(evidence), evidence);
+assert.throws(() => validateEvidence({...evidence, results:{}}), /no cohort/);
+assert.throws(() => validateEvidence({...evidence, results:{finite:{policies:{fixed:{mean_reward:NaN}}}}}), /finite/);
+console.log("Workbench contracts: 18 assertions passed.");

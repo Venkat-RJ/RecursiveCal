@@ -1,0 +1,291 @@
+{
+  "fixed_schedule": [
+    0,
+    6
+  ],
+  "fixed_two_schedule": [
+    0,
+    6
+  ],
+  "candidate_schedules": [
+    {
+      "schedule": [],
+      "train_mean_reward": 0.8347993907763427,
+      "validation_mean_reward": 0.8360327823100213
+    },
+    {
+      "schedule": [
+        0
+      ],
+      "train_mean_reward": 0.8584836343649953,
+      "validation_mean_reward": 0.8624117156308941
+    },
+    {
+      "schedule": [
+        1
+      ],
+      "train_mean_reward": 0.8541297892488039,
+      "validation_mean_reward": 0.857151288590058
+    },
+    {
+      "schedule": [
+        2
+      ],
+      "train_mean_reward": 0.8591389178116541,
+      "validation_mean_reward": 0.8615318217500747
+    },
+    {
+      "schedule": [
+        3
+      ],
+      "train_mean_reward": 0.8518493405173622,
+      "validation_mean_reward": 0.8561847713585578
+    },
+    {
+      "schedule": [
+        4
+      ],
+      "train_mean_reward": 0.8511725609124201,
+      "validation_mean_reward": 0.8551940949478256
+    },
+    {
+      "schedule": [
+        5
+      ],
+      "train_mean_reward": 0.853210914893457,
+      "validation_mean_reward": 0.8564411925329396
+    },
+    {
+      "schedule": [
+        6
+      ],
+      "train_mean_reward": 0.8544716141818289,
+      "validation_mean_reward": 0.8531447575229016
+    },
+    {
+      "schedule": [
+        0,
+        1
+      ],
+      "train_mean_reward": 0.8508797867951091,
+      "validation_mean_reward": 0.8537003809739621
+    },
+    {
+      "schedule": [
+        0,
+        2
+      ],
+      "train_mean_reward": 0.8489756544198339,
+      "validation_mean_reward": 0.8522341335290035
+    },
+    {
+      "schedule": [
+        0,
+        3
+      ],
+      "train_mean_reward": 0.8510830271962726,
+      "validation_mean_reward": 0.8539746190433393
+    },
+    {
+      "schedule": [
+        0,
+        4
+      ],
+      "train_mean_reward": 0.8486425659787304,
+      "validation_mean_reward": 0.8518764441453458
+    },
+    {
+      "schedule": [
+        0,
+        5
+      ],
+      "train_mean_reward": 0.8481638114894487,
+      "validation_mean_reward": 0.852306798368216
+    },
+    {
+      "schedule": [
+        0,
+        6
+      ],
+      "train_mean_reward": 0.8769464927463784,
+      "validation_mean_reward": 0.8784552359829368
+    },
+    {
+      "schedule": [
+        1,
+        2
+      ],
+      "train_mean_reward": 0.8508531422452745,
+      "validation_mean_reward": 0.8537921936995274
+    },
+    {
+      "schedule": [
+        1,
+        3
+      ],
+      "train_mean_reward": 0.8442866080518685,
+      "validation_mean_reward": 0.8479930619487115
+    },
+    {
+      "schedule": [
+        1,
+        4
+      ],
+      "train_mean_reward": 0.8462265148522897,
+      "validation_mean_reward": 0.8486116570681705
+    },
+    {
+      "schedule": [
+        1,
+        5
+      ],
+      "train_mean_reward": 0.8467097410948413,
+      "validation_mean_reward": 0.8505205823655846
+    },
+    {
+      "schedule": [
+        1,
+        6
+      ],
+      "train_mean_reward": 0.8726678526713396,
+      "validation_mean_reward": 0.8732494849028776
+    },
+    {
+      "schedule": [
+        2,
+        3
+      ],
+      "train_mean_reward": 0.850896173651407,
+      "validation_mean_reward": 0.8534607503694246
+    },
+    {
+      "schedule": [
+        2,
+        4
+      ],
+      "train_mean_reward": 0.8492034384129401,
+      "validation_mean_reward": 0.8512782196998434
+    },
+    {
+      "schedule": [
+        2,
+        5
+      ],
+      "train_mean_reward": 0.8489057665698282,
+      "validation_mean_reward": 0.8518841581147382
+    },
+    {
+      "schedule": [
+        2,
+        6
+      ],
+      "train_mean_reward": 0.8776528275658299,
+      "validation_mean_reward": 0.8775817107261743
+    },
+    {
+      "schedule": [
+        3,
+        4
+      ],
+      "train_mean_reward": 0.8464318486401126,
+      "validation_mean_reward": 0.8487009101161429
+    },
+    {
+      "schedule": [
+        3,
+        5
+      ],
+      "train_mean_reward": 0.8468365832445932,
+      "validation_mean_reward": 0.8487269612361753
+    },
+    {
+      "schedule": [
+        3,
+        6
+      ],
+      "train_mean_reward": 0.870416571277668,
+      "validation_mean_reward": 0.8723066810637815
+    },
+    {
+      "schedule": [
+        4,
+        5
+      ],
+      "train_mean_reward": 0.8439179083326217,
+      "validation_mean_reward": 0.8491848492378475
+    },
+    {
+      "schedule": [
+        4,
+        6
+      ],
+      "train_mean_reward": 0.8697407063514169,
+      "validation_mean_reward": 0.8713100763049482
+    },
+    {
+      "schedule": [
+        5,
+        6
+      ],
+      "train_mean_reward": 0.8717760961584031,
+      "validation_mean_reward": 0.8725954538879619
+    }
+  ],
+  "selection": "top five schedules on train, select on validation; fixed-two selected on validation",
+  "first_probe_for_adaptive_policies": 0,
+  "mismatch_threshold": 2.248171572968667,
+  "mismatch_quantile": 0.95,
+  "mismatch_fit_split": "validation",
+  "test_used_for_selection": false,
+  "bayesian_resolution": {
+    "primary_order": 15,
+    "decision": "Use the highest implemented quadrature order; report residual sensitivity, not exact optimality.",
+    "validation_results": {
+      "5": {
+        "n": 512,
+        "mean_reward": 0.8895665961919459,
+        "mean_quality": 0.9103673774419461,
+        "mean_cost": 1.7333984375,
+        "mean_probes": 1.5390625,
+        "abstention_rate": 0.0,
+        "action_counts": {
+          "STOP": 236,
+          "pulse_pos_high": 60,
+          "pulse_neg_low": 9,
+          "pulse_neg_high": 8,
+          "reference_check": 199
+        }
+      },
+      "9": {
+        "n": 512,
+        "mean_reward": 0.889209168425204,
+        "mean_quality": 0.9099865121752042,
+        "mean_cost": 1.7314453125,
+        "mean_probes": 1.537109375,
+        "abstention_rate": 0.0,
+        "action_counts": {
+          "STOP": 237,
+          "pulse_pos_high": 53,
+          "pulse_neg_low": 9,
+          "pulse_neg_high": 14,
+          "reference_check": 199
+        }
+      },
+      "15": {
+        "n": 512,
+        "mean_reward": 0.8900572476479114,
+        "mean_quality": 0.9108580288979116,
+        "mean_cost": 1.7333984375,
+        "mean_probes": 1.5390625,
+        "abstention_rate": 0.0,
+        "action_counts": {
+          "STOP": 236,
+          "pulse_pos_high": 52,
+          "pulse_neg_low": 9,
+          "pulse_neg_high": 16,
+          "reference_check": 199
+        }
+      }
+    }
+  }
+}

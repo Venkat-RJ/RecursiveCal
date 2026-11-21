@@ -1,142 +1,162 @@
+![RecursiveCal concept illustration of a liftgate research rig](assets/recursivecal-banner.png)
+
 # RecursiveCal
 
-**An experimental RL environment for diagnosis and calibration under unknown dynamics.**
+**Open source tools for diagnostic experiment selection, calibration research, and software-in-the-loop testing.**
 
-RecursiveCal studies a specific decision problem: **which experiment should an agent run next, and when does it know enough to stop?**
+[![Product checks](https://github.com/Venkat-RJ/RecursiveCal/actions/workflows/product.yml/badge.svg)](https://github.com/Venkat-RJ/RecursiveCal/actions/workflows/product.yml)
+[![Legacy benchmark checks](https://github.com/Venkat-RJ/RecursiveCal/actions/workflows/verify.yml/badge.svg)](https://github.com/Venkat-RJ/RecursiveCal/actions/workflows/verify.yml)
+[![Research numerical audit](https://github.com/Venkat-RJ/RecursiveCal/actions/workflows/research-audit.yml/badge.svg)](https://github.com/Venkat-RJ/RecursiveCal/actions/workflows/research-audit.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-The current task is a synthetic single-axis actuator. Its dynamics are hidden. An agent can perform bounded diagnostic tests, observe noisy results, and select a final calibration. The environment scores the calibration on unseen trajectories.
+RecursiveCal asks a concrete question: **which diagnostic test should we run next, and when is another test no longer worth its cost?** Version 0.3 provides an installable local workbench, a reproducible diagnostic experiment, and an executable path from CSV measurements to model fitting and trajectory comparison.
 
-This is a **research simulator**, not an industrial calibration product, real-hardware controller, or certified safety system.
+[Open recorded workbench](https://venkat-rj.github.io/recursivecal-lab/) · [User guide](docs/USER_GUIDE.md) · [Experiment protocol](docs/EXPERIMENT_PROTOCOL.md) · [Paper draft](paper/README.md) · [Citation](#citation) · [Legacy 3D CAD explorer](https://venkat-rj.github.io/recursivecal/)
 
-## Parametric mechanical CAD test cell
+The browser preview displays saved release evidence. Running new simulations and fits uses the local Python workbench. The banner is [AI-generated concept artwork](assets/README.md), not a built test rig.
 
-**[Explore RecursiveCal's editable mechanical CAD module](mechanics/cad_v1/README.md)**
+## Start in a clean checkout
 
-This newer test cell is built from an original 69-component parametric assembly, with native STEP/GLB exports, articulated hinge/strut geometry, CAD-linked force calculations, a load-cell fitting workflow, and an interactive CAD-mesh viewer. Its hardware dimensions and forces are illustrative, not measured or OEM-validated. The original RL benchmark remains unchanged.
-
-## 3D physical systems test cell
-
-**[Open the new physical tailgate demo](visualization/physical_twin/demo.html)** · [Source and model notes](visualization/physical_twin/README.md)
-
-This is a separate experimental 3D hinge model. An articulated hatch rotates around its hinge while two telescoping struts move between their mounting points. The opening angle, strut extension, controller response, gravity, and modeled force are linked by the same numerical simulation. Try fault injection, orbit inspection, mechanism cutaway, full-screen physical view, and synchronized factory/modified comparison.
-
-**Research boundary:** this model uses illustrative mechanism geometry and physical parameters, not manufacturer CAD, real plant measurements, or certified vehicle controls. Its reference calibration uses known simulator parameters and is not an RL policy.
-
-The [earlier 2D actuator demonstration](visualization/index.html) remains available. It is tied to the original normalized linear-actuator benchmark and should not be confused with the new hinge model.
-
-## Environment
-
-```text
-  Hidden actuator dynamics
-           |
-     Initial observation
-           |
-   Choose diagnostic probe <----+
-           |                    |
-     Noisy measurement          |
-           |                    |
-  Update estimate / belief      |
-           |                    |
-   Test again or stop? ---------+
-           |
-     Submit calibration
-           |
-  Independent held-out scoring
-```
-
-- **Hidden variables:** motor efficiency, friction, load, damping, and sensor bias. One evaluation split also introduces a torque deadzone absent from the baseline model.
-- **Actions:** six torque-pulse tests, one reference check, or submission of a calibration from a fixed grid of 150 legal choices.
-- **Constraints:** diagnostic actions have costs and are restricted by a host-side action envelope. Repeated, invalid, or over-budget probes are rejected.
-- **Observations:** noisy displacement/velocity measurements or a sensor-reference measurement. The agent does not receive hidden plant parameters.
-- **Objective:** maximize calibration quality on four unseen trajectories minus diagnostic cost.
-
-The simulator's terminal reward is
-
-```text
-net_reward = held_out_calibration_quality - 0.012 * diagnostic_cost
-```
-
-Safety interventions affect calibration quality; the environment also enforces limits on allowable diagnostic actions. These are **simulation-level protections**, not evidence of real-world safety.
-
-## Independent physics and adaptive-experiment audit (November 2026)
-
-A new [numerical audit and adaptive diagnostic research module](research/adaptive_diagnostics/README.md) tests whether the simulated environment actually requires observation-dependent experiments. It includes the source, classical controls, a three-seed CPU contextual-bandit RL pilot, parameter-shift stress tests, and reproducible result JSONs.
-
-**What improved:** On a deliberately constructed ten-hypothesis synthetic task, three small learned policies chose different follow-up tests and scored 0.8891–0.8896, compared with 0.8779 for the best train-selected fixed schedule and 0.8900 for adaptive Bayesian design (2,048 held-out cases). This is *not* an RL victory over strong classical inference, nor physical-world validation. The original v0.2 neural pilot below remains a separate negative result.
-
-**What needs fixing:** A requested 0.55 s diagnostic pulse actually lasts 0.56 s at the v0.2 integration step. The study preserves those frozen equations to reproduce old scores and documents an exact-duration correction for a future version. In an unseen high-load stress test, doing no diagnostic test was better than both adaptive methods. Our CAD simulator also fails a nominal passive open-hold check: at 78°, the current gas struts supply 68.9 Nm against 134.6 Nm of gravity torque; it needs separate hold logic or a mechanically justified correction. Public NHTSA liftgate data motivate this gate but are not transplanted across vehicle geometries. No actual RecursiveCal vehicle measurements were used.
-
-## Results so far
-
-The strongest classical baseline uses particle-based Bayesian system identification and cost-aware probe selection. The maximum probe count was selected using training seeds, then evaluated on separate fixed seeds.
-
-**Mean net reward, 60 synthetic tasks per split. Higher is better.**
-
-| Policy | Single fault | Combined faults | Shifted dynamics |
-|---|---:|---:|---:|
-| Factory calibration, no probes | 0.84053 | 0.79321 | 0.64360 |
-| Bayesian identification, up to 2 probes | **0.86167** | **0.87811** | **0.78425** |
-| Neural diagnostic policy, 720 training episodes | 0.84763 | 0.89186 | 0.78962 |
-
-The neural policy's apparently good performance on combined faults is **not evidence of adaptive diagnosis**. It chose the same `pulse_neg_low` probe on all 180 held-out tasks. A hand-coded policy making that same fixed choice reproduced its rewards exactly. It did not outperform the appropriate fixed-action control.
-
-A separate Qwen2.5-0.5B-Instruct smoke test ran two model-generated episodes through the installed Verifiers v1 environment. Neither completed a valid calibration; both received zero reward. This was an integration smoke test, not a representative language-model evaluation or language-model RL experiment.
-
-Details: [classical baselines](RESULTS.md) · [RL pilot and negative control](RL_PILOT.md) · [language-model smoke test](LLM_SMOKE.md).
-
-## Research question
-
-The current simulator still allows a simple fixed diagnostic strategy to perform well. It is **not yet evidence that RL learns better experiment selection**.
-
-The next test is to construct *identifiable but ambiguous* systems in which the best second experiment depends on the first measurement. Then compare learned policies against:
-
-- fixed and random diagnostics,
-- classical system-identification methods,
-- Bayesian expected value-of-information and stopping policies,
-- matched-budget tool-using language-model agents.
-
-Evaluation must include unseen dynamics, calibration quality, diagnostic cost, blocked/invalid actions, and fixed-probe controls. A result only matters if it survives strong non-privileged baselines on held-out systems. See [research plan](RESEARCH_PLAN.md).
-
-## Reproduce
-
-Python 3.11+:
+Python 3.11 or later:
 
 ```bash
-python -m pip install -e '.[bayes,rl]'
-python -m unittest discover -s tests -v
-python demo.py
-python benchmark.py --tasks 60 --split heldout --policies default bayes2 --json results_heldout.json
-python benchmark.py --tasks 60 --split combined --policies default bayes2 --json results_combined.json
-python benchmark.py --tasks 60 --split shifted --policies default bayes2 --json results_shifted.json
+git clone https://github.com/Venkat-RJ/RecursiveCal.git
+cd RecursiveCal
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e .
+recursivecal doctor
+recursivecal serve
 ```
 
-The summary in [PUBLIC_RESULTS.json](PUBLIC_RESULTS.json) records the classical pilot; the scripts regenerate per-seed results. RL training commands and reproducibility limits are in [RL_PILOT.md](RL_PILOT.md). The trained checkpoint and full run artifacts are not currently tracked in this repository.
+Open `http://127.0.0.1:8765`. The server runs in the current terminal; Ctrl+C stops it. NumPy is the only required third-party runtime dependency. The new suite needs no GPU, API key, paid service, or CAD installation.
 
-### Verifiers v1 integration
+## What you can use now
 
-`recursivecal_v1/` implements a multi-turn taskset and host-side environment for [Prime Intellect Verifiers](https://github.com/PrimeIntellect-ai/verifiers).
+| Capability | Implemented behavior |
+| --- | --- |
+| SI liftgate simulation | Explicit geometry, gravity, force lag, gas assistance, friction and stiction, stops, sensor assumptions, power loss, and holding architecture |
+| Workbench | Configure and run the model, inspect signals, replay time, pin comparisons, import results, export complete JSON and CSV |
+| Force fitting | Read SI CSVs with provenance, fit training rows, report held-out residuals, apply a curve only within its measured-length support |
+| Trajectory comparison | Compare declared observations against a saved simulation without refitting, time shifting, or extrapolation |
+| Diagnostic experiments | Fixed, Bayesian, learned contextual-bandit, shuffled, and abstention policies under a public synthetic protocol |
+| Reproducibility | Raw trial records, observations, frozen selection, checkpoints, source hashes, and an artifact verifier |
+| Research handoff | Numerical audit, explicit negative results, manuscript source, generated figures, citation file, and measurement protocol |
+
+The SI liftgate model and normalized diagnostic benchmark have separate identifiers. A policy trained in the normalized benchmark is not presented as a learned liftgate controller. Default physical coefficients and bundled example data are synthetic. **Independent hardware accuracy and safe real-world operation have not been established.**
+
+## Run the workflows
+
+### Simulate and export
 
 ```bash
-python -m pip install -e '.[bayes,verifiers]'
+recursivecal simulate --scenario open --duration 6.5 --dt 0.01 \
+  --output runs/open.json --csv runs/open.csv
+recursivecal simulate --scenario passive_hold --output runs/hold.json
 ```
 
-Taskset initialization, scripted interaction, and package imports passed against the installed Verifiers v1 runtime. A custom small-model inference smoke also ran. A native `vf-eval` model-provider run and language-model RL training have **not** been validated.
+The default passive-hold test fails by design: the assumed gas support and hinge stiction cannot hold the hatch open. The run records its speed-limit event and actual early stop. An explicit brake parameter can change the modeled architecture; it is not evidence that a real brake exists or is adequate.
 
-## Repository layout
+### Fit data and compare a trace
+
+```bash
+recursivecal fit-force examples/measurements/synthetic_force.csv \
+  --metadata examples/measurements/synthetic_force.metadata.json \
+  --output runs/fit.json --parameters-output runs/fitted-parameters.json
+
+recursivecal simulate --parameters runs/fitted-parameters.json \
+  --controller-parameters runs/fitted-parameters.json \
+  --output runs/fitted-open.json
+
+recursivecal replay examples/measurements/synthetic_trajectory.csv \
+  --metadata examples/measurements/synthetic_trajectory.metadata.json \
+  --simulation runs/open.json --output runs/comparison.json
+```
+
+The example files are labeled synthetic. The same contracts accept actual measurements with declared units and source metadata. A source declaration is retained, not independently authenticated. See [data contracts](docs/DATA_CONTRACT.md) and [physical model assumptions](docs/PHYSICAL_MODEL.md).
+
+### Train, evaluate, and verify
+
+```bash
+recursivecal experiment --output runs/smoke --quick
+recursivecal verify runs/smoke
+
+recursivecal experiment --output runs/full \
+  --train-size 1024 --test-size 512 --seeds 13 37 103 211 509
+recursivecal verify runs/full
+```
+
+The full recorded release is in [research/releases/v0.3](research/releases/v0.3/). It uses 1,024 training contexts, 512 validation contexts, five learned seeds, and 512 shared test cases in each of five cohorts. The 51,200 policy-by-case records represent 2,560 distinct evaluation cases, not 51,200 independent physical experiments. Quick mode is a software smoke test.
+
+## Recorded research results
+
+Mean net reward is terminal calibration quality minus `0.012 × diagnostic cost`. Higher is better. The learned column is the mean of five fitted seed results.
+
+| Evaluation cohort | No diagnostic test | Fixed schedule | Adaptive Bayes | Learned mean | Bayes with fallback |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Constructed finite prior | 0.835115 | 0.877108 | 0.889437 | 0.889164 | 0.885895 |
+| Continuous parameter jitter | 0.831377 | 0.870065 | 0.879933 | 0.877946 | 0.874278 |
+| Unseen high load | **0.932925** | 0.882169 | 0.895317 | 0.895957 | 0.904224 |
+| Extreme deadzone | 0.522092 | 0.509154 | 0.527154 | 0.522354 | 0.512011 |
+| Directional-friction shift | 0.809727 | **0.825827** | 0.815906 | 0.813475 | 0.810208 |
+
+Source: [verified summary](research/releases/v0.3/summary.json), [protocol](docs/EXPERIMENT_PROTOCOL.md), and the compressed trial files beside the summary.
+
+On the constructed finite prior, adaptive Bayes improves on the selected fixed schedule by **0.012329**, with a paired 95% interval of **[0.010389, 0.014152]**. Under directional friction, that comparison reverses to **-0.009921 [-0.015302, -0.004964]**. All five learned-versus-Bayes intervals on the finite test include zero; this does not establish equivalence or learned superiority.
+
+The no-test policy chooses the prior-optimal fixed calibration. It is not necessarily a factory setting. A large part of some shifted-cohort differences comes from test cost rather than better calibration quality. Shuffled controls preserve aggregate action cost and are reported descriptively, without an invalid independent-row interval.
+
+The learned policy is a small NumPy contextual bandit with a fixed first test, one optional follow-up, and a shared Bayesian terminal calibrator. It is not LLM RL, long-horizon control, or a general industrial calibration agent. The study is exploratory and was not independently preregistered.
+
+## Physical verification and its limits
+
+The [SI physical audit](research/releases/physical-v1/audit.json) includes explicit numerical gates, geometry/virtual-work checks, energy behavior, step refinement, force fitting, and known failure demonstrations. Nominal opening has about 1.07 degrees simulated tracking RMSE. The default unpowered support balance still lacks about 57.75 Nm after assumed static friction. Passing numerical gates does not turn that failure into a hardware pass.
+
+No OEM model or real actuator dataset was used to train or validate this release. A public NHTSA report motivates the architecture-dependent hold test and is documented in [provenance](docs/PROVENANCE.md); its vehicle measurements are not transferred to this geometry. The [physical measurement protocol](docs/HARDWARE_PROTOCOL.md) specifies the independent evidence needed for a later physical claim.
+
+## Project map
 
 | Path | Purpose |
-|---|---|
-| `recursivecal.py` | Synthetic plant, diagnostic action shield, and independent terminal score |
-| `bayes_id.py` | Particle-based Bayesian identification and classical probe selection |
-| `recursivecal_v1/` | Verifiers v1 taskset, protocol, and environment |
-| `benchmark.py`, `budget_sweep.py` | Seeded evaluations and probe-budget comparisons |
-| `train_probe_rl.py`, `audit_rl.py` | CPU RL pilot and fixed-probe audit |
-| `tests/` | Unit and protocol tests |
+| --- | --- |
+| `recursivecal_lab/` | Installable workbench, SI model, data fitting, experiment runner, and CLI |
+| `research/releases/` | Current raw evidence, checkpoints, physical audit, and descriptive inference timings |
+| `paper/` | Working manuscript, bibliography, generated figures, and PDF |
+| `docs/` | Usage, architecture, model/data contracts, provenance, and experiment protocol |
+| `examples/measurements/` | Runnable synthetic CSVs and metadata, with generation script |
+| `tests/` | Numerical, scientific, interface, and browser acceptance checks |
+| `recursivecal.py`, `bayes_id.py` | Frozen normalized benchmark and historical Bayesian baseline |
+| `research/adaptive_diagnostics/` | Earlier exploratory audit, repaired reproduction entrypoints, preserved results |
+| `mechanics/cad_v1/` | Separate parametric CAD assembly and legacy mesh viewer |
+| `recursivecal_v1/` | Optional Prime Intellect Verifiers integration |
 
-The Python module is `recursivecal` and the Verifiers taskset is `recursivecal_v1`.
+## Development and license
 
-## Scope
+```bash
+python -m pip install -e '.[dev]'
+python -m unittest discover -s tests -v
+python scripts/check_release.py
+```
 
-All dynamics, faults, and measurements are synthetic and normalized. There is no proprietary industrial data, hardware validation, sim-to-real claim, or evidence of safe deployment. Strong classical methods may remain the best approach, and negative findings are part of the result.
+CI also installs the wheel outside the source directory, tests supported Python/NumPy combinations, and exercises the workbench in a real browser. Optional historical neural tests use `.[rl]`; the Verifiers adapter uses `.[verifiers]`. Historical outcomes remain in [RESULTS.md](RESULTS.md), [RL_PILOT.md](RL_PILOT.md), and [LLM_SMOKE.md](LLM_SMOKE.md). The old neural pilot's fixed-probe behavior is retained as a negative control.
 
-MIT licensed. Earlier experiment provenance is retained in the project's Git history.
+See [contributing](CONTRIBUTING.md), [security and local operation](SECURITY.md), [changelog](CHANGELOG.md), and [architecture](docs/ARCHITECTURE.md). Code and original synthetic examples are MIT licensed; external reference documents retain their own terms.
+
+## Citation
+
+If you use RecursiveCal in your research or build on the code, please cite it:
+
+```bibtex
+@software{Reddy_RecursiveCal_2026,
+  author = {Reddy, Venkateshwar},
+  title = {{RecursiveCal: Reproducible Active Calibration and a Software-in-the-Loop Workbench}},
+  version = {0.3.0},
+  year = {2026},
+  month = nov,
+  url = {https://github.com/Venkat-RJ/RecursiveCal},
+  license = {MIT}
+}
+```
+
+Use GitHub's **Cite this repository** link for APA or BibTeX, or download [CITATION.bib](CITATION.bib). The machine-readable metadata is in [CITATION.cff](CITATION.cff).
+
+For reproducibility, also record the exact source commit (`git rev-parse HEAD`), the experiment manifest, and the artifact hashes used. The citation identifies this software; the [manuscript](paper/README.md) is a working draft.

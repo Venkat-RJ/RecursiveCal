@@ -4,17 +4,39 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "recursivecal-v1"
-version = "0.2.0"
-description = "Synthetic safe actuator diagnosis and calibration taskset for RL research"
+version = "0.3.0"
+description = "Reproducible active calibration experiments and a local software-in-the-loop workbench"
+authors = [{name = "Venkateshwar Reddy"}]
+readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
-dependencies = []
+dependencies = ["numpy>=1.24,<3"]
+
+[project.scripts]
+recursivecal = "recursivecal_lab.cli:main"
+
+[project.urls]
+Repository = "https://github.com/Venkat-RJ/RecursiveCal"
+Documentation = "https://github.com/Venkat-RJ/RecursiveCal/blob/main/docs/USER_GUIDE.md"
+Issues = "https://github.com/Venkat-RJ/RecursiveCal/issues"
 
 [project.optional-dependencies]
 bayes = ["numpy>=1.24"]
 rl = ["numpy>=1.24", "torch>=2.2"]
 verifiers = ["verifiers>=0.4.0,<0.5.0"]
+dev = ["build>=1.2,<2", "ruff>=0.9,<1"]
+paper = ["matplotlib>=3.7,<4", "reportlab>=4,<5"]
 
 [tool.setuptools]
+include-package-data = false
 py-modules = ["recursivecal", "bayes_id", "benchmark", "budget_sweep", "report_analysis", "demo", "train_probe_rl", "audit_rl"]
-packages = ["recursivecal_v1"]
+packages = ["recursivecal_v1", "recursivecal_lab", "research", "research.adaptive_diagnostics"]
+
+[tool.setuptools.package-data]
+recursivecal_lab = ["web/*.html", "web/*.css", "web/*.js", "web/*.svg", "data/*.md"]
+
+[tool.ruff]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E9", "F63", "F7", "F82"]

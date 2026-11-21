@@ -1,0 +1,106 @@
+name: RecursiveCal product
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: product-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - python: '3.11'
+            numpy: 'numpy==1.24.4'
+          - python: '3.12'
+            numpy: 'numpy==2.3.5'
+          - python: '3.13'
+            numpy: 'numpy==2.3.5'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install supported numerical version and package tools
+        run: python -m pip install '${{ matrix.numpy }}' build ruff
+      - name: Compile and check new Python code
+        run: |
+          python -m compileall -q recursivecal_lab research
+          ruff check recursivecal_lab tests/test_lab_*.py
+      - name: Run product and preserved benchmark tests
+        run: python -m unittest discover -s tests -v
+      - name: Build wheel and source distribution
+        run: python -m build
+      - name: Verify source archive includes citation, manuscript and research evidence
+        run: python scripts/check_release.py --archive dist/*.tar.gz
+      - name: Test installed wheel away from source
+        run: |
+          python -m pip install --no-deps dist/*.whl
+          cd "$RUNNER_TEMP"
+          recursivecal doctor
+          recursivecal simulate --output installed-run.json --csv installed-trace.csv
+          recursivecal experiment --quick --output installed-experiment
+          recursivecal verify installed-experiment
+      - name: Preserve package artifacts
+        if: matrix.python == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: recursivecal-v0.3-packages
+          path: dist/
+          retention-days: 30
+
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install workbench and browser test tools
+        run: |
+          python -m pip install . playwright
+          python -m playwright install --with-deps chromium
+      - name: Exercise real HTTP workbench, CSV import, exports and mobile layout
+        run: |
+          node tests/workbench_contracts.cjs
+          python tests/workbench_smoke.py
+      - name: Preserve browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: recursivecal-workbench-evidence
+          path: artifacts/workbench/
+          retention-days: 30
+
+  source-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install package
+        run: python -m pip install .
+      - name: Verify published experiment artifacts
+        run: recursivecal verify research/releases/v0.3
+      - name: Check documentation links and release metadata
+        run: python scripts/check_release.py
+

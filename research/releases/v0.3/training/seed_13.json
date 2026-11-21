@@ -1,0 +1,86 @@
+[
+  {
+    "update": 50,
+    "epsilon": 0.5184549356223176,
+    "train_selected_mse": 0.25607030566205774,
+    "validation_mean_reward": 0.8835884448368259
+  },
+  {
+    "update": 100,
+    "epsilon": 0.48626609442060087,
+    "train_selected_mse": 0.1133071486929775,
+    "validation_mean_reward": 0.8874543195935164
+  },
+  {
+    "update": 150,
+    "epsilon": 0.45407725321888415,
+    "train_selected_mse": 0.10924594031455796,
+    "validation_mean_reward": 0.8873275970052406
+  },
+  {
+    "update": 200,
+    "epsilon": 0.4218884120171674,
+    "train_selected_mse": 0.11211820559549093,
+    "validation_mean_reward": 0.8885815105357557
+  },
+  {
+    "update": 250,
+    "epsilon": 0.3896995708154507,
+    "train_selected_mse": 0.16299528987843176,
+    "validation_mean_reward": 0.8885559483458649
+  },
+  {
+    "update": 300,
+    "epsilon": 0.3575107296137339,
+    "train_selected_mse": 0.0930743682644852,
+    "validation_mean_reward": 0.8890015824828758
+  },
+  {
+    "update": 350,
+    "epsilon": 0.3253218884120172,
+    "train_selected_mse": 0.11977971173653743,
+    "validation_mean_reward": 0.8887000309342493
+  },
+  {
+    "update": 400,
+    "epsilon": 0.2931330472103005,
+    "train_selected_mse": 0.10336800134277654,
+    "validation_mean_reward": 0.8889735393206173
+  },
+  {
+    "update": 450,
+    "epsilon": 0.2609442060085837,
+    "train_selected_mse": 0.08765393513061029,
+    "validation_mean_reward": 0.8886732765428778
+  },
+  {
+    "update": 500,
+    "epsilon": 0.22875536480686698,
+    "train_selected_mse": 0.1282909240601275,
+    "validation_mean_reward": 0.8883055695654876
+  },
+  {
+    "update": 550,
+    "epsilon": 0.19656652360515026,
+    "train_selected_mse": 0.06768733023638168,
+    "validation_mean_reward": 0.8889762516546404
+  },
+  {
+    "update": 600,
+    "epsilon": 0.16437768240343348,
+    "train_selected_mse": 0.0874331930299126,
+    "validation_mean_reward": 0.8885189178454489
+  },
+  {
+    "update": 650,
+    "epsilon": 0.13218884120171676,
+    "train_selected_mse": 0.05663102607440481,
+    "validation_mean_reward": 0.8890242460635589
+  },
+  {
+    "update": 700,
+    "epsilon": 0.10000000000000003,
+    "train_selected_mse": 0.07157895624749636,
+    "validation_mean_reward": 0.8886943898208919
+  }
+]

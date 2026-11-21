@@ -1,0 +1,595 @@
+{
+  "schema_version": "recursivecal.inference-timing/1",
+  "scope": "Descriptive measurement on this shared CPU and these saved synthetic observations. No real-time guarantee or general algorithmic speed claim.",
+  "release_manifest_sha256": "9be94c7d42a16bd6f5f7d21f7ac8145f70677cf40478274c0ca71ad71e83967c",
+  "source_sha256": {
+    "experiments.py": "40208386fbf3448ec20d6ff61c1eb8fd5fc0e22339146af0ce8cde20f21a769f",
+    "benchmark.py": "83c14737480169ed94f8b0ca02a3283f1a92a49456d10e86396e3bfa0b55ee6f",
+    "checkpoint": "3dc904ec7e86131015ae6233a7ff49e27b96da4c018220056a8ca73a4a20cfce",
+    "observations": "8ce72081914ea81b70390238e95fbcdfc3eadf9382df7203ca5101bb60b65e7a"
+  },
+  "inputs": {
+    "cohort": "finite_test",
+    "episode_ids": [
+      "finite_test:3300261121:0",
+      "finite_test:3300261121:1",
+      "finite_test:3300261121:2",
+      "finite_test:3300261121:3",
+      "finite_test:3300261121:4",
+      "finite_test:3300261121:5",
+      "finite_test:3300261121:6",
+      "finite_test:3300261121:7",
+      "finite_test:3300261121:8",
+      "finite_test:3300261121:9",
+      "finite_test:3300261121:10",
+      "finite_test:3300261121:11",
+      "finite_test:3300261121:12",
+      "finite_test:3300261121:13",
+      "finite_test:3300261121:14",
+      "finite_test:3300261121:15",
+      "finite_test:3300261121:16",
+      "finite_test:3300261121:17",
+      "finite_test:3300261121:18",
+      "finite_test:3300261121:19",
+      "finite_test:3300261121:20",
+      "finite_test:3300261121:21",
+      "finite_test:3300261121:22",
+      "finite_test:3300261121:23",
+      "finite_test:3300261121:24",
+      "finite_test:3300261121:25",
+      "finite_test:3300261121:26",
+      "finite_test:3300261121:27",
+      "finite_test:3300261121:28",
+      "finite_test:3300261121:29",
+      "finite_test:3300261121:30",
+      "finite_test:3300261121:31",
+      "finite_test:3300261121:32",
+      "finite_test:3300261121:33",
+      "finite_test:3300261121:34",
+      "finite_test:3300261121:35",
+      "finite_test:3300261121:36",
+      "finite_test:3300261121:37",
+      "finite_test:3300261121:38",
+      "finite_test:3300261121:39",
+      "finite_test:3300261121:40",
+      "finite_test:3300261121:41",
+      "finite_test:3300261121:42",
+      "finite_test:3300261121:43",
+      "finite_test:3300261121:44",
+      "finite_test:3300261121:45",
+      "finite_test:3300261121:46",
+      "finite_test:3300261121:47",
+      "finite_test:3300261121:48",
+      "finite_test:3300261121:49",
+      "finite_test:3300261121:50",
+      "finite_test:3300261121:51",
+      "finite_test:3300261121:52",
+      "finite_test:3300261121:53",
+      "finite_test:3300261121:54",
+      "finite_test:3300261121:55",
+      "finite_test:3300261121:56",
+      "finite_test:3300261121:57",
+      "finite_test:3300261121:58",
+      "finite_test:3300261121:59",
+      "finite_test:3300261121:60",
+      "finite_test:3300261121:61",
+      "finite_test:3300261121:62",
+      "finite_test:3300261121:63"
+    ],
+    "observed_first_probe": [
+      [
+        0.05873180161004699,
+        0.2104694474934701
+      ],
+      [
+        0.03892442285005402,
+        0.12015615809823363
+      ],
+      [
+        0.015226929091009303,
+        0.04223547704609291
+      ],
+      [
+        0.04499576264148617,
+        0.16988985457687025
+      ],
+      [
+        0.05948198488686625,
+        0.16437770671916505
+      ],
+      [
+        0.056212869578764,
+        0.18405632464027372
+      ],
+      [
+        0.03293444732349121,
+        0.10663343589107577
+      ],
+      [
+        0.05648139928872689,
+        0.18800464605193432
+      ],
+      [
+        0.03422532620090816,
+        0.09758569067578253
+      ],
+      [
+        0.0037529295316255616,
+        0.030151348109853666
+      ],
+      [
+        0.03152761284916811,
+        0.11416013907457344
+      ],
+      [
+        0.05579711658267305,
+        0.19442463328521234
+      ],
+      [
+        0.042767847057111986,
+        0.1031466328266727
+      ],
+      [
+        0.03550293443595227,
+        0.1165763822229989
+      ],
+      [
+        0.01989565087815897,
+        0.029412795230623207
+      ],
+      [
+        0.051622073378244246,
+        0.17746555512735948
+      ],
+      [
+        0.012195536222302204,
+        0.029467826926868446
+      ],
+      [
+        0.041276559190261075,
+        0.11939590546914752
+      ],
+      [
+        0.036596298137316984,
+        0.07643206571356696
+      ],
+      [
+        0.0487534228037511,
+        0.11663584281679218
+      ],
+      [
+        0.03451530934764938,
+        0.09739204316513898
+      ],
+      [
+        0.0218429244705659,
+        0.11711343542528138
+      ],
+      [
+        0.03144539342771266,
+        0.0871754245267849
+      ],
+      [
+        0.0435323901947612,
+        0.10594673870627923
+      ],
+      [
+        0.038338366193887315,
+        0.10059487678987938
+      ],
+      [
+        0.04030602569375515,
+        0.10400582852583465
+      ],
+      [
+        0.03656789072492061,
+        0.10744096567378797
+      ],
+      [
+        0.01197886324132185,
+        0.020352344101097316
+      ],
+      [
+        0.008567235996172625,
+        0.030526094861358523
+      ],
+      [
+        0.016604178117684616,
+        0.04312848634957711
+      ],
+      [
+        0.02844204984599375,
+        0.0739192230352197
+      ],
+      [
+        0.03767980505337408,
+        0.11790950365996808
+      ],
+      [
+        0.02925690390711503,
+        0.06976669973876123
+      ],
+      [
+        0.04792815372769582,
+        0.17011115938474183
+      ],
+      [
+        0.05735958640469251,
+        0.1747878242917509
+      ],
+      [
+        0.0538925163632226,
+        0.17539932425587929
+      ],
+      [
+        0.038427862838975514,
+        0.121758830256161
+      ],
+      [
+        0.05951200794057671,
+        0.18413470327532783
+      ],
+      [
+        0.05390934537803604,
+        0.16231066501839034
+      ],
+      [
+        0.056842140683613304,
+        0.18675696935138894
+      ],
+      [
+        0.04184594239010909,
+        0.12303441793325036
+      ],
+      [
+        0.04044597801599453,
+        0.11642873482704283
+      ],
+      [
+        0.03621505162090857,
+        0.11466618485431984
+      ],
+      [
+        0.017525178718430182,
+        0.05104283127799668
+      ],
+      [
+        0.06513852957180638,
+        0.17976563762928952
+      ],
+      [
+        0.04900760154055314,
+        0.172793954348245
+      ],
+      [
+        0.058469366267085154,
+        0.19434873039051145
+      ],
+      [
+        0.026542106433852665,
+        0.08895582521725215
+      ],
+      [
+        0.058272064853370505,
+        0.18112292398349053
+      ],
+      [
+        0.03996506554380032,
+        0.10233752988007529
+      ],
+      [
+        0.051555331163599526,
+        0.1714782419918112
+      ],
+      [
+        0.05375925973320413,
+        0.20010658446876048
+      ],
+      [
+        0.04892436567348206,
+        0.17788256950937562
+      ],
+      [
+        0.037466289815278296,
+        0.11141701672136295
+      ],
+      [
+        0.01140898275070126,
+        0.06640022633263076
+      ],
+      [
+        0.011253849004493355,
+        0.03684045200779438
+      ],
+      [
+        0.03864935909343589,
+        0.12493847143322505
+      ],
+      [
+        0.060859774709517284,
+        0.1868281833102752
+      ],
+      [
+        0.014140520197476188,
+        0.03333760219222781
+      ],
+      [
+        0.035486501743163014,
+        0.08892526528824508
+      ],
+      [
+        0.016132174725009985,
+        0.04821264916616625
+      ],
+      [
+        0.01770154545651599,
+        0.04053968368682808
+      ],
+      [
+        0.05525833852975715,
+        0.18917083352102654
+      ],
+      [
+        0.010908327911368153,
+        0.049114752622483576
+      ]
+    ],
+    "batch_size": 64,
+    "checkpoint_seed": 13,
+    "bayesian_quadrature_order": 15,
+    "warmups": 2,
+    "repeats": 7
+  },
+  "timing": {
+    "posterior_only_batch": {
+      "repeat_duration_s": [
+        0.000124544,
+        0.0001012,
+        0.000123652,
+        9.9116e-05,
+        0.000151133,
+        0.000120566,
+        0.000130505
+      ],
+      "median_duration_s": 0.000123652,
+      "per_decision_us": {
+        "median": 1.9320625,
+        "min": 1.5486875,
+        "max": 2.361453125
+      },
+      "decisions_per_repeat": 64
+    },
+    "posterior_and_feature_preparation_batch": {
+      "repeat_duration_s": [
+        0.000129612,
+        0.000132588,
+        0.000113803,
+        0.000134632,
+        0.000121658,
+        0.000195005,
+        0.000116409
+      ],
+      "median_duration_s": 0.000129612,
+      "per_decision_us": {
+        "median": 2.0251875,
+        "min": 1.778171875,
+        "max": 3.046953125
+      },
+      "decisions_per_repeat": 64
+    },
+    "learned_network_only_batch": {
+      "repeat_duration_s": [
+        0.000113533,
+        0.00012805,
+        0.000103424,
+        0.000150311,
+        0.000103013,
+        9.605e-05,
+        0.000107572
+      ],
+      "median_duration_s": 0.000107572,
+      "per_decision_us": {
+        "median": 1.6808125,
+        "min": 1.50078125,
+        "max": 2.348609375
+      },
+      "decisions_per_repeat": 64
+    },
+    "learned_end_to_end_batch": {
+      "repeat_duration_s": [
+        0.000212669,
+        0.000444904,
+        0.000342632,
+        0.000322905,
+        0.000355647,
+        0.000335498,
+        0.000630391
+      ],
+      "median_duration_s": 0.000342632,
+      "per_decision_us": {
+        "median": 5.353625,
+        "min": 3.322953125,
+        "max": 9.849859375
+      },
+      "decisions_per_repeat": 64
+    },
+    "bayesian_order15_end_to_end_batch": {
+      "repeat_duration_s": [
+        0.12443345,
+        0.135685862,
+        0.121706939,
+        0.119096085,
+        0.114690757,
+        0.109270577,
+        0.113532456
+      ],
+      "median_duration_s": 0.119096085,
+      "per_decision_us": {
+        "median": 1860.876328125,
+        "min": 1707.352765625,
+        "max": 2120.09159375
+      },
+      "decisions_per_repeat": 64
+    },
+    "learned_end_to_end_scalar_loop": {
+      "repeat_duration_s": [
+        0.004646611,
+        0.004561931,
+        0.00472078,
+        0.004609771,
+        0.004680725,
+        0.004754361,
+        0.004678509
+      ],
+      "median_duration_s": 0.004678509,
+      "per_decision_us": {
+        "median": 73.101703125,
+        "min": 71.280171875,
+        "max": 74.286890625
+      },
+      "decisions_per_repeat": 64
+    },
+    "bayesian_order15_end_to_end_scalar_loop": {
+      "repeat_duration_s": [
+        0.139415323,
+        0.156796064,
+        0.131936504,
+        0.164237783,
+        0.138690324,
+        0.202112249,
+        0.146333311
+      ],
+      "median_duration_s": 0.146333311,
+      "per_decision_us": {
+        "median": 2286.457984375,
+        "min": 2061.507875,
+        "max": 3158.003890625
+      },
+      "decisions_per_repeat": 64
+    }
+  },
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "system": "Linux",
+    "release": "6.18.57",
+    "machine": "x86_64",
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "logical_cpu_count": 9,
+    "available_cpu_affinity_count": 9,
+    "blas_thread_environment": {
+      "OPENBLAS_NUM_THREADS": null,
+      "MKL_NUM_THREADS": null,
+      "OMP_NUM_THREADS": null,
+      "VECLIB_MAXIMUM_THREADS": null,
+      "NUMEXPR_NUM_THREADS": null
+    },
+    "numpy_build_configuration": {
+      "Compilers": {
+        "c": {
+          "name": "gcc",
+          "linker": "ld.bfd",
+          "version": "14.2.1",
+          "commands": "cc"
+        },
+        "cython": {
+          "name": "cython",
+          "linker": "cython",
+          "version": "3.2.1",
+          "commands": "cython"
+        },
+        "c++": {
+          "name": "gcc",
+          "linker": "ld.bfd",
+          "version": "14.2.1",
+          "commands": "c++"
+        }
+      },
+      "Machine Information": {
+        "host": {
+          "cpu": "x86_64",
+          "family": "x86_64",
+          "endian": "little",
+          "system": "linux"
+        },
+        "build": {
+          "cpu": "x86_64",
+          "family": "x86_64",
+          "endian": "little",
+          "system": "linux"
+        }
+      },
+      "Build Dependencies": {
+        "blas": {
+          "name": "scipy-openblas",
+          "found": true,
+          "version": "0.3.30",
+          "detection method": "pkgconfig",
+          "include directory": "/opt/_internal/cpython-3.12.12/lib/python3.12/site-packages/scipy_openblas64/include",
+          "lib directory": "/opt/_internal/cpython-3.12.12/lib/python3.12/site-packages/scipy_openblas64/lib",
+          "openblas configuration": "OpenBLAS 0.3.30  USE64BITINT DYNAMIC_ARCH NO_AFFINITY Haswell MAX_THREADS=64",
+          "pc file directory": "/project/.openblas"
+        },
+        "lapack": {
+          "name": "scipy-openblas",
+          "found": true,
+          "version": "0.3.30",
+          "detection method": "pkgconfig",
+          "include directory": "/opt/_internal/cpython-3.12.12/lib/python3.12/site-packages/scipy_openblas64/include",
+          "lib directory": "/opt/_internal/cpython-3.12.12/lib/python3.12/site-packages/scipy_openblas64/lib",
+          "openblas configuration": "OpenBLAS 0.3.30  USE64BITINT DYNAMIC_ARCH NO_AFFINITY Haswell MAX_THREADS=64",
+          "pc file directory": "/project/.openblas"
+        }
+      },
+      "Python Information": {
+        "path": "/tmp/build-env-aw1mwcap/bin/python",
+        "version": "3.12"
+      },
+      "SIMD Extensions": {
+        "baseline": [
+          "SSE",
+          "SSE2",
+          "SSE3"
+        ],
+        "found": [
+          "SSSE3",
+          "SSE41",
+          "POPCNT",
+          "SSE42",
+          "AVX",
+          "F16C",
+          "FMA3",
+          "AVX2"
+        ],
+        "not found": [
+          "AVX512F",
+          "AVX512CD",
+          "AVX512_KNL",
+          "AVX512_KNM",
+          "AVX512_SKX",
+          "AVX512_CLX",
+          "AVX512_CNL",
+          "AVX512_ICL",
+          "AVX512_SPR"
+        ]
+      }
+    }
+  },
+  "checks": {
+    "release_integrity_valid": true,
+    "same_observations_for_both_methods": true,
+    "scalar_batch_decisions_identical": true,
+    "learned_bayesian_action_agreement_fraction": 0.671875
+  },
+  "measurement_notes": [
+    "Bank construction, checkpoint loading, training, data generation, disk I/O, and terminal calibration are outside timed intervals.",
+    "Both end-to-end paths include their public posterior computation; the shared posterior and learner feature-construction costs are also timed separately.",
+    "Posterior-only, feature-preparation, and network-only rows are components and must not be added to end-to-end rows.",
+    "Bayesian public API also computes its forced-two choice from the same utility table; the optional choice is used here.",
+    "Batch per-decision numbers are amortized batch time divided by batch size, not single-case response latency.",
+    "Scalar-loop per-decision numbers average separate one-observation calls including Python-loop overhead; they are not tail-latency percentiles.",
+    "Min, median, and max describe seven repeated runs (or configured repeats), not confidence intervals or worst-case guarantees.",
+    "Shared CPU scheduling, BLAS configuration, frequency scaling, and cache state are not controlled; no thread environment is changed by this script.",
+    "This compares implementations on one finite prior and batch, and does not establish method accuracy, novelty, or asymptotic complexity."
+  ]
+}

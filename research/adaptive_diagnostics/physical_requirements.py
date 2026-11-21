@@ -12,7 +12,7 @@ import json
 import math
 from pathlib import Path
 try:
-    import cad_simulation_physics_v2 as cad
+    from mechanics.cad_v1.simulation import physics_v2 as cad
 except ModuleNotFoundError:
     import sys
     repo=Path(__file__).resolve().parents[2]

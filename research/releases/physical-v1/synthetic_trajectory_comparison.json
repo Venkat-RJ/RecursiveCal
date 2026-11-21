@@ -1,0 +1,826 @@
+{
+  "schema_version": "recursivecal.trajectory-comparison/1",
+  "provenance": {
+    "source_kind": "synthetic",
+    "metadata": {
+      "source_kind": "synthetic",
+      "source": "generate_examples.py, seed 7112026; default SI simulation with artificial observation error",
+      "units": {
+        "time_s": "s",
+        "angle_rad": "rad"
+      },
+      "noise": "angle bias 0.0012 rad plus Gaussian standard deviation 0.0005 rad",
+      "independence": "Same simulator as the comparison model. This is an import demo, not independent validation.",
+      "license": "MIT"
+    },
+    "source": "generate_examples.py, seed 7112026; default SI simulation with artificial observation error",
+    "csv_sha256": "d0104100650236acb1467a49ccfc64b78fab2fdb65de84572338635c49a87ec0",
+    "filename": "synthetic_trajectory.csv",
+    "hardware_validated": false
+  },
+  "simulation_model_id": "recursivecal.si-liftgate/1",
+  "simulation_sha256": "487decd309d0d300f70607e358574884414fc915d92238f2e1d6e147b761a4e7",
+  "method": "linear time interpolation without refitting, alignment, or extrapolation",
+  "metrics": {
+    "angle_rad": {
+      "n": 131,
+      "rmse": 0.0013016555647063673,
+      "mae": 0.0012106748068086532,
+      "bias": -0.0012073243362529056,
+      "max_abs": 0.0021553253565274044,
+      "p95_abs": 0.0020147318505272516
+    }
+  },
+  "acceptance_limits": null,
+  "acceptance_passed": null,
+  "validation_scope": "dataset agreement only; threshold origin and data independence are not verified",
+  "residuals": [
+    {
+      "time_s": 0.0,
+      "predicted_angle_rad": 0.0,
+      "observed_angle_rad": 0.001102414207,
+      "residual_angle_rad": -0.001102414207
+    },
+    {
+      "time_s": 0.05,
+      "predicted_angle_rad": 0.0066397584265473365,
+      "observed_angle_rad": 0.008181713317,
+      "residual_angle_rad": -0.0015419548904526629
+    },
+    {
+      "time_s": 0.1,
+      "predicted_angle_rad": 0.019502917116660343,
+      "observed_angle_rad": 0.020501939393,
+      "residual_angle_rad": -0.0009990222763396582
+    },
+    {
+      "time_s": 0.15,
+      "predicted_angle_rad": 0.03184596379049724,
+      "observed_angle_rad": 0.032583239263,
+      "residual_angle_rad": -0.0007372754725027547
+    },
+    {
+      "time_s": 0.2,
+      "predicted_angle_rad": 0.040726859547575885,
+      "observed_angle_rad": 0.042036426012,
+      "residual_angle_rad": -0.0013095664644241153
+    },
+    {
+      "time_s": 0.25,
+      "predicted_angle_rad": 0.045514839728680805,
+      "observed_angle_rad": 0.045686625012,
+      "residual_angle_rad": -0.00017178528331919518
+    },
+    {
+      "time_s": 0.3,
+      "predicted_angle_rad": 0.04682166939857058,
+      "observed_angle_rad": 0.047180548576,
+      "residual_angle_rad": -0.00035887917742941783
+    },
+    {
+      "time_s": 0.35,
+      "predicted_angle_rad": 0.04682166939857058,
+      "observed_angle_rad": 0.048515450882,
+      "residual_angle_rad": -0.0016937814834294199
+    },
+    {
+      "time_s": 0.4,
+      "predicted_angle_rad": 0.04682166939857058,
+      "observed_angle_rad": 0.048164489773,
+      "residual_angle_rad": -0.0013428203744294195
+    },
+    {
+      "time_s": 0.45,
+      "predicted_angle_rad": 0.04682166939857058,
+      "observed_angle_rad": 0.048065341452,
+      "residual_angle_rad": -0.001243672053429415
+    },
+    {
+      "time_s": 0.5,
+      "predicted_angle_rad": 0.04682166939857058,
+      "observed_angle_rad": 0.048374574307,
+      "residual_angle_rad": -0.0015529049084294158
+    },
+    {
+      "time_s": 0.55,
+      "predicted_angle_rad": 0.04682166939857058,
+      "observed_angle_rad": 0.048795622822,
+      "residual_angle_rad": -0.001973953423429417
+    },
+    {
+      "time_s": 0.6,
+      "predicted_angle_rad": 0.04708611463544341,
+      "observed_angle_rad": 0.04820987656,
+      "residual_angle_rad": -0.001123761924556592
+    },
+    {
+      "time_s": 0.65,
+      "predicted_angle_rad": 0.0480872611273861,
+      "observed_angle_rad": 0.049733716833,
+      "residual_angle_rad": -0.0016464557056138987
+    },
+    {
+      "time_s": 0.7,
+      "predicted_angle_rad": 0.0500650093158717,
+      "observed_angle_rad": 0.051625329242,
+      "residual_angle_rad": -0.0015603199261283035
+    },
+    {
+      "time_s": 0.75,
+      "predicted_angle_rad": 0.05316976136759843,
+      "observed_angle_rad": 0.053633833306,
+      "residual_angle_rad": -0.0004640719384015751
+    },
+    {
+      "time_s": 0.8,
+      "predicted_angle_rad": 0.05748082105825424,
+      "observed_angle_rad": 0.059007378899,
+      "residual_angle_rad": -0.0015265578407457556
+    },
+    {
+      "time_s": 0.85,
+      "predicted_angle_rad": 0.06302532209592884,
+      "observed_angle_rad": 0.062997962005,
+      "residual_angle_rad": 2.7360090928837955e-05
+    },
+    {
+      "time_s": 0.9,
+      "predicted_angle_rad": 0.06979496473188704,
+      "observed_angle_rad": 0.071538703261,
+      "residual_angle_rad": -0.0017437385291129565
+    },
+    {
+      "time_s": 0.95,
+      "predicted_angle_rad": 0.07775948176156611,
+      "observed_angle_rad": 0.078788757884,
+      "residual_angle_rad": -0.001029276122433892
+    },
+    {
+      "time_s": 1.0,
+      "predicted_angle_rad": 0.08687668780437328,
+      "observed_angle_rad": 0.087311040651,
+      "residual_angle_rad": -0.00043435284662671214
+    },
+    {
+      "time_s": 1.05,
+      "predicted_angle_rad": 0.09709945244845397,
+      "observed_angle_rad": 0.098528871358,
+      "residual_angle_rad": -0.0014294189095460236
+    },
+    {
+      "time_s": 1.1,
+      "predicted_angle_rad": 0.10838014818459989,
+      "observed_angle_rad": 0.109611972173,
+      "residual_angle_rad": -0.0012318239884001186
+    },
+    {
+      "time_s": 1.15,
+      "predicted_angle_rad": 0.12067316984513819,
+      "observed_angle_rad": 0.121333496813,
+      "residual_angle_rad": -0.0006603269678618073
+    },
+    {
+      "time_s": 1.2,
+      "predicted_angle_rad": 0.13393607726216036,
+      "observed_angle_rad": 0.135190172246,
+      "residual_angle_rad": -0.001254094983839632
+    },
+    {
+      "time_s": 1.25,
+      "predicted_angle_rad": 0.14812982489193097,
+      "observed_angle_rad": 0.148920812667,
+      "residual_angle_rad": -0.0007909877750690297
+    },
+    {
+      "time_s": 1.3,
+      "predicted_angle_rad": 0.16321844107652386,
+      "observed_angle_rad": 0.165071794922,
+      "residual_angle_rad": -0.0018533538454761356
+    },
+    {
+      "time_s": 1.35,
+      "predicted_angle_rad": 0.1791684228393398,
+      "observed_angle_rad": 0.180395057299,
+      "residual_angle_rad": -0.0012266344596601753
+    },
+    {
+      "time_s": 1.4,
+      "predicted_angle_rad": 0.1959480285829851,
+      "observed_angle_rad": 0.196320101259,
+      "residual_angle_rad": -0.0003720726760149118
+    },
+    {
+      "time_s": 1.45,
+      "predicted_angle_rad": 0.21352658418323,
+      "observed_angle_rad": 0.215262157692,
+      "residual_angle_rad": -0.0017355735087699886
+    },
+    {
+      "time_s": 1.5,
+      "predicted_angle_rad": 0.23187386776420926,
+      "observed_angle_rad": 0.233587406587,
+      "residual_angle_rad": -0.0017135388227907389
+    },
+    {
+      "time_s": 1.55,
+      "predicted_angle_rad": 0.25095960304634374,
+      "observed_angle_rad": 0.252468409056,
+      "residual_angle_rad": -0.0015088060096562494
+    },
+    {
+      "time_s": 1.6,
+      "predicted_angle_rad": 0.2707530679085425,
+      "observed_angle_rad": 0.272411931693,
+      "residual_angle_rad": -0.0016588637844575094
+    },
+    {
+      "time_s": 1.65,
+      "predicted_angle_rad": 0.2912228108758039,
+      "observed_angle_rad": 0.29208904009,
+      "residual_angle_rad": -0.0008662292141961014
+    },
+    {
+      "time_s": 1.7,
+      "predicted_angle_rad": 0.31233646103944573,
+      "observed_angle_rad": 0.313600084888,
+      "residual_angle_rad": -0.001263623848554274
+    },
+    {
+      "time_s": 1.75,
+      "predicted_angle_rad": 0.3340606142639678,
+      "observed_angle_rad": 0.33546839501,
+      "residual_angle_rad": -0.00140778074603215
+    },
+    {
+      "time_s": 1.8,
+      "predicted_angle_rad": 0.35636077872811267,
+      "observed_angle_rad": 0.35697533899,
+      "residual_angle_rad": -0.0006145602618873314
+    },
+    {
+      "time_s": 1.85,
+      "predicted_angle_rad": 0.3792013646330914,
+      "observed_angle_rad": 0.380118828182,
+      "residual_angle_rad": -0.0009174635489085925
+    },
+    {
+      "time_s": 1.9,
+      "predicted_angle_rad": 0.40254570541891405,
+      "observed_angle_rad": 0.404688726991,
+      "residual_angle_rad": -0.002143021572085957
+    },
+    {
+      "time_s": 1.95,
+      "predicted_angle_rad": 0.42635610049883554,
+      "observed_angle_rad": 0.427392037201,
+      "residual_angle_rad": -0.0010359367021644528
+    },
+    {
+      "time_s": 2.0,
+      "predicted_angle_rad": 0.45059387202124895,
+      "observed_angle_rad": 0.451228585024,
+      "residual_angle_rad": -0.0006347130027510306
+    },
+    {
+      "time_s": 2.05,
+      "predicted_angle_rad": 0.4752194303299354,
+      "observed_angle_rad": 0.476027078394,
+      "residual_angle_rad": -0.0008076480640645811
+    },
+    {
+      "time_s": 2.1,
+      "predicted_angle_rad": 0.5001923445570327,
+      "observed_angle_rad": 0.501793234899,
+      "residual_angle_rad": -0.0016008903419673093
+    },
+    {
+      "time_s": 2.15,
+      "predicted_angle_rad": 0.52547141615372,
+      "observed_angle_rad": 0.52617501196,
+      "residual_angle_rad": -0.0007035958062800995
+    },
+    {
+      "time_s": 2.2,
+      "predicted_angle_rad": 0.5510147541822961,
+      "observed_angle_rad": 0.552004425518,
+      "residual_angle_rad": -0.0009896713357039344
+    },
+    {
+      "time_s": 2.25,
+      "predicted_angle_rad": 0.5767798519161798,
+      "observed_angle_rad": 0.577552282331,
+      "residual_angle_rad": -0.0007724304148202243
+    },
+    {
+      "time_s": 2.3,
+      "predicted_angle_rad": 0.6027236647801886,
+      "observed_angle_rad": 0.604582394824,
+      "residual_angle_rad": -0.0018587300438114296
+    },
+    {
+      "time_s": 2.35,
+      "predicted_angle_rad": 0.628802689966495,
+      "observed_angle_rad": 0.630745749568,
+      "residual_angle_rad": -0.0019430596015049817
+    },
+    {
+      "time_s": 2.4,
+      "predicted_angle_rad": 0.6549730482283878,
+      "observed_angle_rad": 0.656746460005,
+      "residual_angle_rad": -0.001773411776612277
+    },
+    {
+      "time_s": 2.45,
+      "predicted_angle_rad": 0.6811905684220182,
+      "observed_angle_rad": 0.682484010739,
+      "residual_angle_rad": -0.0012934423169818077
+    },
+    {
+      "time_s": 2.5,
+      "predicted_angle_rad": 0.7074108753649602,
+      "observed_angle_rad": 0.707768188434,
+      "residual_angle_rad": -0.00035731306903985516
+    },
+    {
+      "time_s": 2.55,
+      "predicted_angle_rad": 0.7335894815318349,
+      "observed_angle_rad": 0.734722992002,
+      "residual_angle_rad": -0.0011335104701650778
+    },
+    {
+      "time_s": 2.6,
+      "predicted_angle_rad": 0.7596818830276034,
+      "observed_angle_rad": 0.760178254513,
+      "residual_angle_rad": -0.0004963714853966072
+    },
+    {
+      "time_s": 2.65,
+      "predicted_angle_rad": 0.785643660180294,
+      "observed_angle_rad": 0.78594433415,
+      "residual_angle_rad": -0.00030067396970601123
+    },
+    {
+      "time_s": 2.7,
+      "predicted_angle_rad": 0.8114305829852703,
+      "observed_angle_rad": 0.813024655451,
+      "residual_angle_rad": -0.0015940724657297345
+    },
+    {
+      "time_s": 2.75,
+      "predicted_angle_rad": 0.8369987215187993,
+      "observed_angle_rad": 0.838071054219,
+      "residual_angle_rad": -0.0010723327002006844
+    },
+    {
+      "time_s": 2.8,
+      "predicted_angle_rad": 0.8623045613240977,
+      "observed_angle_rad": 0.86409597864,
+      "residual_angle_rad": -0.0017914173159022662
+    },
+    {
+      "time_s": 2.85,
+      "predicted_angle_rad": 0.8873051236615757,
+      "observed_angle_rad": 0.887683079478,
+      "residual_angle_rad": -0.0003779558164243024
+    },
+    {
+      "time_s": 2.9,
+      "predicted_angle_rad": 0.911958090409345,
+      "observed_angle_rad": 0.914001942249,
+      "residual_angle_rad": -0.002043851839655053
+    },
+    {
+      "time_s": 2.95,
+      "predicted_angle_rad": 0.9362219333023681,
+      "observed_angle_rad": 0.936963333959,
+      "residual_angle_rad": -0.0007414006566318632
+    },
+    {
+      "time_s": 3.0,
+      "predicted_angle_rad": 0.9600560471107734,
+      "observed_angle_rad": 0.960939412402,
+      "residual_angle_rad": -0.0008833652912265677
+    },
+    {
+      "time_s": 3.05,
+      "predicted_angle_rad": 0.9834208862814855,
+      "observed_angle_rad": 0.984387985587,
+      "residual_angle_rad": -0.0009670993055145294
+    },
+    {
+      "time_s": 3.1,
+      "predicted_angle_rad": 1.0062781045038005,
+      "observed_angle_rad": 1.007408182583,
+      "residual_angle_rad": -0.0011300780791994036
+    },
+    {
+      "time_s": 3.15,
+      "predicted_angle_rad": 1.0285906966101181,
+      "observed_angle_rad": 1.029744932112,
+      "residual_angle_rad": -0.0011542355018818728
+    },
+    {
+      "time_s": 3.2,
+      "predicted_angle_rad": 1.050323142188669,
+      "observed_angle_rad": 1.051505018918,
+      "residual_angle_rad": -0.0011818767293310106
+    },
+    {
+      "time_s": 3.25,
+      "predicted_angle_rad": 1.071441550266468,
+      "observed_angle_rad": 1.071675892874,
+      "residual_angle_rad": -0.00023434260753196767
+    },
+    {
+      "time_s": 3.3,
+      "predicted_angle_rad": 1.0919138044182566,
+      "observed_angle_rad": 1.093287220812,
+      "residual_angle_rad": -0.001373416393743332
+    },
+    {
+      "time_s": 3.35,
+      "predicted_angle_rad": 1.1117097076709368,
+      "observed_angle_rad": 1.112942397958,
+      "residual_angle_rad": -0.0012326902870631873
+    },
+    {
+      "time_s": 3.4,
+      "predicted_angle_rad": 1.1308011266025393,
+      "observed_angle_rad": 1.13212439069,
+      "residual_angle_rad": -0.0013232640874607515
+    },
+    {
+      "time_s": 3.45,
+      "predicted_angle_rad": 1.1491621340794136,
+      "observed_angle_rad": 1.150787188212,
+      "residual_angle_rad": -0.001625054132586401
+    },
+    {
+      "time_s": 3.5,
+      "predicted_angle_rad": 1.1667691501337536,
+      "observed_angle_rad": 1.168174742682,
+      "residual_angle_rad": -0.0014055925482463483
+    },
+    {
+      "time_s": 3.55,
+      "predicted_angle_rad": 1.1836010805542196,
+      "observed_angle_rad": 1.184925544415,
+      "residual_angle_rad": -0.0013244638607803338
+    },
+    {
+      "time_s": 3.6,
+      "predicted_angle_rad": 1.1996394528431178,
+      "observed_angle_rad": 1.201277351608,
+      "residual_angle_rad": -0.0016378987648821841
+    },
+    {
+      "time_s": 3.65,
+      "predicted_angle_rad": 1.2148685492818887,
+      "observed_angle_rad": 1.215821460131,
+      "residual_angle_rad": -0.0009529108491113103
+    },
+    {
+      "time_s": 3.7,
+      "predicted_angle_rad": 1.229275536939702,
+      "observed_angle_rad": 1.230278711877,
+      "residual_angle_rad": -0.001003174937298068
+    },
+    {
+      "time_s": 3.75,
+      "predicted_angle_rad": 1.242850594554595,
+      "observed_angle_rad": 1.244557306975,
+      "residual_angle_rad": -0.0017067124204050987
+    },
+    {
+      "time_s": 3.8,
+      "predicted_angle_rad": 1.2555870363093928,
+      "observed_angle_rad": 1.256244261667,
+      "residual_angle_rad": -0.0006572253576071496
+    },
+    {
+      "time_s": 3.85,
+      "predicted_angle_rad": 1.2674814326115824,
+      "observed_angle_rad": 1.26937056835,
+      "residual_angle_rad": -0.0018891357384176466
+    },
+    {
+      "time_s": 3.9,
+      "predicted_angle_rad": 1.278533728061241,
+      "observed_angle_rad": 1.279921463911,
+      "residual_angle_rad": -0.001387735849758931
+    },
+    {
+      "time_s": 3.95,
+      "predicted_angle_rad": 1.2887473568403447,
+      "observed_angle_rad": 1.290051058742,
+      "residual_angle_rad": -0.0013037019016552964
+    },
+    {
+      "time_s": 4.0,
+      "predicted_angle_rad": 1.2981293557381757,
+      "observed_angle_rad": 1.298984985655,
+      "residual_angle_rad": -0.0008556299168243076
+    },
+    {
+      "time_s": 4.05,
+      "predicted_angle_rad": 1.3066904748011223,
+      "observed_angle_rad": 1.308017198716,
+      "residual_angle_rad": -0.0013267239148777588
+    },
+    {
+      "time_s": 4.1,
+      "predicted_angle_rad": 1.3144452846989796,
+      "observed_angle_rad": 1.316122780759,
+      "residual_angle_rad": -0.0016774960600203226
+    },
+    {
+      "time_s": 4.15,
+      "predicted_angle_rad": 1.3214122768878862,
+      "observed_angle_rad": 1.32258429259,
+      "residual_angle_rad": -0.0011720157021137823
+    },
+    {
+      "time_s": 4.2,
+      "predicted_angle_rad": 1.3276139433133762,
+      "observed_angle_rad": 1.328779687539,
+      "residual_angle_rad": -0.001165744225623877
+    },
+    {
+      "time_s": 4.25,
+      "predicted_angle_rad": 1.333076795599951,
+      "observed_angle_rad": 1.334593857298,
+      "residual_angle_rad": -0.0015170616980491047
+    },
+    {
+      "time_s": 4.3,
+      "predicted_angle_rad": 1.337831213516284,
+      "observed_angle_rad": 1.338462350362,
+      "residual_angle_rad": -0.0006311368457159183
+    },
+    {
+      "time_s": 4.35,
+      "predicted_angle_rad": 1.341910849531983,
+      "observed_angle_rad": 1.342741557708,
+      "residual_angle_rad": -0.0008307081760170476
+    },
+    {
+      "time_s": 4.4,
+      "predicted_angle_rad": 1.345350998213057,
+      "observed_angle_rad": 1.346802783889,
+      "residual_angle_rad": -0.0014517856759430625
+    },
+    {
+      "time_s": 4.45,
+      "predicted_angle_rad": 1.3481848892234556,
+      "observed_angle_rad": 1.349718535328,
+      "residual_angle_rad": -0.0015336461045443173
+    },
+    {
+      "time_s": 4.5,
+      "predicted_angle_rad": 1.3504367013323304,
+      "observed_angle_rad": 1.350994807091,
+      "residual_angle_rad": -0.0005581057586696581
+    },
+    {
+      "time_s": 4.55,
+      "predicted_angle_rad": 1.3521115010097529,
+      "observed_angle_rad": 1.353536124837,
+      "residual_angle_rad": -0.0014246238272470624
+    },
+    {
+      "time_s": 4.6,
+      "predicted_angle_rad": 1.3531868397666669,
+      "observed_angle_rad": 1.354542586053,
+      "residual_angle_rad": -0.0013557462863331704
+    },
+    {
+      "time_s": 4.65,
+      "predicted_angle_rad": 1.3536163866380877,
+      "observed_angle_rad": 1.354552581837,
+      "residual_angle_rad": -0.000936195198912193
+    },
+    {
+      "time_s": 4.7,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.354113108682,
+      "residual_angle_rad": -0.0004877692845273174
+    },
+    {
+      "time_s": 4.75,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.354407370098,
+      "residual_angle_rad": -0.000782030700527292
+    },
+    {
+      "time_s": 4.8,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.354948670345,
+      "residual_angle_rad": -0.0013233309475273458
+    },
+    {
+      "time_s": 4.85,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.355049429559,
+      "residual_angle_rad": -0.001424090161527447
+    },
+    {
+      "time_s": 4.9,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.355417105894,
+      "residual_angle_rad": -0.0017917664965274582
+    },
+    {
+      "time_s": 4.95,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.354723920357,
+      "residual_angle_rad": -0.0010985809595274176
+    },
+    {
+      "time_s": 5.0,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.355646053991,
+      "residual_angle_rad": -0.002020714593527373
+    },
+    {
+      "time_s": 5.05,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.354918919824,
+      "residual_angle_rad": -0.0012935804265272743
+    },
+    {
+      "time_s": 5.1,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.355288325755,
+      "residual_angle_rad": -0.001662986357527263
+    },
+    {
+      "time_s": 5.15,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.355375624982,
+      "residual_angle_rad": -0.001750285584527278
+    },
+    {
+      "time_s": 5.2,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.354958790352,
+      "residual_angle_rad": -0.0013334509545273043
+    },
+    {
+      "time_s": 5.25,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.354461577947,
+      "residual_angle_rad": -0.0008362385495273017
+    },
+    {
+      "time_s": 5.3,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.354878026802,
+      "residual_angle_rad": -0.0012526874045273306
+    },
+    {
+      "time_s": 5.35,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.355382710582,
+      "residual_angle_rad": -0.0017573711845273454
+    },
+    {
+      "time_s": 5.4,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.355655386386,
+      "residual_angle_rad": -0.0020300469885272676
+    },
+    {
+      "time_s": 5.45,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.354788557784,
+      "residual_angle_rad": -0.0011632183865273316
+    },
+    {
+      "time_s": 5.5,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.355780664754,
+      "residual_angle_rad": -0.0021553253565274044
+    },
+    {
+      "time_s": 5.55,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.355189218558,
+      "residual_angle_rad": -0.0015638791605272484
+    },
+    {
+      "time_s": 5.6,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.353433243667,
+      "residual_angle_rad": 0.00019209573047263007
+    },
+    {
+      "time_s": 5.65,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.354493322638,
+      "residual_angle_rad": -0.0008679832405273924
+    },
+    {
+      "time_s": 5.7,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.355272877052,
+      "residual_angle_rad": -0.001647537654527298
+    },
+    {
+      "time_s": 5.75,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.354623452028,
+      "residual_angle_rad": -0.0009981126305274035
+    },
+    {
+      "time_s": 5.8,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.354982806429,
+      "residual_angle_rad": -0.0013574670315272819
+    },
+    {
+      "time_s": 5.85,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.354597537558,
+      "residual_angle_rad": -0.0009721981605272934
+    },
+    {
+      "time_s": 5.9,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.354709991735,
+      "residual_angle_rad": -0.0010846523375274142
+    },
+    {
+      "time_s": 5.95,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.355011352405,
+      "residual_angle_rad": -0.0013860130075273869
+    },
+    {
+      "time_s": 6.0,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.35463689464,
+      "residual_angle_rad": -0.0010115552425273844
+    },
+    {
+      "time_s": 6.05,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.354391603721,
+      "residual_angle_rad": -0.0007662643235273325
+    },
+    {
+      "time_s": 6.1,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.35485860535,
+      "residual_angle_rad": -0.0012332659525273737
+    },
+    {
+      "time_s": 6.15,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.354034906617,
+      "residual_angle_rad": -0.00040956721952745134
+    },
+    {
+      "time_s": 6.2,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.354547860326,
+      "residual_angle_rad": -0.0009225209285272928
+    },
+    {
+      "time_s": 6.25,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.355065141087,
+      "residual_angle_rad": -0.001439801689527398
+    },
+    {
+      "time_s": 6.3,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.355032172114,
+      "residual_angle_rad": -0.0014068327165273065
+    },
+    {
+      "time_s": 6.35,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.355187995041,
+      "residual_angle_rad": -0.001562655643527311
+    },
+    {
+      "time_s": 6.4,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.355640071248,
+      "residual_angle_rad": -0.0020147318505272516
+    },
+    {
+      "time_s": 6.45,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.355702261072,
+      "residual_angle_rad": -0.0020769216745273322
+    },
+    {
+      "time_s": 6.5,
+      "predicted_angle_rad": 1.3536253393974726,
+      "observed_angle_rad": 1.354781085465,
+      "residual_angle_rad": -0.0011557460675273301
+    }
+  ],
+  "warnings": []
+}

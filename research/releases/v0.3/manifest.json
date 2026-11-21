@@ -1,0 +1,185 @@
+{
+  "schema_version": "recursivecal.experiment.v1",
+  "model_id": "recursivecal-normalized-v0.2",
+  "scope": "Exploratory synthetic diagnosis. No measured-data training, SI liftgate inference, or hardware validation.",
+  "preregistered": false,
+  "quick_ci_run": false,
+  "train_size": 1024,
+  "validation_size": 512,
+  "test_size_per_cohort": 512,
+  "training_seeds": [
+    13,
+    37,
+    103,
+    211,
+    509
+  ],
+  "split_seeds": {
+    "train": 3100261121,
+    "validation": 3200261121,
+    "finite_test": 3300261121,
+    "continuous_jitter": 3400261121,
+    "unseen_high_load": 3500261121,
+    "extreme_deadzone": 3600261121,
+    "directional_friction": 3700261121,
+    "shuffle": 3800261121,
+    "bootstrap": 3900261121
+  },
+  "split_disjointness": "unique episode identifiers and RNG streams; finite-support plant values intentionally overlap",
+  "policy": "NumPy MLP contextual bandit with fixed first probe; replayed contexts; selected-action reward regression",
+  "learning": {
+    "updates": 700,
+    "batch_size_max": 128,
+    "hidden_units": 48,
+    "optimizer": "Adam",
+    "learning_rate": 0.0015,
+    "epsilon_start": 0.55,
+    "epsilon_end": 0.1,
+    "checkpoint_selection": "best validation mean reward every 50 updates"
+  },
+  "bayesian_quadrature_order": 15,
+  "cost_coefficient": 0.012,
+  "maximum_probes": 2,
+  "maximum_cost": 2.5,
+  "model_assumptions": {
+    "prior": [
+      [
+        1.0,
+        0.1,
+        0.12,
+        0.23,
+        0.0,
+        0.0
+      ],
+      [
+        0.98,
+        0.12,
+        0.13,
+        0.23,
+        0.0,
+        0.0
+      ],
+      [
+        1.0,
+        0.1,
+        0.12,
+        0.23,
+        0.075,
+        0.0
+      ],
+      [
+        1.0,
+        0.1,
+        0.12,
+        0.23,
+        -0.075,
+        0.0
+      ],
+      [
+        0.69,
+        0.115,
+        0.12,
+        0.23,
+        0.0,
+        0.0
+      ],
+      [
+        0.78,
+        0.12,
+        0.12,
+        0.23,
+        0.0,
+        0.0
+      ],
+      [
+        0.92,
+        0.3,
+        0.14,
+        0.23,
+        0.0,
+        0.0
+      ],
+      [
+        0.95,
+        0.27,
+        0.14,
+        0.23,
+        0.0,
+        0.0
+      ],
+      [
+        0.91,
+        0.14,
+        0.14,
+        0.23,
+        0.0,
+        0.25
+      ],
+      [
+        1.02,
+        0.17,
+        0.14,
+        0.23,
+        0.0,
+        0.31
+      ]
+    ],
+    "prior_probabilities": [
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1
+    ],
+    "noise_sigmas": [
+      [
+        0.004,
+        0.009
+      ],
+      [
+        0.004,
+        0.009
+      ],
+      [
+        0.004,
+        0.009
+      ],
+      [
+        0.004,
+        0.009
+      ],
+      [
+        0.004,
+        0.009
+      ],
+      [
+        0.004,
+        0.009
+      ],
+      [
+        0.006,
+        1.0
+      ]
+    ],
+    "legacy_dt": 0.02,
+    "legacy_055s_pulse_actual_seconds": 0.56
+  },
+  "source_sha256": {
+    "experiments.py": "40208386fbf3448ec20d6ff61c1eb8fd5fc0e22339146af0ce8cde20f21a769f",
+    "recursivecal.py": "221163d5f05cbbdff74f57e25a0573a8adc7ef4bd711b4f4abd3a23774f6de2d"
+  },
+  "selection_sha256": "8770ddacebca1d7aced16a8c68089921b451bc91858df8b2f02ae9acb95cde80",
+  "protocol_sha256": "65b75e410fc88f551d602c417c7876984b6988d05ba5e917c921db371daa5932",
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "byteorder": "little"
+  },
+  "physical_model_validated": false
+}

@@ -1,22 +1,25 @@
 """First-probe discrepancy audit, threshold chosen exclusively on training model cases.
 This is a diagnostic sanity check, not real-world anomaly detection validation.
 """
-from pathlib import sys
+import sys
 from pathlib import Path
 _PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if (_PROJECT_ROOT / "recursivecal.py").exists():
     sys.path.insert(0, str(_PROJECT_ROOT))
-import Path
+import argparse
 import json
 import numpy as np
-import adaptive_benchmark as ab
+if __package__:
+    from . import adaptive_benchmark as ab
+else:
+    import adaptive_benchmark as ab
 
 def residuals(observations,mu):
     y=observations[:,ab.FIRST,:2]
     r=(y[:,None,:]-mu[None,:,ab.FIRST,:2])/ab.SIGMA[None,ab.FIRST,:2]
     return np.sqrt(np.min(np.sum(r*r,axis=2),axis=1))
 
-def main():
+def main(output='mismatch_detection.json'):
     mu,_=ab.model_tables()
     _,train,_=ab.make_dataset(5000,701050,mu)
     thresh=float(np.quantile(residuals(train,mu),.95))
@@ -33,5 +36,8 @@ def main():
                                'median_min_standardized_residual':round(float(np.median(x)),5),
                                'p95_min_standardized_residual':round(float(np.quantile(x,.95)),5)}
         print(name,result['cases'][name])
-    Path('mismatch_detection.json').write_text(json.dumps(result,indent=2)+'\n')
-if __name__=='__main__':main()
+    Path(output).write_text(json.dumps(result,indent=2)+'\n')
+if __name__=='__main__':
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--output',default='mismatch_detection.json')
+    main(parser.parse_args().output)

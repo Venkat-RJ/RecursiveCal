@@ -1,0 +1,13 @@
+{
+  "source_kind": "synthetic",
+  "source": "generate_examples.py, seed 7112026; no hardware measurements",
+  "units": {
+    "length_m": "m",
+    "force_N_each": "N",
+    "temperature_C": "degC"
+  },
+  "split_definition": "13 training locations and 7 separate validation locations chosen before generation",
+  "noise": "independent Gaussian force noise with standard deviation 1.5 N per strut",
+  "parameter_origin": "illustrative SI model defaults",
+  "license": "MIT"
+}

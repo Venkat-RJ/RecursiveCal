@@ -18,7 +18,10 @@ from pathlib import Path
 import numpy as np
 import torch
 from torch import nn
-import adaptive_benchmark as ab
+if __package__:
+    from . import adaptive_benchmark as ab
+else:
+    import adaptive_benchmark as ab
 
 torch.set_num_threads(1)
 SECOND_ACTIONS=np.array([-1]+[j for j in range(ab.NPROBES) if j!=ab.FIRST],dtype=int)

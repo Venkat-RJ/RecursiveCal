@@ -1,0 +1,2655 @@
+{
+  "schema_version": "recursivecal.experiment.v1",
+  "model_id": "recursivecal-normalized-v0.2",
+  "seeds": [
+    13,
+    37,
+    103,
+    211,
+    509
+  ],
+  "scope": "Exploratory synthetic diagnosis. No measured-data training, SI liftgate inference, or hardware validation.",
+  "preregistered": false,
+  "quick_ci_run": false,
+  "results": {
+    "finite_test": {
+      "policies": {
+        "no_probe_prior_calibration": {
+          "n": 512,
+          "mean_reward": 0.8351151732776758,
+          "mean_quality": 0.8351151732776758,
+          "mean_cost": 0.0,
+          "mean_probes": 0.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "fixed_first_only": {
+          "n": 512,
+          "mean_reward": 0.8572780138310753,
+          "mean_quality": 0.8692780138310754,
+          "mean_cost": 1.0,
+          "mean_probes": 1.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "bayesian_adaptive": {
+          "n": 512,
+          "mean_reward": 0.8894370031885095,
+          "mean_quality": 0.9100151281885098,
+          "mean_cost": 1.71484375,
+          "mean_probes": 1.537109375,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 237,
+            "pulse_pos_high": 64,
+            "pulse_neg_low": 14,
+            "pulse_neg_high": 15,
+            "reference_check": 182
+          }
+        },
+        "bayesian_forced_two": {
+          "n": 512,
+          "mean_reward": 0.885453813876834,
+          "mean_quality": 0.9116803763768342,
+          "mean_cost": 2.185546875,
+          "mean_probes": 2.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "pulse_pos_high": 133,
+            "pulse_neg_low": 144,
+            "pulse_neg_high": 43,
+            "pulse_neg_offset": 2,
+            "reference_check": 190
+          }
+        },
+        "bayesian_shuffled": {
+          "n": 512,
+          "mean_reward": 0.8646326480794579,
+          "mean_quality": 0.8852107730794581,
+          "mean_cost": 1.71484375,
+          "mean_probes": 1.537109375,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 237,
+            "pulse_pos_high": 64,
+            "pulse_neg_low": 14,
+            "pulse_neg_high": 15,
+            "reference_check": 182
+          }
+        },
+        "bayesian_order_5": {
+          "n": 512,
+          "mean_reward": 0.8894604406885096,
+          "mean_quality": 0.9100151281885096,
+          "mean_cost": 1.712890625,
+          "mean_probes": 1.53515625,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 238,
+            "pulse_pos_high": 62,
+            "pulse_neg_low": 14,
+            "pulse_neg_high": 16,
+            "reference_check": 182
+          }
+        },
+        "bayesian_order_9": {
+          "n": 512,
+          "mean_reward": 0.8894370031885095,
+          "mean_quality": 0.9100151281885096,
+          "mean_cost": 1.71484375,
+          "mean_probes": 1.537109375,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 237,
+            "pulse_pos_high": 61,
+            "pulse_neg_low": 14,
+            "pulse_neg_high": 18,
+            "reference_check": 182
+          }
+        },
+        "best_fixed": {
+          "n": 512,
+          "mean_reward": 0.8771077391337965,
+          "mean_quality": 0.9071077391337965,
+          "mean_cost": 2.5,
+          "mean_probes": 2.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "reference_check": 512
+          }
+        },
+        "best_fixed_two": {
+          "n": 512,
+          "mean_reward": 0.8771077391337965,
+          "mean_quality": 0.9071077391337965,
+          "mean_cost": 2.5,
+          "mean_probes": 2.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "reference_check": 512
+          }
+        },
+        "bayesian_abstain": {
+          "n": 512,
+          "mean_reward": 0.8858950215786089,
+          "mean_quality": 0.9060747090786091,
+          "mean_cost": 1.681640625,
+          "mean_probes": 1.513671875,
+          "abstention_rate": 0.048828125,
+          "action_counts": {
+            "STOP": 249,
+            "pulse_pos_high": 63,
+            "pulse_neg_low": 13,
+            "pulse_neg_high": 15,
+            "reference_check": 172
+          }
+        },
+        "learned_seed_13": {
+          "n": 512,
+          "mean_reward": 0.8890262118242298,
+          "mean_quality": 0.9107996493242299,
+          "mean_cost": 1.814453125,
+          "mean_probes": 1.638671875,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 185,
+            "pulse_neg_high": 95,
+            "pulse_pos_offset": 52,
+            "reference_check": 180
+          }
+        },
+        "learned_seed_13_shuffled": {
+          "n": 512,
+          "mean_reward": 0.863954518369787,
+          "mean_quality": 0.885727955869787,
+          "mean_cost": 1.814453125,
+          "mean_probes": 1.638671875,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 185,
+            "pulse_neg_high": 95,
+            "pulse_pos_offset": 52,
+            "reference_check": 180
+          }
+        },
+        "learned_seed_37": {
+          "n": 512,
+          "mean_reward": 0.8885177370453046,
+          "mean_quality": 0.9106896120453047,
+          "mean_cost": 1.84765625,
+          "mean_probes": 1.677734375,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 165,
+            "pulse_pos_high": 146,
+            "pulse_neg_low": 23,
+            "pulse_neg_high": 4,
+            "reference_check": 174
+          }
+        },
+        "learned_seed_37_shuffled": {
+          "n": 512,
+          "mean_reward": 0.8633006739397875,
+          "mean_quality": 0.8854725489397877,
+          "mean_cost": 1.84765625,
+          "mean_probes": 1.677734375,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 165,
+            "pulse_pos_high": 146,
+            "pulse_neg_low": 23,
+            "pulse_neg_high": 4,
+            "reference_check": 174
+          }
+        },
+        "learned_seed_103": {
+          "n": 512,
+          "mean_reward": 0.8894106607709618,
+          "mean_quality": 0.911465348270962,
+          "mean_cost": 1.837890625,
+          "mean_probes": 1.66796875,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 170,
+            "pulse_neg_high": 110,
+            "pulse_neg_offset": 58,
+            "reference_check": 174
+          }
+        },
+        "learned_seed_103_shuffled": {
+          "n": 512,
+          "mean_reward": 0.8633594720204639,
+          "mean_quality": 0.885414159520464,
+          "mean_cost": 1.837890625,
+          "mean_probes": 1.66796875,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 170,
+            "pulse_neg_high": 110,
+            "pulse_neg_offset": 58,
+            "reference_check": 174
+          }
+        },
+        "learned_seed_211": {
+          "n": 512,
+          "mean_reward": 0.8888566093635162,
+          "mean_quality": 0.9100909843635163,
+          "mean_cost": 1.76953125,
+          "mean_probes": 1.59375,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 208,
+            "pulse_pos_high": 82,
+            "pulse_pos_offset": 42,
+            "reference_check": 180
+          }
+        },
+        "learned_seed_211_shuffled": {
+          "n": 512,
+          "mean_reward": 0.8640272513779973,
+          "mean_quality": 0.8852616263779974,
+          "mean_cost": 1.76953125,
+          "mean_probes": 1.59375,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 208,
+            "pulse_pos_high": 82,
+            "pulse_pos_offset": 42,
+            "reference_check": 180
+          }
+        },
+        "learned_seed_509": {
+          "n": 512,
+          "mean_reward": 0.8900103526493868,
+          "mean_quality": 0.910611915149387,
+          "mean_cost": 1.716796875,
+          "mean_probes": 1.541015625,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 235,
+            "pulse_neg_high": 91,
+            "pulse_pos_offset": 6,
+            "reference_check": 180
+          }
+        },
+        "learned_seed_509_shuffled": {
+          "n": 512,
+          "mean_reward": 0.864431807447175,
+          "mean_quality": 0.8850333699471751,
+          "mean_cost": 1.716796875,
+          "mean_probes": 1.541015625,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 235,
+            "pulse_neg_high": 91,
+            "pulse_pos_offset": 6,
+            "reference_check": 180
+          }
+        }
+      },
+      "paired_comparisons": {
+        "bayesian_adaptive minus best_fixed": {
+          "mean_difference": 0.012329264054713265,
+          "ci95": [
+            0.010389108945445221,
+            0.014151807029478053
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261121,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "bayesian_adaptive minus bayesian_shuffled": {
+          "mean_difference": 0.024804355109051716,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261121,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "bayesian_adaptive minus no_probe_prior_calibration": {
+          "mean_difference": 0.054321829910833876,
+          "ci95": [
+            0.04905629642134005,
+            0.059645854694765736
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261123,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "bayesian_forced_two minus best_fixed_two": {
+          "mean_difference": 0.008346074743037724,
+          "ci95": [
+            0.006577898615811886,
+            0.010098726485800022
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261124,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "bayesian_abstain minus bayesian_adaptive": {
+          "mean_difference": -0.0035419816099006044,
+          "ci95": [
+            -0.005520653410972896,
+            -0.0018958240327047796
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261125,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_13 minus best_fixed": {
+          "mean_difference": 0.011918472690433453,
+          "ci95": [
+            0.009932440642804744,
+            0.013813129393834833
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261126,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_13 minus bayesian_adaptive": {
+          "mean_difference": -0.0004107913642798146,
+          "ci95": [
+            -0.0011784174079251283,
+            0.0004159961837865843
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261127,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_13 minus learned_seed_13_shuffled": {
+          "mean_difference": 0.025071693454442913,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261121,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_37 minus best_fixed": {
+          "mean_difference": 0.011409997911508271,
+          "ci95": [
+            0.009542177109809372,
+            0.013362685229274033
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261129,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_37 minus bayesian_adaptive": {
+          "mean_difference": -0.0009192661432049949,
+          "ci95": [
+            -0.001917819626643659,
+            8.955325281765775e-05
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261130,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_37 minus learned_seed_37_shuffled": {
+          "mean_difference": 0.02521706310551715,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261121,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_103 minus best_fixed": {
+          "mean_difference": 0.012302921637165516,
+          "ci95": [
+            0.010218740326398135,
+            0.014444767097691569
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261132,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_103 minus bayesian_adaptive": {
+          "mean_difference": -2.6342417547750878e-05,
+          "ci95": [
+            -0.000999834652555522,
+            0.0010402739120015298
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261133,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_103 minus learned_seed_103_shuffled": {
+          "mean_difference": 0.026051188750497938,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261121,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_211 minus best_fixed": {
+          "mean_difference": 0.011748870229719854,
+          "ci95": [
+            0.009886981479698834,
+            0.013576580636659546
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261135,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_211 minus bayesian_adaptive": {
+          "mean_difference": -0.0005803938249934117,
+          "ci95": [
+            -0.0013036640448935242,
+            0.00015357761848564867
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261136,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_211 minus learned_seed_211_shuffled": {
+          "mean_difference": 0.02482935798551894,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261121,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_509 minus best_fixed": {
+          "mean_difference": 0.012902613515590513,
+          "ci95": [
+            0.010957866658690746,
+            0.01477933391839083
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261138,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_509 minus bayesian_adaptive": {
+          "mean_difference": 0.0005733494608772477,
+          "ci95": [
+            -4.001050925829488e-05,
+            0.0012521416930220861
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261139,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_509 minus learned_seed_509_shuffled": {
+          "mean_difference": 0.025578545202211915,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261121,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        }
+      },
+      "bayesian_quadrature_sensitivity": {
+        "15": {
+          "mean_reward": 0.8894370031885095,
+          "fraction_actions_differ_from_primary": 0.0,
+          "mean_reward_difference_from_primary": 0.0
+        },
+        "5": {
+          "mean_reward": 0.8894604406885096,
+          "fraction_actions_differ_from_primary": 0.05078125,
+          "mean_reward_difference_from_primary": 2.343750000000002e-05
+        },
+        "9": {
+          "mean_reward": 0.8894370031885095,
+          "fraction_actions_differ_from_primary": 0.056640625,
+          "mean_reward_difference_from_primary": 0.0
+        }
+      },
+      "mismatch_flag_rate": 0.048828125,
+      "learned_training_seed_summary": {
+        "seeds": [
+          13,
+          37,
+          103,
+          211,
+          509
+        ],
+        "mean_rewards": [
+          0.8890262118242298,
+          0.8885177370453046,
+          0.8894106607709618,
+          0.8888566093635162,
+          0.8900103526493868
+        ],
+        "mean": 0.8891643143306798,
+        "sample_standard_deviation": 0.0005719012677963413,
+        "note": "Descriptive across seeds. No population-level interval from these few training runs."
+      },
+      "no_probe_definition": "prior-optimal fixed calibration, not necessarily factory settings",
+      "shift_type": "in-support finite prior"
+    },
+    "continuous_jitter": {
+      "policies": {
+        "no_probe_prior_calibration": {
+          "n": 512,
+          "mean_reward": 0.8313774447906422,
+          "mean_quality": 0.8313774447906422,
+          "mean_cost": 0.0,
+          "mean_probes": 0.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "fixed_first_only": {
+          "n": 512,
+          "mean_reward": 0.8512995155043024,
+          "mean_quality": 0.8632995155043023,
+          "mean_cost": 1.0,
+          "mean_probes": 1.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "bayesian_adaptive": {
+          "n": 512,
+          "mean_reward": 0.8799326729171504,
+          "mean_quality": 0.9003467354171504,
+          "mean_cost": 1.701171875,
+          "mean_probes": 1.517578125,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 247,
+            "pulse_pos_high": 55,
+            "pulse_neg_low": 9,
+            "pulse_neg_high": 13,
+            "reference_check": 188
+          }
+        },
+        "bayesian_forced_two": {
+          "n": 512,
+          "mean_reward": 0.8751451460535526,
+          "mean_quality": 0.9014420210535528,
+          "mean_cost": 2.19140625,
+          "mean_probes": 2.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "pulse_pos_high": 128,
+            "pulse_neg_low": 136,
+            "pulse_neg_high": 47,
+            "pulse_pos_offset": 2,
+            "pulse_neg_offset": 3,
+            "reference_check": 196
+          }
+        },
+        "bayesian_shuffled": {
+          "n": 512,
+          "mean_reward": 0.8586028580428643,
+          "mean_quality": 0.8790169205428643,
+          "mean_cost": 1.701171875,
+          "mean_probes": 1.517578125,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 247,
+            "pulse_pos_high": 55,
+            "pulse_neg_low": 9,
+            "pulse_neg_high": 13,
+            "reference_check": 188
+          }
+        },
+        "bayesian_order_5": {
+          "n": 512,
+          "mean_reward": 0.8800566446345699,
+          "mean_quality": 0.90044726963457,
+          "mean_cost": 1.69921875,
+          "mean_probes": 1.515625,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 248,
+            "pulse_pos_high": 59,
+            "pulse_neg_low": 9,
+            "pulse_neg_high": 8,
+            "reference_check": 188
+          }
+        },
+        "bayesian_order_9": {
+          "n": 512,
+          "mean_reward": 0.8798789194661619,
+          "mean_quality": 0.900292981966162,
+          "mean_cost": 1.701171875,
+          "mean_probes": 1.517578125,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 247,
+            "pulse_pos_high": 50,
+            "pulse_neg_low": 9,
+            "pulse_neg_high": 18,
+            "reference_check": 188
+          }
+        },
+        "best_fixed": {
+          "n": 512,
+          "mean_reward": 0.8700649954378489,
+          "mean_quality": 0.9000649954378489,
+          "mean_cost": 2.5,
+          "mean_probes": 2.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "reference_check": 512
+          }
+        },
+        "best_fixed_two": {
+          "n": 512,
+          "mean_reward": 0.8700649954378489,
+          "mean_quality": 0.9000649954378489,
+          "mean_cost": 2.5,
+          "mean_probes": 2.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "reference_check": 512
+          }
+        },
+        "bayesian_abstain": {
+          "n": 512,
+          "mean_reward": 0.874278415817177,
+          "mean_quality": 0.8940596658171771,
+          "mean_cost": 1.6484375,
+          "mean_probes": 1.48046875,
+          "abstention_rate": 0.1015625,
+          "action_counts": {
+            "STOP": 266,
+            "pulse_pos_high": 53,
+            "pulse_neg_low": 8,
+            "pulse_neg_high": 13,
+            "reference_check": 172
+          }
+        },
+        "learned_seed_13": {
+          "n": 512,
+          "mean_reward": 0.8782648319659889,
+          "mean_quality": 0.899932800715989,
+          "mean_cost": 1.8056640625,
+          "mean_probes": 1.625,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 192,
+            "pulse_neg_high": 83,
+            "pulse_pos_offset": 52,
+            "reference_check": 185
+          }
+        },
+        "learned_seed_13_shuffled": {
+          "n": 512,
+          "mean_reward": 0.8567574512796107,
+          "mean_quality": 0.8784254200296107,
+          "mean_cost": 1.8056640625,
+          "mean_probes": 1.625,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 192,
+            "pulse_neg_high": 83,
+            "pulse_pos_offset": 52,
+            "reference_check": 185
+          }
+        },
+        "learned_seed_37": {
+          "n": 512,
+          "mean_reward": 0.8768099200282464,
+          "mean_quality": 0.8984192950282466,
+          "mean_cost": 1.80078125,
+          "mean_probes": 1.630859375,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 189,
+            "pulse_pos_high": 135,
+            "pulse_neg_low": 12,
+            "pulse_neg_high": 1,
+            "pulse_pos_offset": 1,
+            "reference_check": 174
+          }
+        },
+        "learned_seed_37_shuffled": {
+          "n": 512,
+          "mean_reward": 0.8543091416845658,
+          "mean_quality": 0.8759185166845658,
+          "mean_cost": 1.80078125,
+          "mean_probes": 1.630859375,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 189,
+            "pulse_pos_high": 135,
+            "pulse_neg_low": 12,
+            "pulse_neg_high": 1,
+            "pulse_pos_offset": 1,
+            "reference_check": 174
+          }
+        },
+        "learned_seed_103": {
+          "n": 512,
+          "mean_reward": 0.8768505063492822,
+          "mean_quality": 0.8985067563492823,
+          "mean_cost": 1.8046875,
+          "mean_probes": 1.634765625,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 187,
+            "pulse_neg_high": 99,
+            "pulse_neg_offset": 52,
+            "reference_check": 174
+          }
+        },
+        "learned_seed_103_shuffled": {
+          "n": 512,
+          "mean_reward": 0.8542636148807535,
+          "mean_quality": 0.8759198648807536,
+          "mean_cost": 1.8046875,
+          "mean_probes": 1.634765625,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 187,
+            "pulse_neg_high": 99,
+            "pulse_neg_offset": 52,
+            "reference_check": 174
+          }
+        },
+        "learned_seed_211": {
+          "n": 512,
+          "mean_reward": 0.8786042308683939,
+          "mean_quality": 0.8998503246183939,
+          "mean_cost": 1.7705078125,
+          "mean_probes": 1.58984375,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 210,
+            "pulse_pos_high": 69,
+            "pulse_pos_offset": 48,
+            "reference_check": 185
+          }
+        },
+        "learned_seed_211_shuffled": {
+          "n": 512,
+          "mean_reward": 0.8572019677816898,
+          "mean_quality": 0.8784480615316896,
+          "mean_cost": 1.7705078125,
+          "mean_probes": 1.58984375,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 210,
+            "pulse_pos_high": 69,
+            "pulse_pos_offset": 48,
+            "reference_check": 185
+          }
+        },
+        "learned_seed_509": {
+          "n": 512,
+          "mean_reward": 0.8792013678280606,
+          "mean_quality": 0.8996974615780606,
+          "mean_cost": 1.7080078125,
+          "mean_probes": 1.52734375,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 242,
+            "pulse_neg_high": 79,
+            "pulse_pos_offset": 6,
+            "reference_check": 185
+          }
+        },
+        "learned_seed_509_shuffled": {
+          "n": 512,
+          "mean_reward": 0.8579737552801189,
+          "mean_quality": 0.8784698490301188,
+          "mean_cost": 1.7080078125,
+          "mean_probes": 1.52734375,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 242,
+            "pulse_neg_high": 79,
+            "pulse_pos_offset": 6,
+            "reference_check": 185
+          }
+        }
+      },
+      "paired_comparisons": {
+        "bayesian_adaptive minus best_fixed": {
+          "mean_difference": 0.009867677479301477,
+          "ci95": [
+            0.007802994484971473,
+            0.011799298412105084
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261221,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "bayesian_adaptive minus bayesian_shuffled": {
+          "mean_difference": 0.021329814874286077,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261122,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "bayesian_adaptive minus no_probe_prior_calibration": {
+          "mean_difference": 0.0485552281265081,
+          "ci95": [
+            0.043083316675994666,
+            0.05434122258372273
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261223,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "bayesian_forced_two minus best_fixed_two": {
+          "mean_difference": 0.005080150615703793,
+          "ci95": [
+            0.003110168081560563,
+            0.007036121545343223
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261224,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "bayesian_abstain minus bayesian_adaptive": {
+          "mean_difference": -0.005654257099973305,
+          "ci95": [
+            -0.007996177566074594,
+            -0.003622752356600017
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261225,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_13 minus best_fixed": {
+          "mean_difference": 0.008199836528140094,
+          "ci95": [
+            0.005787778133775158,
+            0.010248129868573142
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261226,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_13 minus bayesian_adaptive": {
+          "mean_difference": -0.0016678409511613832,
+          "ci95": [
+            -0.002920716816888555,
+            -0.0006356421199016664
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261227,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_13 minus learned_seed_13_shuffled": {
+          "mean_difference": 0.02150738068637831,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261122,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_37 minus best_fixed": {
+          "mean_difference": 0.006744924590397628,
+          "ci95": [
+            0.004069427518953542,
+            0.009210090033901512
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261229,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_37 minus bayesian_adaptive": {
+          "mean_difference": -0.003122752888903851,
+          "ci95": [
+            -0.004860561323066653,
+            -0.0015841962029771956
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261230,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_37 minus learned_seed_37_shuffled": {
+          "mean_difference": 0.02250077834368068,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261122,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_103 minus best_fixed": {
+          "mean_difference": 0.006785510911433423,
+          "ci95": [
+            0.004138237620441033,
+            0.009209076767380139
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261232,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_103 minus bayesian_adaptive": {
+          "mean_difference": -0.0030821665678680546,
+          "ci95": [
+            -0.005015864467773914,
+            -0.0014547928696984928
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261233,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_103 minus learned_seed_103_shuffled": {
+          "mean_difference": 0.022586891468528787,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261122,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_211 minus best_fixed": {
+          "mean_difference": 0.008539235430544977,
+          "ci95": [
+            0.006318327069981189,
+            0.010744787469444737
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261235,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_211 minus bayesian_adaptive": {
+          "mean_difference": -0.0013284420487565016,
+          "ci95": [
+            -0.0024582232901783005,
+            -0.0004679208360106224
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261236,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_211 minus learned_seed_211_shuffled": {
+          "mean_difference": 0.0214022630867041,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261122,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_509 minus best_fixed": {
+          "mean_difference": 0.0091363723902118,
+          "ci95": [
+            0.006875744719332506,
+            0.011317393258021297
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261238,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_509 minus bayesian_adaptive": {
+          "mean_difference": -0.000731305089089676,
+          "ci95": [
+            -0.0020393943534872962,
+            0.00041912167986760357
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261239,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_509 minus learned_seed_509_shuffled": {
+          "mean_difference": 0.02122761254794179,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261122,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        }
+      },
+      "bayesian_quadrature_sensitivity": {
+        "15": {
+          "mean_reward": 0.8799326729171504,
+          "fraction_actions_differ_from_primary": 0.0,
+          "mean_reward_difference_from_primary": 0.0
+        },
+        "5": {
+          "mean_reward": 0.8800566446345699,
+          "fraction_actions_differ_from_primary": 0.04296875,
+          "mean_reward_difference_from_primary": 0.00012397171741956522
+        },
+        "9": {
+          "mean_reward": 0.8798789194661619,
+          "fraction_actions_differ_from_primary": 0.044921875,
+          "mean_reward_difference_from_primary": -5.3753450988345544e-05
+        }
+      },
+      "mismatch_flag_rate": 0.1015625,
+      "learned_training_seed_summary": {
+        "seeds": [
+          13,
+          37,
+          103,
+          211,
+          509
+        ],
+        "mean_rewards": [
+          0.8782648319659889,
+          0.8768099200282464,
+          0.8768505063492822,
+          0.8786042308683939,
+          0.8792013678280606
+        ],
+        "mean": 0.8779461714079944,
+        "sample_standard_deviation": 0.001072573304773573,
+        "note": "Descriptive across seeds. No population-level interval from these few training runs."
+      },
+      "no_probe_definition": "prior-optimal fixed calibration, not necessarily factory settings",
+      "shift_type": "continuous parameter perturbation"
+    },
+    "unseen_high_load": {
+      "policies": {
+        "no_probe_prior_calibration": {
+          "n": 512,
+          "mean_reward": 0.9329254795529772,
+          "mean_quality": 0.9329254795529772,
+          "mean_cost": 0.0,
+          "mean_probes": 0.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "fixed_first_only": {
+          "n": 512,
+          "mean_reward": 0.901605427205515,
+          "mean_quality": 0.9136054272055149,
+          "mean_cost": 1.0,
+          "mean_probes": 1.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "bayesian_adaptive": {
+          "n": 512,
+          "mean_reward": 0.895317478451596,
+          "mean_quality": 0.9121690409515961,
+          "mean_cost": 1.404296875,
+          "mean_probes": 1.26953125,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 374,
+            "reference_check": 138
+          }
+        },
+        "bayesian_forced_two": {
+          "n": 512,
+          "mean_reward": 0.8864784325255999,
+          "mean_quality": 0.9129159325255998,
+          "mean_cost": 2.203125,
+          "mean_probes": 2.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "pulse_pos_high": 221,
+            "pulse_neg_low": 1,
+            "pulse_neg_high": 82,
+            "reference_check": 208
+          }
+        },
+        "bayesian_shuffled": {
+          "n": 512,
+          "mean_reward": 0.896280479399648,
+          "mean_quality": 0.9131320418996478,
+          "mean_cost": 1.404296875,
+          "mean_probes": 1.26953125,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 374,
+            "reference_check": 138
+          }
+        },
+        "bayesian_order_5": {
+          "n": 512,
+          "mean_reward": 0.895317478451596,
+          "mean_quality": 0.9121690409515961,
+          "mean_cost": 1.404296875,
+          "mean_probes": 1.26953125,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 374,
+            "reference_check": 138
+          }
+        },
+        "bayesian_order_9": {
+          "n": 512,
+          "mean_reward": 0.895317478451596,
+          "mean_quality": 0.9121690409515961,
+          "mean_cost": 1.404296875,
+          "mean_probes": 1.26953125,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 374,
+            "reference_check": 138
+          }
+        },
+        "best_fixed": {
+          "n": 512,
+          "mean_reward": 0.8821690409515961,
+          "mean_quality": 0.9121690409515961,
+          "mean_cost": 2.5,
+          "mean_probes": 2.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "reference_check": 512
+          }
+        },
+        "best_fixed_two": {
+          "n": 512,
+          "mean_reward": 0.8821690409515961,
+          "mean_quality": 0.9121690409515961,
+          "mean_cost": 2.5,
+          "mean_probes": 2.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "reference_check": 512
+          }
+        },
+        "bayesian_abstain": {
+          "n": 512,
+          "mean_reward": 0.9042240438277251,
+          "mean_quality": 0.9208998250777252,
+          "mean_cost": 1.3896484375,
+          "mean_probes": 1.259765625,
+          "abstention_rate": 0.34765625,
+          "action_counts": {
+            "STOP": 379,
+            "reference_check": 133
+          }
+        },
+        "learned_seed_13": {
+          "n": 512,
+          "mean_reward": 0.895563572201596,
+          "mean_quality": 0.9121690409515961,
+          "mean_cost": 1.3837890625,
+          "mean_probes": 1.255859375,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 381,
+            "reference_check": 131
+          }
+        },
+        "learned_seed_13_shuffled": {
+          "n": 512,
+          "mean_reward": 0.8965265731496479,
+          "mean_quality": 0.9131320418996478,
+          "mean_cost": 1.3837890625,
+          "mean_probes": 1.255859375,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 381,
+            "reference_check": 131
+          }
+        },
+        "learned_seed_37": {
+          "n": 512,
+          "mean_reward": 0.896512790951596,
+          "mean_quality": 0.9121690409515961,
+          "mean_cost": 1.3046875,
+          "mean_probes": 1.203125,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 408,
+            "reference_check": 104
+          }
+        },
+        "learned_seed_37_shuffled": {
+          "n": 512,
+          "mean_reward": 0.8975537209763798,
+          "mean_quality": 0.9132099709763797,
+          "mean_cost": 1.3046875,
+          "mean_probes": 1.203125,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 408,
+            "reference_check": 104
+          }
+        },
+        "learned_seed_103": {
+          "n": 512,
+          "mean_reward": 0.896547947201596,
+          "mean_quality": 0.9121690409515961,
+          "mean_cost": 1.3017578125,
+          "mean_probes": 1.201171875,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 409,
+            "reference_check": 103
+          }
+        },
+        "learned_seed_103_shuffled": {
+          "n": 512,
+          "mean_reward": 0.8975888772263798,
+          "mean_quality": 0.9132099709763797,
+          "mean_cost": 1.3017578125,
+          "mean_probes": 1.201171875,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 409,
+            "reference_check": 103
+          }
+        },
+        "learned_seed_211": {
+          "n": 512,
+          "mean_reward": 0.8955284159515959,
+          "mean_quality": 0.9121690409515961,
+          "mean_cost": 1.38671875,
+          "mean_probes": 1.2578125,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 380,
+            "reference_check": 132
+          }
+        },
+        "learned_seed_211_shuffled": {
+          "n": 512,
+          "mean_reward": 0.896491416899648,
+          "mean_quality": 0.9131320418996478,
+          "mean_cost": 1.38671875,
+          "mean_probes": 1.2578125,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 380,
+            "reference_check": 132
+          }
+        },
+        "learned_seed_509": {
+          "n": 512,
+          "mean_reward": 0.895633884701596,
+          "mean_quality": 0.9121690409515961,
+          "mean_cost": 1.3779296875,
+          "mean_probes": 1.251953125,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 383,
+            "reference_check": 129
+          }
+        },
+        "learned_seed_509_shuffled": {
+          "n": 512,
+          "mean_reward": 0.8966748147263799,
+          "mean_quality": 0.9132099709763797,
+          "mean_cost": 1.3779296875,
+          "mean_probes": 1.251953125,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 383,
+            "reference_check": 129
+          }
+        }
+      },
+      "paired_comparisons": {
+        "bayesian_adaptive minus best_fixed": {
+          "mean_difference": 0.013148437500000013,
+          "ci95": [
+            0.012480468750000012,
+            0.013816406250000014
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261321,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "bayesian_adaptive minus bayesian_shuffled": {
+          "mean_difference": -0.0009630009480518626,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261123,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "bayesian_adaptive minus no_probe_prior_calibration": {
+          "mean_difference": -0.03760800110138119,
+          "ci95": [
+            -0.039691433700606696,
+            -0.035485454156413715
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261323,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "bayesian_forced_two minus best_fixed_two": {
+          "mean_difference": 0.0043093915740038315,
+          "ci95": [
+            0.003829850026682457,
+            0.004797947352365029
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261324,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "bayesian_abstain minus bayesian_adaptive": {
+          "mean_difference": 0.008906565376129019,
+          "ci95": [
+            0.007335601314867957,
+            0.010509125778668568
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261325,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_13 minus best_fixed": {
+          "mean_difference": 0.013394531250000011,
+          "ci95": [
+            0.012690527343750011,
+            0.014062500000000012
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261326,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_13 minus bayesian_adaptive": {
+          "mean_difference": 0.0002460937500000002,
+          "ci95": [
+            7.031250000000006e-05,
+            0.00042275390624999556
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261327,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_13 minus learned_seed_13_shuffled": {
+          "mean_difference": -0.0009630009480518626,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261123,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_37 minus best_fixed": {
+          "mean_difference": 0.014343750000000013,
+          "ci95": [
+            0.013746093750000011,
+            0.014941406250000015
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261329,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_37 minus bayesian_adaptive": {
+          "mean_difference": 0.001195312500000001,
+          "ci95": [
+            0.0008437500000000007,
+            0.0015820312500000014
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261330,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_37 minus learned_seed_37_shuffled": {
+          "mean_difference": -0.0010409300247837406,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261123,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_103 minus best_fixed": {
+          "mean_difference": 0.014378906250000014,
+          "ci95": [
+            0.013746093750000011,
+            0.015046875000000013
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261332,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_103 minus bayesian_adaptive": {
+          "mean_difference": 0.001230468750000001,
+          "ci95": [
+            0.0008437500000000007,
+            0.0016171875000000014
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261333,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_103 minus learned_seed_103_shuffled": {
+          "mean_difference": -0.0010409300247837406,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261123,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_211 minus best_fixed": {
+          "mean_difference": 0.013359375000000012,
+          "ci95": [
+            0.012691406250000013,
+            0.014027343750000011
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261335,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_211 minus bayesian_adaptive": {
+          "mean_difference": 0.0002109375000000002,
+          "ci95": [
+            7.031250000000006e-05,
+            0.00038671875000000034
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261336,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_211 minus learned_seed_211_shuffled": {
+          "mean_difference": -0.0009630009480518626,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261123,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_509 minus best_fixed": {
+          "mean_difference": 0.01346484375000001,
+          "ci95": [
+            0.012761718750000012,
+            0.014097656250000014
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261338,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_509 minus bayesian_adaptive": {
+          "mean_difference": 0.0003164062500000003,
+          "ci95": [
+            0.00014062500000000012,
+            0.0005273437500000005
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261339,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_509 minus learned_seed_509_shuffled": {
+          "mean_difference": -0.0010409300247837406,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261123,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        }
+      },
+      "bayesian_quadrature_sensitivity": {
+        "15": {
+          "mean_reward": 0.895317478451596,
+          "fraction_actions_differ_from_primary": 0.0,
+          "mean_reward_difference_from_primary": 0.0
+        },
+        "5": {
+          "mean_reward": 0.895317478451596,
+          "fraction_actions_differ_from_primary": 0.0,
+          "mean_reward_difference_from_primary": 0.0
+        },
+        "9": {
+          "mean_reward": 0.895317478451596,
+          "fraction_actions_differ_from_primary": 0.0,
+          "mean_reward_difference_from_primary": 0.0
+        }
+      },
+      "mismatch_flag_rate": 0.34765625,
+      "learned_training_seed_summary": {
+        "seeds": [
+          13,
+          37,
+          103,
+          211,
+          509
+        ],
+        "mean_rewards": [
+          0.895563572201596,
+          0.896512790951596,
+          0.896547947201596,
+          0.8955284159515959,
+          0.895633884701596
+        ],
+        "mean": 0.895957322201596,
+        "sample_standard_deviation": 0.0005246415140471979,
+        "note": "Descriptive across seeds. No population-level interval from these few training runs."
+      },
+      "no_probe_definition": "prior-optimal fixed calibration, not necessarily factory settings",
+      "shift_type": "new parameter range under frozen equations"
+    },
+    "extreme_deadzone": {
+      "policies": {
+        "no_probe_prior_calibration": {
+          "n": 512,
+          "mean_reward": 0.522091562289008,
+          "mean_quality": 0.522091562289008,
+          "mean_cost": 0.0,
+          "mean_probes": 0.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "fixed_first_only": {
+          "n": 512,
+          "mean_reward": 0.5271539290067953,
+          "mean_quality": 0.539153929006795,
+          "mean_cost": 1.0,
+          "mean_probes": 1.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "bayesian_adaptive": {
+          "n": 512,
+          "mean_reward": 0.5271539290067953,
+          "mean_quality": 0.539153929006795,
+          "mean_cost": 1.0,
+          "mean_probes": 1.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "bayesian_forced_two": {
+          "n": 512,
+          "mean_reward": 0.515153929006795,
+          "mean_quality": 0.539153929006795,
+          "mean_cost": 2.0,
+          "mean_probes": 2.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "pulse_pos_high": 22,
+            "pulse_neg_low": 480,
+            "pulse_pos_offset": 8,
+            "pulse_neg_offset": 2
+          }
+        },
+        "bayesian_shuffled": {
+          "n": 512,
+          "mean_reward": 0.5271539290067953,
+          "mean_quality": 0.539153929006795,
+          "mean_cost": 1.0,
+          "mean_probes": 1.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "bayesian_order_5": {
+          "n": 512,
+          "mean_reward": 0.5271539290067953,
+          "mean_quality": 0.539153929006795,
+          "mean_cost": 1.0,
+          "mean_probes": 1.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "bayesian_order_9": {
+          "n": 512,
+          "mean_reward": 0.5271539290067953,
+          "mean_quality": 0.539153929006795,
+          "mean_cost": 1.0,
+          "mean_probes": 1.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "best_fixed": {
+          "n": 512,
+          "mean_reward": 0.509153929006795,
+          "mean_quality": 0.539153929006795,
+          "mean_cost": 2.5,
+          "mean_probes": 2.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "reference_check": 512
+          }
+        },
+        "best_fixed_two": {
+          "n": 512,
+          "mean_reward": 0.509153929006795,
+          "mean_quality": 0.539153929006795,
+          "mean_cost": 2.5,
+          "mean_probes": 2.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "reference_check": 512
+          }
+        },
+        "bayesian_abstain": {
+          "n": 512,
+          "mean_reward": 0.5120110737290864,
+          "mean_quality": 0.5240110737290864,
+          "mean_cost": 1.0,
+          "mean_probes": 1.0,
+          "abstention_rate": 0.9296875,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "learned_seed_13": {
+          "n": 512,
+          "mean_reward": 0.515153929006795,
+          "mean_quality": 0.539153929006795,
+          "mean_cost": 2.0,
+          "mean_probes": 2.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "pulse_pos_offset": 512
+          }
+        },
+        "learned_seed_13_shuffled": {
+          "n": 512,
+          "mean_reward": 0.515153929006795,
+          "mean_quality": 0.539153929006795,
+          "mean_cost": 2.0,
+          "mean_probes": 2.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "pulse_pos_offset": 512
+          }
+        },
+        "learned_seed_37": {
+          "n": 512,
+          "mean_reward": 0.5271539290067953,
+          "mean_quality": 0.539153929006795,
+          "mean_cost": 1.0,
+          "mean_probes": 1.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "learned_seed_37_shuffled": {
+          "n": 512,
+          "mean_reward": 0.5271539290067953,
+          "mean_quality": 0.539153929006795,
+          "mean_cost": 1.0,
+          "mean_probes": 1.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "learned_seed_103": {
+          "n": 512,
+          "mean_reward": 0.5271539290067953,
+          "mean_quality": 0.539153929006795,
+          "mean_cost": 1.0,
+          "mean_probes": 1.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "learned_seed_103_shuffled": {
+          "n": 512,
+          "mean_reward": 0.5271539290067953,
+          "mean_quality": 0.539153929006795,
+          "mean_cost": 1.0,
+          "mean_probes": 1.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "learned_seed_211": {
+          "n": 512,
+          "mean_reward": 0.515153929006795,
+          "mean_quality": 0.539153929006795,
+          "mean_cost": 2.0,
+          "mean_probes": 2.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "pulse_pos_offset": 512
+          }
+        },
+        "learned_seed_211_shuffled": {
+          "n": 512,
+          "mean_reward": 0.515153929006795,
+          "mean_quality": 0.539153929006795,
+          "mean_cost": 2.0,
+          "mean_probes": 2.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "pulse_pos_offset": 512
+          }
+        },
+        "learned_seed_509": {
+          "n": 512,
+          "mean_reward": 0.5271539290067953,
+          "mean_quality": 0.539153929006795,
+          "mean_cost": 1.0,
+          "mean_probes": 1.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "learned_seed_509_shuffled": {
+          "n": 512,
+          "mean_reward": 0.5271539290067953,
+          "mean_quality": 0.539153929006795,
+          "mean_cost": 1.0,
+          "mean_probes": 1.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        }
+      },
+      "paired_comparisons": {
+        "bayesian_adaptive minus best_fixed": {
+          "mean_difference": 0.01800000000000001,
+          "ci95": [
+            0.018000000000000002,
+            0.01800000000000001
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261421,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "bayesian_adaptive minus bayesian_shuffled": {
+          "mean_difference": 0.0,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261124,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "bayesian_adaptive minus no_probe_prior_calibration": {
+          "mean_difference": 0.00506236671778707,
+          "ci95": [
+            0.003717456769536072,
+            0.006417228244933366
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261423,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "bayesian_forced_two minus best_fixed_two": {
+          "mean_difference": 0.005999999999999996,
+          "ci95": [
+            0.005999999999999993,
+            0.0059999999999999975
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261424,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "bayesian_abstain minus bayesian_adaptive": {
+          "mean_difference": -0.015142855277708655,
+          "ci95": [
+            -0.016471847307288606,
+            -0.013815264023945489
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261425,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_13 minus best_fixed": {
+          "mean_difference": 0.005999999999999996,
+          "ci95": [
+            0.005999999999999993,
+            0.0059999999999999975
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261426,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_13 minus bayesian_adaptive": {
+          "mean_difference": -0.01200000000000001,
+          "ci95": [
+            -0.01200000000000001,
+            -0.01200000000000001
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261427,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_13 minus learned_seed_13_shuffled": {
+          "mean_difference": 0.0,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261124,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_37 minus best_fixed": {
+          "mean_difference": 0.01800000000000001,
+          "ci95": [
+            0.018000000000000002,
+            0.01800000000000001
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261429,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_37 minus bayesian_adaptive": {
+          "mean_difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261430,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_37 minus learned_seed_37_shuffled": {
+          "mean_difference": 0.0,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261124,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_103 minus best_fixed": {
+          "mean_difference": 0.01800000000000001,
+          "ci95": [
+            0.018000000000000002,
+            0.01800000000000001
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261432,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_103 minus bayesian_adaptive": {
+          "mean_difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261433,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_103 minus learned_seed_103_shuffled": {
+          "mean_difference": 0.0,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261124,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_211 minus best_fixed": {
+          "mean_difference": 0.005999999999999996,
+          "ci95": [
+            0.005999999999999994,
+            0.0059999999999999975
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261435,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_211 minus bayesian_adaptive": {
+          "mean_difference": -0.01200000000000001,
+          "ci95": [
+            -0.01200000000000001,
+            -0.01200000000000001
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261436,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_211 minus learned_seed_211_shuffled": {
+          "mean_difference": 0.0,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261124,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_509 minus best_fixed": {
+          "mean_difference": 0.01800000000000001,
+          "ci95": [
+            0.018000000000000002,
+            0.01800000000000001
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261438,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_509 minus bayesian_adaptive": {
+          "mean_difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261439,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_509 minus learned_seed_509_shuffled": {
+          "mean_difference": 0.0,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261124,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        }
+      },
+      "bayesian_quadrature_sensitivity": {
+        "15": {
+          "mean_reward": 0.5271539290067953,
+          "fraction_actions_differ_from_primary": 0.0,
+          "mean_reward_difference_from_primary": 0.0
+        },
+        "5": {
+          "mean_reward": 0.5271539290067953,
+          "fraction_actions_differ_from_primary": 0.0,
+          "mean_reward_difference_from_primary": 0.0
+        },
+        "9": {
+          "mean_reward": 0.5271539290067953,
+          "fraction_actions_differ_from_primary": 0.0,
+          "mean_reward_difference_from_primary": 0.0
+        }
+      },
+      "mismatch_flag_rate": 0.9296875,
+      "learned_training_seed_summary": {
+        "seeds": [
+          13,
+          37,
+          103,
+          211,
+          509
+        ],
+        "mean_rewards": [
+          0.515153929006795,
+          0.5271539290067953,
+          0.5271539290067953,
+          0.515153929006795,
+          0.5271539290067953
+        ],
+        "mean": 0.5223539290067951,
+        "sample_standard_deviation": 0.006572670690062121,
+        "note": "Descriptive across seeds. No population-level interval from these few training runs."
+      },
+      "no_probe_definition": "prior-optimal fixed calibration, not necessarily factory settings",
+      "shift_type": "new parameter range under frozen equations"
+    },
+    "directional_friction": {
+      "policies": {
+        "no_probe_prior_calibration": {
+          "n": 512,
+          "mean_reward": 0.8097272091004848,
+          "mean_quality": 0.8097272091004848,
+          "mean_cost": 0.0,
+          "mean_probes": 0.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "fixed_first_only": {
+          "n": 512,
+          "mean_reward": 0.8144284909257,
+          "mean_quality": 0.8264284909257,
+          "mean_cost": 1.0,
+          "mean_probes": 1.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 512
+          }
+        },
+        "bayesian_adaptive": {
+          "n": 512,
+          "mean_reward": 0.8159059666115398,
+          "mean_quality": 0.8295934666115399,
+          "mean_cost": 1.140625,
+          "mean_probes": 1.123046875,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 449,
+            "pulse_pos_high": 19,
+            "pulse_neg_low": 20,
+            "pulse_neg_high": 6,
+            "reference_check": 18
+          }
+        },
+        "bayesian_forced_two": {
+          "n": 512,
+          "mean_reward": 0.811138702856234,
+          "mean_quality": 0.8354785466062341,
+          "mean_cost": 2.0283203125,
+          "mean_probes": 2.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "pulse_pos_high": 220,
+            "pulse_neg_low": 201,
+            "pulse_neg_high": 59,
+            "pulse_pos_offset": 2,
+            "pulse_neg_offset": 1,
+            "reference_check": 29
+          }
+        },
+        "bayesian_shuffled": {
+          "n": 512,
+          "mean_reward": 0.8137587493443859,
+          "mean_quality": 0.8274462493443859,
+          "mean_cost": 1.140625,
+          "mean_probes": 1.123046875,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 449,
+            "pulse_pos_high": 19,
+            "pulse_neg_low": 20,
+            "pulse_neg_high": 6,
+            "reference_check": 18
+          }
+        },
+        "bayesian_order_5": {
+          "n": 512,
+          "mean_reward": 0.8160402276197912,
+          "mean_quality": 0.8297277276197912,
+          "mean_cost": 1.140625,
+          "mean_probes": 1.123046875,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 449,
+            "pulse_pos_high": 20,
+            "pulse_neg_low": 20,
+            "pulse_neg_high": 5,
+            "reference_check": 18
+          }
+        },
+        "bayesian_order_9": {
+          "n": 512,
+          "mean_reward": 0.8159668309653749,
+          "mean_quality": 0.829654330965375,
+          "mean_cost": 1.140625,
+          "mean_probes": 1.123046875,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 449,
+            "pulse_pos_high": 17,
+            "pulse_neg_low": 20,
+            "pulse_neg_high": 8,
+            "reference_check": 18
+          }
+        },
+        "best_fixed": {
+          "n": 512,
+          "mean_reward": 0.8258267820968521,
+          "mean_quality": 0.855826782096852,
+          "mean_cost": 2.5,
+          "mean_probes": 2.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "reference_check": 512
+          }
+        },
+        "best_fixed_two": {
+          "n": 512,
+          "mean_reward": 0.8258267820968521,
+          "mean_quality": 0.855826782096852,
+          "mean_cost": 2.5,
+          "mean_probes": 2.0,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "reference_check": 512
+          }
+        },
+        "bayesian_abstain": {
+          "n": 512,
+          "mean_reward": 0.8102076674187306,
+          "mean_quality": 0.8237662611687306,
+          "mean_cost": 1.1298828125,
+          "mean_probes": 1.11328125,
+          "abstention_rate": 0.234375,
+          "action_counts": {
+            "STOP": 454,
+            "pulse_pos_high": 17,
+            "pulse_neg_low": 18,
+            "pulse_neg_high": 6,
+            "reference_check": 17
+          }
+        },
+        "learned_seed_13": {
+          "n": 512,
+          "mean_reward": 0.8128112303752648,
+          "mean_quality": 0.8291588866252648,
+          "mean_cost": 1.3623046875,
+          "mean_probes": 1.345703125,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 335,
+            "pulse_neg_high": 35,
+            "pulse_pos_offset": 125,
+            "reference_check": 17
+          }
+        },
+        "learned_seed_13_shuffled": {
+          "n": 512,
+          "mean_reward": 0.8108734008880173,
+          "mean_quality": 0.8272210571380174,
+          "mean_cost": 1.3623046875,
+          "mean_probes": 1.345703125,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 335,
+            "pulse_neg_high": 35,
+            "pulse_pos_offset": 125,
+            "reference_check": 17
+          }
+        },
+        "learned_seed_37": {
+          "n": 512,
+          "mean_reward": 0.812549887840598,
+          "mean_quality": 0.8276787940905981,
+          "mean_cost": 1.2607421875,
+          "mean_probes": 1.251953125,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 383,
+            "pulse_pos_high": 85,
+            "pulse_neg_low": 30,
+            "pulse_pos_offset": 5,
+            "reference_check": 9
+          }
+        },
+        "learned_seed_37_shuffled": {
+          "n": 512,
+          "mean_reward": 0.8126772722063176,
+          "mean_quality": 0.8278061784563175,
+          "mean_cost": 1.2607421875,
+          "mean_probes": 1.251953125,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 383,
+            "pulse_pos_high": 85,
+            "pulse_neg_low": 30,
+            "pulse_pos_offset": 5,
+            "reference_check": 9
+          }
+        },
+        "learned_seed_103": {
+          "n": 512,
+          "mean_reward": 0.8131004407088029,
+          "mean_quality": 0.827924659458803,
+          "mean_cost": 1.2353515625,
+          "mean_probes": 1.2265625,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 396,
+            "pulse_neg_high": 44,
+            "pulse_neg_offset": 63,
+            "reference_check": 9
+          }
+        },
+        "learned_seed_103_shuffled": {
+          "n": 512,
+          "mean_reward": 0.8132592848363429,
+          "mean_quality": 0.828083503586343,
+          "mean_cost": 1.2353515625,
+          "mean_probes": 1.2265625,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 396,
+            "pulse_neg_high": 44,
+            "pulse_neg_offset": 63,
+            "reference_check": 9
+          }
+        },
+        "learned_seed_211": {
+          "n": 512,
+          "mean_reward": 0.8134898868081684,
+          "mean_quality": 0.8293336368081685,
+          "mean_cost": 1.3203125,
+          "mean_probes": 1.302734375,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 357,
+            "pulse_pos_high": 24,
+            "pulse_pos_offset": 113,
+            "reference_check": 18
+          }
+        },
+        "learned_seed_211_shuffled": {
+          "n": 512,
+          "mean_reward": 0.811088485106165,
+          "mean_quality": 0.8269322351061652,
+          "mean_cost": 1.3203125,
+          "mean_probes": 1.302734375,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 357,
+            "pulse_pos_high": 24,
+            "pulse_pos_offset": 113,
+            "reference_check": 18
+          }
+        },
+        "learned_seed_509": {
+          "n": 512,
+          "mean_reward": 0.8154255830440474,
+          "mean_quality": 0.8287732392940474,
+          "mean_cost": 1.1123046875,
+          "mean_probes": 1.09765625,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 462,
+            "pulse_neg_high": 33,
+            "pulse_pos_offset": 2,
+            "reference_check": 15
+          }
+        },
+        "learned_seed_509_shuffled": {
+          "n": 512,
+          "mean_reward": 0.8142456648985692,
+          "mean_quality": 0.8275933211485691,
+          "mean_cost": 1.1123046875,
+          "mean_probes": 1.09765625,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 462,
+            "pulse_neg_high": 33,
+            "pulse_pos_offset": 2,
+            "reference_check": 15
+          }
+        }
+      },
+      "paired_comparisons": {
+        "bayesian_adaptive minus best_fixed": {
+          "mean_difference": -0.009920815485312231,
+          "ci95": [
+            -0.015301700592513661,
+            -0.004964194261611189
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261521,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "bayesian_adaptive minus bayesian_shuffled": {
+          "mean_difference": 0.0021472172671539126,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261125,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "bayesian_adaptive minus no_probe_prior_calibration": {
+          "mean_difference": 0.006178757511054955,
+          "ci95": [
+            0.003320888456760987,
+            0.009238323930317623
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261523,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "bayesian_forced_two minus best_fixed_two": {
+          "mean_difference": -0.014688079240617945,
+          "ci95": [
+            -0.019758479037624323,
+            -0.00962762566797207
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261524,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "bayesian_abstain minus bayesian_adaptive": {
+          "mean_difference": -0.005698299192809172,
+          "ci95": [
+            -0.007270903139421631,
+            -0.004271926404690673
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261525,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_13 minus best_fixed": {
+          "mean_difference": -0.01301555172158726,
+          "ci95": [
+            -0.01794100597565899,
+            -0.007974856509690416
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261526,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_13 minus bayesian_adaptive": {
+          "mean_difference": -0.003094736236275029,
+          "ci95": [
+            -0.003671074248197162,
+            -0.00251639676950948
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261527,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_13 minus learned_seed_13_shuffled": {
+          "mean_difference": 0.0019378294872474666,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261125,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_37 minus best_fixed": {
+          "mean_difference": -0.013276894256253958,
+          "ci95": [
+            -0.018904187467898327,
+            -0.008124437020587816
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261529,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_37 minus bayesian_adaptive": {
+          "mean_difference": -0.003356078770941728,
+          "ci95": [
+            -0.004932288870172819,
+            -0.0021291930719887636
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261530,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_37 minus learned_seed_37_shuffled": {
+          "mean_difference": -0.0001273843657194865,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261125,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_103 minus best_fixed": {
+          "mean_difference": -0.012726341388049081,
+          "ci95": [
+            -0.017976376786308534,
+            -0.007276575342522627
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261532,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_103 minus bayesian_adaptive": {
+          "mean_difference": -0.002805525902736852,
+          "ci95": [
+            -0.004321189185773801,
+            -0.0015296939831903056
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261533,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_103 minus learned_seed_103_shuffled": {
+          "mean_difference": -0.00015884412753998855,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261125,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_211 minus best_fixed": {
+          "mean_difference": -0.012336895288683604,
+          "ci95": [
+            -0.017641603859469616,
+            -0.007179209667611181
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261535,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_211 minus bayesian_adaptive": {
+          "mean_difference": -0.0024160798033713736,
+          "ci95": [
+            -0.0028938633704231544,
+            -0.0019491968388905495
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261536,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_211 minus learned_seed_211_shuffled": {
+          "mean_difference": 0.002401401702003243,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261125,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        },
+        "learned_seed_509 minus best_fixed": {
+          "mean_difference": -0.010401199052804587,
+          "ci95": [
+            -0.01579598846679836,
+            -0.005115111060306551
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261538,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_509 minus bayesian_adaptive": {
+          "mean_difference": -0.00048038356749235695,
+          "ci95": [
+            -0.0012041161570185048,
+            0.00012594094520480408
+          ],
+          "method": "paired episode percentile bootstrap",
+          "resamples": 2000,
+          "seed": 3900261539,
+          "scope": "episode uncertainty conditional on this fitted policy; not training-seed uncertainty"
+        },
+        "learned_seed_509 minus learned_seed_509_shuffled": {
+          "mean_difference": 0.0011799181454783313,
+          "ci95": null,
+          "method": "descriptive single-permutation matched-frequency control",
+          "resamples": 0,
+          "seed": 3800261125,
+          "aggregate_cost_difference": 0.0,
+          "scope": "Rows share a fixed permutation and are dependent; no iid bootstrap interval is claimed."
+        }
+      },
+      "bayesian_quadrature_sensitivity": {
+        "15": {
+          "mean_reward": 0.8159059666115398,
+          "fraction_actions_differ_from_primary": 0.0,
+          "mean_reward_difference_from_primary": 0.0
+        },
+        "5": {
+          "mean_reward": 0.8160402276197912,
+          "fraction_actions_differ_from_primary": 0.021484375,
+          "mean_reward_difference_from_primary": 0.00013426100825140335
+        },
+        "9": {
+          "mean_reward": 0.8159668309653749,
+          "fraction_actions_differ_from_primary": 0.0234375,
+          "mean_reward_difference_from_primary": 6.0864353835139674e-05
+        }
+      },
+      "mismatch_flag_rate": 0.234375,
+      "learned_training_seed_summary": {
+        "seeds": [
+          13,
+          37,
+          103,
+          211,
+          509
+        ],
+        "mean_rewards": [
+          0.8128112303752648,
+          0.812549887840598,
+          0.8131004407088029,
+          0.8134898868081684,
+          0.8154255830440474
+        ],
+        "mean": 0.8134754057553764,
+        "sample_standard_deviation": 0.0011447393033363808,
+        "note": "Descriptive across seeds. No population-level interval from these few training runs."
+      },
+      "no_probe_definition": "prior-optimal fixed calibration, not necessarily factory settings",
+      "shift_type": "new direction-dependent friction equation"
+    }
+  },
+  "selection": {
+    "fixed_schedule": [
+      0,
+      6
+    ],
+    "fixed_two_schedule": [
+      0,
+      6
+    ],
+    "selection": "top five schedules on train, select on validation; fixed-two selected on validation",
+    "first_probe_for_adaptive_policies": 0,
+    "mismatch_threshold": 2.248171572968667,
+    "mismatch_quantile": 0.95,
+    "mismatch_fit_split": "validation",
+    "test_used_for_selection": false,
+    "bayesian_resolution": {
+      "primary_order": 15,
+      "decision": "Use the highest implemented quadrature order; report residual sensitivity, not exact optimality.",
+      "validation_results": {
+        "5": {
+          "n": 512,
+          "mean_reward": 0.8895665961919459,
+          "mean_quality": 0.9103673774419461,
+          "mean_cost": 1.7333984375,
+          "mean_probes": 1.5390625,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 236,
+            "pulse_pos_high": 60,
+            "pulse_neg_low": 9,
+            "pulse_neg_high": 8,
+            "reference_check": 199
+          }
+        },
+        "9": {
+          "n": 512,
+          "mean_reward": 0.889209168425204,
+          "mean_quality": 0.9099865121752042,
+          "mean_cost": 1.7314453125,
+          "mean_probes": 1.537109375,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 237,
+            "pulse_pos_high": 53,
+            "pulse_neg_low": 9,
+            "pulse_neg_high": 14,
+            "reference_check": 199
+          }
+        },
+        "15": {
+          "n": 512,
+          "mean_reward": 0.8900572476479114,
+          "mean_quality": 0.9108580288979116,
+          "mean_cost": 1.7333984375,
+          "mean_probes": 1.5390625,
+          "abstention_rate": 0.0,
+          "action_counts": {
+            "STOP": 236,
+            "pulse_pos_high": 52,
+            "pulse_neg_low": 9,
+            "pulse_neg_high": 16,
+            "reference_check": 199
+          }
+        }
+      }
+    }
+  },
+  "completed": true,
+  "elapsed_seconds": 20.418707679998988,
+  "limitations": [
+    "Synthetic normalized plant coefficients and noise; no empirical physical validation.",
+    "New directional-friction case is a specified synthetic stress test, not a measured fault.",
+    "Small finite prior and short decision horizon suit a Bayesian baseline. Its observation integral is numerically approximated.",
+    "Quadrature sensitivity is reported. Small learner-versus-Bayesian differences cannot establish an advantage beyond numerical uncertainty.",
+    "Single-permutation shuffled controls are descriptive and have no iid bootstrap confidence interval.",
+    "Episode bootstrap intervals condition on a trained policy and do not replace more training seeds.",
+    "Mismatch abstention falls back to prior-optimal calibration after paying for the first probe; it is not a certified safeguard.",
+    "Bayesian forced-two and best-fixed-two use equal test counts but may spend different test costs.",
+    "Protocol and test cases are public and exploratory; this is not a blinded or independently preregistered study.",
+    "Frozen v0.2 numerical timing is preserved for comparability, including 0.56 s low pulses."
+  ]
+}
