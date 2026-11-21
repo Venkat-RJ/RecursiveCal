@@ -120,7 +120,7 @@
   function normalized(row, mode, p = {}) {
     // Investigation views never read true_* values, even from a sealed report.
     const q = mode === "simulation" ? row.angle_rad : mode === "verify" ? row.true_angle_rad : row.angle_rad;
-    return {t:row.time_s, q, angle:row.angle_rad, target:row.target_angle_rad,
+    return {t:row.time_s, q, angle:mode === "simulation" ? row.observed_angle_rad : row.angle_rad, target:row.target_angle_rad,
       velocity:mode === "verify" ? (row.true_velocity_rad_s ?? row.velocity_rad_s) : row.velocity_rad_s,
       drive:mode === "simulation" ? row.motor_force_N_each : undefined,
       command:mode === "simulation" ? row.requested_motor_force_N_each : undefined,

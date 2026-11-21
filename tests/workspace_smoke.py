@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import math
 from pathlib import Path
@@ -177,6 +178,8 @@ def run(output: Path, browser_path: str | None = None, visual_only: bool = False
                         page.get_by_role("button", name="Rig & data", exact=True).click()
                         page.locator("#openSettings").click()
                         page.locator("#scenario").select_option("power_loss")
+                        page.locator("#simulationForm summary").click()
+                        page.locator('[data-param="sensor_bias_rad"]').fill("0.02")
                         page.locator("#simulationForm .dialog-run").click()
                         expect(page.locator("body")).to_have_attribute("data-busy", "false", timeout=60000)
                         expect(page.locator("#runOrigin")).to_have_text("Computed locally")
@@ -189,6 +192,11 @@ def run(output: Path, browser_path: str | None = None, visual_only: bool = False
                             page.locator("#exportCsv").click()
                         csv_file=output/"computed-trace.csv";download.value.save_as(csv_file)
                         assert len(csv_file.read_text().splitlines()) == len(fresh["trace"])+1
+                        with csv_file.open() as stream:
+                            first = next(csv.DictReader(stream))
+                        assert float(first["observed_angle_rad"]) == fresh["trace"][0]["observed_angle_rad"]
+                        assert float(first["display_angle_rad"]) == fresh["trace"][0]["angle_rad"]
+                        assert float(first["observed_angle_rad"]) != float(first["display_angle_rad"])
                         checked("A real new simulation computes, exposes its power-loss event and exports every CSV sample")
 
                         page.get_by_role("button", name="Investigate", exact=True).click()
