@@ -70,7 +70,9 @@
     }
     if(S.stream?.observation) {
       const row=C.normalized({...S.stream.observation.measurement,time_s:0},"investigate");
-      return {rows:[row],before:[],predictions:[],events:[],samples:[],end:0,parameters:{},
+      const predictions=(currentPredictions()?.candidates||[]).map(predictionRows);
+      const end=Math.max(0,...predictions.map(rows=>rows.at(-1)?.t||0));
+      return {rows:[row],before:[],predictions,events:[],samples:[],end,parameters:{},
         origin:"Computing locally",model:"recursivecal.physical-rig/2",kind:"investigate"};
     }
     return null;
@@ -101,7 +103,7 @@
       text("navTitle","Assembly");text("navCount","01 rig");
       const components=[["hatch","Hatch & hinge","◇"],["left","Left actuator","↗"],["right","Right actuator","↗"],["gas","Gas assistance","⊙"],["sensor","Angle sensor","◉"]];
       for(const [key,label,icon] of components)nav.append(navItem(label,"",icon,S.component===key,()=>{
-        S.component=key;if(key==="left"||key==="right")S.renderer&&(S.renderer.selected=key);
+        S.component=key;if(S.renderer)S.renderer.selected=key;
         if(key==="left"||key==="right")$("showCutaway").checked=true;render(S.time);
       }));
       details.append(el("h2","Current run"));
@@ -176,6 +178,7 @@
     $("rigStage").hidden=view==="calibrate";
     $("calibrationPanel").hidden=view!=="calibrate";
     $("actuatorPane").hidden=!$("showCutaway").checked;
+    $("showVectors").closest("label").hidden=view!=="simulation";
     $("comparisonLabels").hidden=view!=="verify"||!r;
     text("actuatorTitle",(S.component==="right"?"Right":"Left")+" actuator");
     text("poseSource",view==="simulation"?"Simulator state":view==="verify"?"Verifier state":"Pose derived from the angle sensor");
@@ -191,10 +194,28 @@
       signals(p,[["Hatch angle","n/a","deg","readingAngle",true],["Target","n/a","deg","readingTarget"],
         ["Angular speed","n/a","rad/s","readingSpeed"],["Extension","n/a","mm","readingStroke"]]);
       p.append(el("p","Pose and extension come from the displayed trace. Playback interpolates between recorded samples.","meta-label"));
-      p=section("Actuator");
-      signals(p,[["Command","n/a","N / strut","readingCommand"],["Delivered force","n/a","N / strut","readingDrive"],
-        ["Gas assistance","n/a","N / strut","readingGas"],["Command limit",fmt(S.run?.parameters.motor_force_max_N_each,0),"N / strut"],
-        ["Saturated","n/a","","readingSaturated"]]);
+      const parameters=S.run?.parameters||{};
+      if(S.component==="hatch") {
+        p=section("Hatch & hinge");
+        signals(p,[["Mass",fmt(parameters.mass_kg),"kg"],["Hinge inertia",fmt(parameters.inertia_kg_m2),"kg·m²"],
+          ["Center of mass",fmt(parameters.com_radius_m,3),"m"],["Coulomb friction",fmt(parameters.friction_coulomb_Nm),"N·m"],
+          ["Static friction",fmt(parameters.friction_static_Nm),"N·m"]]);
+      } else if(S.component==="gas") {
+        p=section("Gas assistance model");
+        signals(p,[["At cursor","n/a","N / strut","readingGas"],["Force scale",fmt(parameters.gas_scale,3)],
+          ["Compressed reference",fmt(parameters.gas_force_compressed_N_each,1),"N / strut"],
+          ["Extended reference",fmt(parameters.gas_force_extended_N_each,1),"N / strut"],
+          ["Temperature",fmt(parameters.temperature_C,1),"°C"]]);
+      } else if(S.component==="sensor") {
+        p=section("Angle sensor model");
+        signals(p,[["Encoder bias",fmt(parameters.sensor_bias_rad,4),"rad"],["Logging noise σ",fmt(parameters.sensor_noise_std_rad,4),"rad"]]);
+        p.append(el("p","The simulation pose shows model state. The investigator view uses the recorded sensor angle.","description"));
+      } else {
+        p=section(S.component==="right"?"Right actuator":"Left actuator");
+        signals(p,[["Command","n/a","N / strut","readingCommand"],["Delivered force","n/a","N / strut","readingDrive"],
+          ["Gas assistance","n/a","N / strut","readingGas"],["Command limit",fmt(parameters.motor_force_max_N_each,0),"N / strut"],
+          ["Saturated","n/a","","readingSaturated"]]);
+      }
       p=section("Model coverage");
       signals(p,[["Force response","Simulated"],["Motor current","Not modeled"],["Rotor speed","Not modeled"],["Motor heating","Not modeled"]]);
       p=section("Run events");appendEvents(p,S.data?.events||[]);
@@ -428,7 +449,7 @@
   }
   function drawVectors(current) {
     const overlay=$("rigOverlay");overlay.replaceChildren();
-    if(!$("showVectors").checked||S.data?.kind!=="simulation"||!S.renderer||!Number.isFinite(current.drive))return;
+    if(!$("showVectors").checked||S.data?.kind!=="simulation"||!S.renderer||!Number.isFinite(current.drive)||$("rigCanvas").style.visibility==="hidden")return;
     const canvas=$("rigCanvas"),w=canvas.clientWidth,h=canvas.clientHeight;
     overlay.setAttribute("viewBox","0 0 "+w+" "+h);
     const defs=svg("defs"),marker=svg("marker",{id:"forceArrow",markerWidth:6,markerHeight:6,refX:5,refY:3,orient:"auto"});

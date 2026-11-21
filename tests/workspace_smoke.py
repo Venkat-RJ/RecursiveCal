@@ -89,6 +89,7 @@ def run(output: Path, browser_path: str | None = None, visual_only: bool = False
                     page.locator("#playButton").click()
                     expect(page.locator("body")).to_have_attribute("data-playing", "true")
                     page.wait_for_timeout(220)
+                    page.screenshot(path=str(output / "simulation-playing.png"), full_page=True)
                     page.locator("#playButton").click()
                     paused = page.locator("#workspace").get_attribute("data-time")
                     page.wait_for_timeout(150)
@@ -116,7 +117,18 @@ def run(output: Path, browser_path: str | None = None, visual_only: bool = False
                     page.locator("#timeline").fill("4200")
                     page.locator("#timeline").dispatch_event("input")
                     page.screenshot(path=str(output / "simulation-desktop.png"), full_page=True)
-                    checked("Actuator selection, cutaway, force-vector and motion-trail controls work")
+                    page.locator("#focusMechanism").click()
+                    expect(page.locator("#focusMechanism")).to_have_attribute("aria-pressed", "true")
+                    page.screenshot(path=str(output / "actuator-inspection.png"), full_page=True)
+                    page.locator("#resetCamera").click()
+                    page.get_by_role("button", name="Gas assistance", exact=True).click()
+                    expect(page.locator("#inspector")).to_contain_text("Gas assistance model")
+                    page.get_by_role("button", name="Angle sensor", exact=True).click()
+                    expect(page.locator("#inspector")).to_contain_text("Encoder bias")
+                    page.get_by_role("button", name="Hatch & hinge", exact=True).click()
+                    expect(page.locator("#inspector")).to_contain_text("Hinge inertia")
+                    page.get_by_role("button", name="Left actuator", exact=True).click()
+                    checked("Component inspection, cutaway, camera, force-vector and motion-trail controls work")
 
                     page.get_by_role("button", name="Investigate", exact=True).click()
                     expect(page.locator("body")).to_have_attribute("data-view", "investigate")
@@ -126,7 +138,7 @@ def run(output: Path, browser_path: str | None = None, visual_only: bool = False
                     page.locator("#timeline").dispatch_event("input")
                     assert page.locator("#anglePlot path").count() >= 4
                     assert "Delivered force" not in page.locator("#inspector").inner_text()
-                    assert "prior" in page.locator("#plotsHeading").inner_text().lower() or "Predictions" in page.locator("#plotsHeading").inner_text()
+                    expect(page.locator("#plotsHeading")).to_have_text("Predictions & observations")
                     page.screenshot(path=str(output / "investigation-desktop.png"), full_page=True)
                     recorded = download_current("investigation.json")
                     assert verify_report(recorded)["valid"]
@@ -184,6 +196,10 @@ def run(output: Path, browser_path: str | None = None, visual_only: bool = False
                         page.locator("#condition").select_option("compound")
                         page.locator("#investigationForm .dialog-run").click()
                         expect(page.locator("body")).to_have_attribute("data-busy", "true")
+                        page.wait_for_function("""() => document.body.dataset.busy === 'true' &&
+                            document.querySelectorAll('#sideNav .nav-item').length > 0 &&
+                            document.querySelectorAll('#anglePlot path').length >= 4""", timeout=60000)
+                        page.screenshot(path=str(output / "investigation-computing.png"), full_page=True)
                         expect(page.locator("body")).to_have_attribute("data-busy", "false", timeout=90000)
                         expect(page.locator("#runOrigin")).to_have_text("Computed locally")
                         computed=download_current("computed-investigation.json")
