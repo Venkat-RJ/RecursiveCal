@@ -8,6 +8,14 @@ The current task is a synthetic single-axis actuator. Its dynamics are hidden. A
 
 This is a **research simulator**, not an industrial calibration product, real-hardware controller, or certified safety system.
 
+## Interactive visual laboratory
+
+Open [visualization/index.html](visualization/index.html) in a browser to explore the actuator model interactively. No server or API key is needed.
+
+Choose synthetic fault scenarios, run bounded diagnostic probes, animate the mechanical response, tune the controller, and compare it against a frozen **classical Bayesian reference**. The screen uses the same numerical dynamics and scoring equations as `recursivecal.py`; a Python/JavaScript parity test was run on 28 cases.
+
+The visual demo bundles **public showcase-only seeds and hidden plant parameters** in the HTML so it can run offline. It must **never be used as the secure RL task evaluator**. See [visualization/README.md](visualization/README.md) for scope and source files.
+
 ## Environment
 
 ```text
