@@ -57,8 +57,21 @@ else:
         if hashlib.sha256(raw).hexdigest() != item["sha256"] or bundle[key] != json.loads(raw):
             errors.append(f"recorded workbench data drifted: {key}")
 audit = json.loads((ROOT / "research/releases/physical-v1/audit.json").read_text())
-if audit["provenance"]["model_source_sha256"] != hashlib.sha256((ROOT / "recursivecal_lab/physics.py").read_bytes()).hexdigest():
-    errors.append("physical audit source differs from implementation")
+historical = json.loads((ROOT / "research/releases/physics-v2/historical-evidence.json").read_text())
+if historical['source_commit'] != '8d51692799b1eaffb18c3f91def12fac44a1b8af':
+    errors.append('historical physics source revision changed')
+if audit["provenance"]["model_source_sha256"] != historical['historical_source_sha256']['physics.py']:
+    errors.append("historical physical audit differs from its pinned source")
+for name, expected in historical['historical_artifacts_sha256'].items():
+    if hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != expected:
+        errors.append(f"historical physics evidence changed: {name}")
+validation = json.loads((ROOT / 'research/releases/physics-v2/validation.json').read_text())
+from recursivecal_lab.physics import MODEL_ID
+if validation['model_id'] != MODEL_ID or not validation['passed'] or not all(validation['gates'].values()):
+    errors.append('current physics numerical validation does not pass for this model')
+for name, expected in validation['source_sha256'].items():
+    if hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != expected:
+        errors.append(f'current physics validation source drifted: {name}')
 if (ROOT / "docs/EXPERIMENT_PROTOCOL.md").read_bytes() != (ROOT / "recursivecal_lab/data/EXPERIMENT_PROTOCOL.md").read_bytes():
     errors.append("installed experiment protocol differs from documentation")
 from recursivecal_lab.inquiry import verify_report
@@ -71,8 +84,8 @@ else:
     if not verify_report(inquiry_report)["valid"]:
         errors.append("physical inquiry recorded report failed integrity or protocol checks")
     for name, expected in inquiry_report["provenance"]["source_sha256"].items():
-        if hashlib.sha256((ROOT / "recursivecal_lab" / name).read_bytes()).hexdigest() != expected:
-            errors.append(f"physical inquiry recorded source drifted: {name}")
+        if historical['historical_source_sha256'].get(name) != expected:
+            errors.append(f"historical inquiry recorded source drifted: {name}")
 for authored, bundled in (("cad_mesh.js", "inquiry-cad.js"), ("cad_renderer.js", "inquiry-renderer.js")):
     if (ROOT / "mechanics/cad_v1/viewer" / authored).read_bytes() != (ROOT / "recursivecal_lab/web" / bundled).read_bytes():
         errors.append(f"physical inquiry CAD asset drifted from authored source: {authored}")

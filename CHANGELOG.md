@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased: mechanics foundation v2
+
+- Both SI simulation interfaces now use the same mechanical kernel and model identifiers ending in `/2`.
+- Resolve sliding stops, directional static friction, motor-lag displacement and inelastic contact within a step. Preserve incoming impact speed and post-impact elapsed time.
+- Reject hinge inertia below the parallel-axis lower bound. Record power loss once at its actual boundary and acquire fixture observations at their stated timestamps.
+- Add analytical regressions, independent DOP853 trajectory/contact checks, a 60-second conservative-motion audit, and a dedicated CI validation job.
+- Preserve model `/1` reports with pinned source/evidence hashes; browser imports support both model versions and label archived evidence.
+- These checks verify synthetic mechanics. No measured-hardware validation or new policy-performance claim is introduced.
+
 ## 0.4.0 - 2026-11-21
 
 Connected the physical simulator, observation-only investigator, calibration controller, independent verifier and CAD workbench. The rig carries position, velocity, actuator force, time and work between tests, with an explicit charged fixture operation.

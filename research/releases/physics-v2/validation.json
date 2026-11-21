@@ -1,0 +1,3141 @@
+{
+  "schema_version": "recursivecal.physics-validation/1",
+  "model_id": "recursivecal.si-liftgate/2",
+  "scope": "Numerical verification of synthetic equations, not measured-hardware validation. The 24-case trajectory envelope excludes dry friction and contact. Three additional motor-reversal cases check contact event roots. Analytical tests separately cover sticking and sliding.",
+  "hardware_validated": false,
+  "measured_data_used": false,
+  "reference_method": "Independent force/geometry implementation, SciPy DOP853, rtol 2e-12, atol 2e-13.",
+  "runtime": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0"
+  },
+  "source_sha256": {
+    "recursivecal_lab/physics.py": "0aaa356e6d7dfb794f74a46097b7b06c7ab116a731b632cec7ce48f2e9302ec8",
+    "recursivecal_lab/physical_rig.py": "b086c7326699eb2139a62112800114c387d7415167dfabfaf4674e9095ae0e04",
+    "scripts/validate_physics.py": "d27aeba5ea7e3eab24a556e16b04c861c373132d1692b02b7befab886edca573",
+    "tests/test_mechanics_foundation_v2.py": "71787f821a5945417cd9defb0b427acefc3616f900fc3de125e4ac6f3487299c"
+  },
+  "gates": {
+    "all_smooth_states_finite": true,
+    "smooth_cases_avoid_contact": true,
+    "10ms_angle_error_below_0_01_degree": true,
+    "10ms_velocity_error_below_0_002_rad_s": true,
+    "motor_lag_error_below_1e_8_N": true,
+    "angle_refinement_at_least_1_8_per_halving": true,
+    "velocity_refinement_at_least_1_8_per_halving": true,
+    "long_run_avoids_contact": true,
+    "long_run_10ms_relative_energy_excursion_below_0_001": true,
+    "long_run_10ms_angle_error_below_0_3_degree": true,
+    "long_run_angle_error_refines": true,
+    "long_run_energy_error_refines": true,
+    "motor_reversal_contact_classifications_match": true,
+    "motor_reversal_contact_time_error_below_20_us": true,
+    "motor_reversal_contact_speed_error_below_0_0002_rad_s": true,
+    "fast_reversal_correctly_exceeds_impact_cutoff": true
+  },
+  "passed": true,
+  "smooth_maxima": [
+    {
+      "max_angle_error_deg": 0.0043138359967304805,
+      "max_velocity_error_rad_s": 0.0003689378286452216,
+      "max_motor_force_error_N": 3.836930773104541e-13,
+      "contacts": 0,
+      "dt_s": 0.02
+    },
+    {
+      "max_angle_error_deg": 0.0010796095343911895,
+      "max_velocity_error_rad_s": 9.234541161373677e-05,
+      "max_motor_force_error_N": 3.836930773104541e-13,
+      "contacts": 0,
+      "dt_s": 0.01
+    },
+    {
+      "max_angle_error_deg": 0.0002699744383516617,
+      "max_velocity_error_rad_s": 2.3093311010469186e-05,
+      "max_motor_force_error_N": 3.979039320256561e-13,
+      "contacts": 0,
+      "dt_s": 0.005
+    },
+    {
+      "max_angle_error_deg": 6.749811524119106e-05,
+      "max_velocity_error_rad_s": 5.773762996819087e-06,
+      "max_motor_force_error_N": 3.979039320256561e-13,
+      "contacts": 0,
+      "dt_s": 0.0025
+    }
+  ],
+  "long_conservative_runs": [
+    {
+      "dt_s": 0.02,
+      "duration_s": 60,
+      "energy_excursion_J": 1.0021056146669594e-05,
+      "relative_energy_excursion": 3.728277733760826e-06,
+      "maximum_angle_error_deg": 0.8454818934260523,
+      "contacts": 0
+    },
+    {
+      "dt_s": 0.01,
+      "duration_s": 60,
+      "energy_excursion_J": 2.5078259828781313e-06,
+      "relative_energy_excursion": 9.330225911585916e-07,
+      "maximum_angle_error_deg": 0.21151212725318996,
+      "contacts": 0
+    },
+    {
+      "dt_s": 0.005,
+      "duration_s": 60,
+      "energy_excursion_J": 6.270879966407961e-07,
+      "relative_energy_excursion": 2.3330457196984798e-07,
+      "maximum_angle_error_deg": 0.05288845766580561,
+      "contacts": 0
+    }
+  ],
+  "smooth_cases": [
+    {
+      "case": 0,
+      "parameters": {
+        "mass_kg": 30.322650093912948,
+        "inertia_kg_m2": 20.149751247112484,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.6447353827248781,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.487113205209522,
+        "body_anchor_z_m": 1.1574486743828194,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 0.8111571897693399,
+        "temperature_C": 52.605488326895326,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 0.07893572892397005,
+        "strut_damping_N_s_m_each": 0.15751339914159956,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 0.9033243468053527,
+        "actuator_time_constant_s": 0.10500140923190673,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        0.048214553100183466,
+        2.8493378704143097
+      ],
+      "command_N_each": [
+        101.47866186397786,
+        71.76243208990559,
+        23.535542627096035,
+        -32.05596515475426,
+        48.95881685016181
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          0.048214553100183466,
+          2.8493378704143097
+        ],
+        [
+          0.7003883257467908,
+          -0.02341381686455377,
+          30.98590028339006
+        ],
+        [
+          0.6984179387779441,
+          -0.07293131140621949,
+          41.705577642048254
+        ],
+        [
+          0.6945874942043987,
+          -0.1196135893918989,
+          35.22877560111193
+        ],
+        [
+          0.6886539780627114,
+          -0.1806340786032626,
+          14.895636062940131
+        ],
+        [
+          0.6801063455968425,
+          -0.24446638104115886,
+          24.18698939562494
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.0007888734823592574,
+          "max_velocity_error_rad_s": 7.605552521197656e-05,
+          "max_motor_force_error_N": 7.105427357601002e-15,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.00019738422529545573,
+          "max_velocity_error_rad_s": 1.901945896684576e-05,
+          "max_motor_force_error_N": 7.105427357601002e-15,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 4.935643147134593e-05,
+          "max_velocity_error_rad_s": 4.755213091373056e-06,
+          "max_motor_force_error_N": 1.4210854715202004e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 1.2339756548324877e-05,
+          "max_velocity_error_rad_s": 1.1888250534275446e-06,
+          "max_motor_force_error_N": 1.4210854715202004e-14,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 1,
+      "parameters": {
+        "mass_kg": 28.153301211617595,
+        "inertia_kg_m2": 12.835388789975788,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.5376717413547254,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.4820726010612989,
+        "body_anchor_z_m": 1.174841097634957,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 1.2439594644310248,
+        "temperature_C": -3.8986550677817817,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 10.81224942135759,
+        "strut_damping_N_s_m_each": 6.707448819534394,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 0.8721162096990656,
+        "actuator_time_constant_s": 0.058547217730350126,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        -0.07624963776684153,
+        3.1399963137999904
+      ],
+      "command_N_each": [
+        137.09252081853148,
+        71.8649599202825,
+        -39.50507634633816,
+        135.20063888045283,
+        130.4141504759187
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          -0.07624963776684153,
+          3.1399963137999904
+        ],
+        [
+          0.6986491433954198,
+          0.025393947744026445,
+          60.76892822794567
+        ],
+        [
+          0.7025492207894048,
+          0.16867523884852792,
+          61.712245922507094
+        ],
+        [
+          0.7113740974067262,
+          0.2571111575994551,
+          14.109838950378379
+        ],
+        [
+          0.7232629052579526,
+          0.3510416506512494,
+          65.49189906280553
+        ],
+        [
+          0.7401479540832515,
+          0.49793828552161656,
+          89.37317666987322
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.0020871523961392643,
+          "max_velocity_error_rad_s": 0.00017197082776654327,
+          "max_motor_force_error_N": 4.263256414560601e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.000521872617178637,
+          "max_velocity_error_rad_s": 4.301114579408072e-05,
+          "max_motor_force_error_N": 4.263256414560601e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 0.00013047339237083776,
+          "max_velocity_error_rad_s": 1.07539473523377e-05,
+          "max_motor_force_error_N": 4.263256414560601e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 3.261867487402936e-05,
+          "max_velocity_error_rad_s": 2.688559542385338e-06,
+          "max_motor_force_error_N": 4.263256414560601e-14,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 2,
+      "parameters": {
+        "mass_kg": 24.118744687944115,
+        "inertia_kg_m2": 13.393675800955599,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.5932404946514176,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.4800320846545896,
+        "body_anchor_z_m": 1.186872548133869,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 1.2181163672633726,
+        "temperature_C": 26.018658078392235,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 11.636180135917046,
+        "strut_damping_N_s_m_each": 8.801010264933891,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 0.7042211444887989,
+        "actuator_time_constant_s": 0.11218478197082146,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        0.0567447375125881,
+        -8.121152796139981
+      ],
+      "command_N_each": [
+        70.28266202615802,
+        136.99810100307053,
+        -36.71766137005308,
+        64.81730203084888,
+        -34.25742713826729
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          0.0567447375125881,
+          -8.121152796139981
+        ],
+        [
+          0.7038095891529325,
+          0.13786669409068958,
+          9.158700146088776
+        ],
+        [
+          0.7114538463395785,
+          0.25051002629249775,
+          35.346821714093096
+        ],
+        [
+          0.723769873732252,
+          0.35838927675670795,
+          16.990725365849062
+        ],
+        [
+          0.7399031922030588,
+          0.44888205520726476,
+          25.584808067468725
+        ],
+        [
+          0.7594293959095137,
+          0.5212432721676484,
+          10.676112129787555
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.0021320903800872656,
+          "max_velocity_error_rad_s": 0.00011506659755922133,
+          "max_motor_force_error_N": 7.105427357601002e-15,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.0005333586363199503,
+          "max_velocity_error_rad_s": 2.877943518586612e-05,
+          "max_motor_force_error_N": 1.7763568394002505e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 0.00013336068285653614,
+          "max_velocity_error_rad_s": 7.195658920156056e-06,
+          "max_motor_force_error_N": 4.973799150320701e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 3.334148527555054e-05,
+          "max_velocity_error_rad_s": 1.7989647929095298e-06,
+          "max_motor_force_error_N": 3.552713678800501e-14,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 3,
+      "parameters": {
+        "mass_kg": 23.597290540032056,
+        "inertia_kg_m2": 11.871883079714962,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.5162622664959297,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.4595600284190362,
+        "body_anchor_z_m": 1.1939280846863047,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 0.6273830376344898,
+        "temperature_C": -11.627688371947347,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 10.22991032859611,
+        "strut_damping_N_s_m_each": 5.852777533464725,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 0.6646820123352584,
+        "actuator_time_constant_s": 0.05534837177499029,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        0.014205012792802313,
+        -13.547854830114488
+      ],
+      "command_N_each": [
+        86.33267530361377,
+        144.70057280381084,
+        59.22714311917943,
+        89.00610650014912,
+        -33.36218279743291
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          0.014205012792802313,
+          -13.547854830114488
+        ],
+        [
+          0.6986253435546578,
+          -0.07057978911946797,
+          22.950572772745076
+        ],
+        [
+          0.6953610400973577,
+          -0.08023860678251891,
+          60.631281403483065
+        ],
+        [
+          0.6924518838767861,
+          -0.06863057541241134,
+          49.68968998408489
+        ],
+        [
+          0.689839156247171,
+          -0.06031975862584767,
+          54.5631023639318
+        ],
+        [
+          0.6870830747579018,
+          -0.08986360052694231,
+          15.076784502586317
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.00042388894298543565,
+          "max_velocity_error_rad_s": 2.383878907639969e-05,
+          "max_motor_force_error_N": 2.4868995751603507e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.00010622958001228042,
+          "max_velocity_error_rad_s": 5.96977103146934e-06,
+          "max_motor_force_error_N": 1.7763568394002505e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 2.6573516539799246e-05,
+          "max_velocity_error_rad_s": 1.4930723925277167e-06,
+          "max_motor_force_error_N": 2.1316282072803006e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 6.644387399408828e-06,
+          "max_velocity_error_rad_s": 3.733074555589688e-07,
+          "max_motor_force_error_N": 2.4868995751603507e-14,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 4,
+      "parameters": {
+        "mass_kg": 32.90093075524575,
+        "inertia_kg_m2": 14.102014898693525,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.5569822221953195,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.4972846134429398,
+        "body_anchor_z_m": 1.1510950977128065,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 0.6135863630954589,
+        "temperature_C": 19.22490155958593,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 7.918706682558513,
+        "strut_damping_N_s_m_each": 4.258278111427695,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 0.6440524001587136,
+        "actuator_time_constant_s": 0.0782833955655082,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        0.12725559572687464,
+        -18.85957753496998
+      ],
+      "command_N_each": [
+        69.36561769190483,
+        149.95741394322943,
+        65.97664991226783,
+        -10.846848720666657,
+        70.89531215455034
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          0.12725559572687464,
+          -18.85957753496998
+        ],
+        [
+          0.7008516514879839,
+          -0.07693579706318397,
+          6.5595666461908895
+        ],
+        [
+          0.6946124077250436,
+          -0.2241092300613682,
+          42.57538858503593
+        ],
+        [
+          0.6833612875971149,
+          -0.33717482980053987,
+          42.54219415316759
+        ],
+        [
+          0.6675065783504663,
+          -0.4593670710235942,
+          22.726827920820845
+        ],
+        [
+          0.6466828232103025,
+          -0.5772806750544728,
+          31.90211960942148
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.0024961799725039843,
+          "max_velocity_error_rad_s": 0.00018995220860795747,
+          "max_motor_force_error_N": 7.105427357601002e-15,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.0006247906112517422,
+          "max_velocity_error_rad_s": 4.749974832873871e-05,
+          "max_motor_force_error_N": 5.329070518200751e-15,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 0.00015624431619054192,
+          "max_velocity_error_rad_s": 1.1875665748783959e-05,
+          "max_motor_force_error_N": 2.842170943040401e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 3.9063996616562824e-05,
+          "max_velocity_error_rad_s": 2.968961976823614e-06,
+          "max_motor_force_error_N": 1.4210854715202004e-14,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 5,
+      "parameters": {
+        "mass_kg": 22.741954713221077,
+        "inertia_kg_m2": 11.43341986678459,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.5448242983441913,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.4860298933086614,
+        "body_anchor_z_m": 1.1754271992708851,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 0.5780279508360168,
+        "temperature_C": -19.235983528729292,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 2.2208672175236837,
+        "strut_damping_N_s_m_each": 7.896282660269865,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 1.0354801261341602,
+        "actuator_time_constant_s": 0.10624781653993788,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        0.14111965420389336,
+        1.565906269062424
+      ],
+      "command_N_each": [
+        51.787664579394715,
+        31.97691329882342,
+        68.71822418634612,
+        81.29639963344616,
+        130.2607308128588
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          0.14111965420389336,
+          1.565906269062424
+        ],
+        [
+          0.7032994086873259,
+          0.029375556231984373,
+          17.898228469490032
+        ],
+        [
+          0.7026306517766073,
+          -0.06097903766712488,
+          22.671014298263064
+        ],
+        [
+          0.6987298058399612,
+          -0.12855491378516484,
+          37.88212679697414
+        ],
+        [
+          0.6927819603855413,
+          -0.1634830312248533,
+          52.407226619466655
+        ],
+        [
+          0.6862491085455348,
+          -0.15400774329528474,
+          78.28183284160232
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.0009582050473609455,
+          "max_velocity_error_rad_s": 8.577715664942476e-05,
+          "max_motor_force_error_N": 4.263256414560601e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.00024011013451844348,
+          "max_velocity_error_rad_s": 2.1455600620501336e-05,
+          "max_motor_force_error_N": 2.842170943040401e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 6.006251290086579e-05,
+          "max_velocity_error_rad_s": 5.3646064973322805e-06,
+          "max_motor_force_error_N": 5.684341886080802e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 1.5017815382941754e-05,
+          "max_velocity_error_rad_s": 1.3411957788811435e-06,
+          "max_motor_force_error_N": 2.842170943040401e-14,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 6,
+      "parameters": {
+        "mass_kg": 24.769581064130854,
+        "inertia_kg_m2": 15.424536486512249,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.6032674755137606,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.4533928530439015,
+        "body_anchor_z_m": 1.1859930015420095,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 0.8838495922327081,
+        "temperature_C": -19.156902688404696,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 9.382884951975395,
+        "strut_damping_N_s_m_each": 9.4034554483054,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 0.5823109029471611,
+        "actuator_time_constant_s": 0.10688130054155451,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        0.1328947876969986,
+        -5.628804204064517
+      ],
+      "command_N_each": [
+        -28.161988933800973,
+        -42.13060088997172,
+        40.63446598486837,
+        90.73320259832673,
+        51.00910138199275
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          0.1328947876969986,
+          -5.628804204064517
+        ],
+        [
+          0.7036188488963859,
+          0.047406094933116386,
+          -8.99119385773739
+        ],
+        [
+          0.7037332896629609,
+          -0.042476995209578844,
+          -13.843270088750634
+        ],
+        [
+          0.7003461922297106,
+          -0.12337416887922861,
+          -2.134422402924357
+        ],
+        [
+          0.6942070262680106,
+          -0.17867037394790916,
+          15.0266233192826
+        ],
+        [
+          0.6863090274978818,
+          -0.21444614748319135,
+          19.608533438817293
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.0008315153184600448,
+          "max_velocity_error_rad_s": 8.026285658513377e-05,
+          "max_motor_force_error_N": 7.105427357601002e-15,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.0002081040767329135,
+          "max_velocity_error_rad_s": 2.0071610839889065e-05,
+          "max_motor_force_error_N": 1.4210854715202004e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 5.204011208902892e-05,
+          "max_velocity_error_rad_s": 5.018270995554852e-06,
+          "max_motor_force_error_N": 1.4210854715202004e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 1.3010909169487292e-05,
+          "max_velocity_error_rad_s": 1.2545907775440845e-06,
+          "max_motor_force_error_N": 3.552713678800501e-14,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 7,
+      "parameters": {
+        "mass_kg": 24.440039990108215,
+        "inertia_kg_m2": 12.23141092085414,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.4805141368583147,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.47905210855984115,
+        "body_anchor_z_m": 1.187362288883038,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 0.7828271226321988,
+        "temperature_C": 27.104154269913863,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 4.513586335197445,
+        "strut_damping_N_s_m_each": 9.165316356382835,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 1.0811298610290447,
+        "actuator_time_constant_s": 0.1093200995091575,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        -0.07104148907609943,
+        5.089632873695614
+      ],
+      "command_N_each": [
+        139.5376316770511,
+        144.0060203468896,
+        -4.859425008611225,
+        25.892074497420907,
+        76.83960028780615
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          -0.07104148907609943,
+          5.089632873695614
+        ],
+        [
+          0.6979669577178145,
+          -0.016629879545584904,
+          49.757003982360814
+        ],
+        [
+          0.6996060455847546,
+          0.10825605087838483,
+          82.2174303930633
+        ],
+        [
+          0.7065707593461278,
+          0.23069205769344625,
+          55.41397429152139
+        ],
+        [
+          0.7175642401956155,
+          0.31534040139339703,
+          47.01136978139995
+        ],
+        [
+          0.7317654800935074,
+          0.3969533908017782,
+          58.06178575763695
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.0014465548074272384,
+          "max_velocity_error_rad_s": 0.00013289285769829684,
+          "max_motor_force_error_N": 1.4210854715202004e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.00036172616875807716,
+          "max_velocity_error_rad_s": 3.324435676033133e-05,
+          "max_motor_force_error_N": 4.263256414560601e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 9.043701451036954e-05,
+          "max_velocity_error_rad_s": 8.312413237621108e-06,
+          "max_motor_force_error_N": 7.105427357601002e-15,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 2.260959590298443e-05,
+          "max_velocity_error_rad_s": 2.078186136678095e-06,
+          "max_motor_force_error_N": 8.526512829121202e-14,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 8,
+      "parameters": {
+        "mass_kg": 20.829486131511874,
+        "inertia_kg_m2": 11.234452805882803,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.48093361596520645,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.4438682887715974,
+        "body_anchor_z_m": 1.143490518935584,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 1.1497869213317424,
+        "temperature_C": 27.477065527458265,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 3.4590186846712463,
+        "strut_damping_N_s_m_each": 5.678296724280989,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 0.5592516259189979,
+        "actuator_time_constant_s": 0.10491146978557056,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        -0.09410295517876276,
+        8.304483573100391
+      ],
+      "command_N_each": [
+        30.138543137148346,
+        14.588993614226567,
+        2.065866776936275,
+        -40.60260469488457,
+        30.270013823936324
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          -0.09410295517876276,
+          8.304483573100391
+        ],
+        [
+          0.7005896079450709,
+          0.12391117262933354,
+          11.015084988133346
+        ],
+        [
+          0.7098600436168403,
+          0.3380884657714857,
+          10.109653979657212
+        ],
+        [
+          0.727463196143342,
+          0.5393359829207789,
+          7.2710541047700294
+        ],
+        [
+          0.7526678104970917,
+          0.7154183863561463,
+          -2.2322870812387197
+        ],
+        [
+          0.784478289334652,
+          0.8745885896005188,
+          3.8418754471051164
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.0035111947490551547,
+          "max_velocity_error_rad_s": 0.0002694951091772868,
+          "max_motor_force_error_N": 2.6645352591003757e-15,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.0008783848930548382,
+          "max_velocity_error_rad_s": 6.739790472132245e-05,
+          "max_motor_force_error_N": 2.6645352591003757e-15,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 0.00021963288836093864,
+          "max_velocity_error_rad_s": 1.685098479231595e-05,
+          "max_motor_force_error_N": 7.549516567451064e-15,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 5.491051405836867e-05,
+          "max_velocity_error_rad_s": 4.212840493678094e-06,
+          "max_motor_force_error_N": 4.440892098500626e-15,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 9,
+      "parameters": {
+        "mass_kg": 33.89009738950153,
+        "inertia_kg_m2": 18.41728084914873,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.602766284967625,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.44877030486636676,
+        "body_anchor_z_m": 1.163854041059596,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 0.7212207298120294,
+        "temperature_C": -14.601082601623192,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 1.6068240232843154,
+        "strut_damping_N_s_m_each": 4.726948430021231,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 0.8388660295507825,
+        "actuator_time_constant_s": 0.04727814378015365,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        -0.12427344736367026,
+        -0.621605682254355
+      ],
+      "command_N_each": [
+        149.83945552934952,
+        91.76707168621988,
+        65.27332463451327,
+        -39.49358311583144,
+        50.20413482091311
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          -0.12427344736367026,
+          -0.621605682254355
+        ],
+        [
+          0.6922600115541695,
+          -0.24706431187777145,
+          71.49222098426185
+        ],
+        [
+          0.6808083993630275,
+          -0.3240811968530101,
+          74.62533360572094
+        ],
+        [
+          0.6663073757184795,
+          -0.4023837820579324,
+          63.281759696501034
+        ],
+        [
+          0.6480571683023154,
+          -0.5205113378443992,
+          8.240732610812344
+        ],
+        [
+          0.6246037825773648,
+          -0.6465161770618046,
+          27.579169266431354
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.0020839644483665824,
+          "max_velocity_error_rad_s": 0.00012768514871897008,
+          "max_motor_force_error_N": 5.684341886080802e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.0005214167411707837,
+          "max_velocity_error_rad_s": 3.192673121443779e-05,
+          "max_motor_force_error_N": 5.684341886080802e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 0.00013038084840102105,
+          "max_velocity_error_rad_s": 7.982018784602474e-06,
+          "max_motor_force_error_N": 5.684341886080802e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 3.259687965235254e-05,
+          "max_velocity_error_rad_s": 1.9955256558290557e-06,
+          "max_motor_force_error_N": 4.263256414560601e-14,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 10,
+      "parameters": {
+        "mass_kg": 29.489789042831283,
+        "inertia_kg_m2": 14.469603403046296,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.5054879825085815,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.4496161756631072,
+        "body_anchor_z_m": 1.1892085030354465,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 1.2157189013188474,
+        "temperature_C": 58.586193553588885,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 4.462813530470688,
+        "strut_damping_N_s_m_each": 10.962069391884267,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 0.7009740537497064,
+        "actuator_time_constant_s": 0.09756002248661054,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        0.09465499027292329,
+        10.394242632457718
+      ],
+      "command_N_each": [
+        12.294275151101488,
+        11.187045868280322,
+        -44.24648491462149,
+        149.51635260891197,
+        145.57447368520567
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          0.09465499027292329,
+          10.394242632457718
+        ],
+        [
+          0.706188378711101,
+          0.21379350464676852,
+          9.79678834551767
+        ],
+        [
+          0.7170118187401406,
+          0.32606635543120766,
+          9.139233025443337
+        ],
+        [
+          0.7320068343840913,
+          0.41872597141569934,
+          -4.36695450693973
+        ],
+        [
+          0.7506899964653589,
+          0.5234106636650954,
+          32.35399618015107
+        ],
+        [
+          0.7743441743601286,
+          0.6632222199269229,
+          55.794372887259215
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.002581917096392857,
+          "max_velocity_error_rad_s": 0.00014846966332693334,
+          "max_motor_force_error_N": 2.842170943040401e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.0006457233734610049,
+          "max_velocity_error_rad_s": 3.7128438219014015e-05,
+          "max_motor_force_error_N": 4.263256414560601e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 0.0001614460956309415,
+          "max_velocity_error_rad_s": 9.282799677268194e-06,
+          "max_motor_force_error_N": 4.263256414560601e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 4.036247740940388e-05,
+          "max_velocity_error_rad_s": 2.3207431101290865e-06,
+          "max_motor_force_error_N": 7.993605777301127e-15,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 11,
+      "parameters": {
+        "mass_kg": 18.969840791428826,
+        "inertia_kg_m2": 9.49691342510493,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.5197102380082269,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.4830921385165591,
+        "body_anchor_z_m": 1.1694326983225167,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 1.1356908988109062,
+        "temperature_C": -15.35736398720731,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 2.044701588773371,
+        "strut_damping_N_s_m_each": 1.8968359951445866,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 1.053970018972709,
+        "actuator_time_constant_s": 0.05684739252129502,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        -0.06405652363770144,
+        15.67783123141308
+      ],
+      "command_N_each": [
+        -20.161087799017462,
+        141.0650091065526,
+        -39.845895876576144,
+        103.16515054609354,
+        -42.231268480362075
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          -0.06405652363770144,
+          15.67783123141308
+        ],
+        [
+          0.7008165357292129,
+          0.09701458016262902,
+          -2.978364900772181
+        ],
+        [
+          0.7089304029066876,
+          0.33853466600313975,
+          73.64132486407979
+        ],
+        [
+          0.7276875360107481,
+          0.5738890426948924,
+          15.21906155798736
+        ],
+        [
+          0.7547808778497467,
+          0.7970674347374945,
+          62.463985151765925
+        ],
+        [
+          0.7908211955693941,
+          0.9803127813640443,
+          8.418541836467645
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.0043138359967304805,
+          "max_velocity_error_rad_s": 0.0003689378286452216,
+          "max_motor_force_error_N": 4.263256414560601e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.0010796095343911895,
+          "max_velocity_error_rad_s": 9.234541161373677e-05,
+          "max_motor_force_error_N": 4.263256414560601e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 0.0002699744383516617,
+          "max_velocity_error_rad_s": 2.3093311010469186e-05,
+          "max_motor_force_error_N": 2.842170943040401e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 6.749811524119106e-05,
+          "max_velocity_error_rad_s": 5.773762996819087e-06,
+          "max_motor_force_error_N": 5.684341886080802e-14,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 12,
+      "parameters": {
+        "mass_kg": 18.255251033273034,
+        "inertia_kg_m2": 11.098251701841853,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.5606362568760952,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.44305259764999155,
+        "body_anchor_z_m": 1.1571635293900757,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 0.8722826182976929,
+        "temperature_C": 33.98683253748236,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 10.378517951993155,
+        "strut_damping_N_s_m_each": 5.676504166050805,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 0.7814520231888971,
+        "actuator_time_constant_s": 0.06052877879291256,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        0.015208636052717828,
+        -18.139705228884594
+      ],
+      "command_N_each": [
+        40.75219813769651,
+        128.26464530281095,
+        69.39867405662513,
+        -18.895877109705793,
+        83.49302173061628
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          0.015208636052717828,
+          -18.139705228884594
+        ],
+        [
+          0.7019685061208902,
+          0.09101663364179034,
+          6.032528682319578
+        ],
+        [
+          0.7082380289464939,
+          0.236945483676389,
+          51.58620995174708
+        ],
+        [
+          0.721336100903766,
+          0.41629042442455,
+          52.865543223283765
+        ],
+        [
+          0.7408432825148233,
+          0.5455414086438634,
+          20.159902678368674
+        ],
+        [
+          0.7647780119901315,
+          0.656381573038274,
+          41.96271763236461
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.002191543620322852,
+          "max_velocity_error_rad_s": 0.00014816717359078524,
+          "max_motor_force_error_N": 7.105427357601002e-15,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.0005480030815416698,
+          "max_velocity_error_rad_s": 3.705517159546812e-05,
+          "max_motor_force_error_N": 2.1316282072803006e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 0.0001370080679550369,
+          "max_velocity_error_rad_s": 9.264633425432045e-06,
+          "max_motor_force_error_N": 1.4210854715202004e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 3.4252472794050624e-05,
+          "max_velocity_error_rad_s": 2.3162109833441136e-06,
+          "max_motor_force_error_N": 4.973799150320701e-14,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 13,
+      "parameters": {
+        "mass_kg": 32.902574452823146,
+        "inertia_kg_m2": 16.708818104662996,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.5553965241044713,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.46173583656025635,
+        "body_anchor_z_m": 1.1505445259666807,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 0.5656228150683746,
+        "temperature_C": -17.277562885764766,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 2.2879514316274587,
+        "strut_damping_N_s_m_each": 7.6654509120660235,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 1.0922127092620801,
+        "actuator_time_constant_s": 0.03910486948958533,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        0.005173341490301353,
+        9.902269151743951
+      ],
+      "command_N_each": [
+        36.00026639313745,
+        68.65436325372572,
+        137.77649274026888,
+        82.32610869311506,
+        83.77999472928565
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          0.005173341490301353,
+          9.902269151743951
+        ],
+        [
+          0.6968511774215821,
+          -0.15787444236619178,
+          28.742700069835678
+        ],
+        [
+          0.6878978335442444,
+          -0.28228079788539245,
+          58.35849723026395
+        ],
+        [
+          0.6752390955000717,
+          -0.3362112669167862,
+          117.35812406801016
+        ],
+        [
+          0.6612817990049024,
+          -0.3648056385678259,
+          99.78396828637234
+        ],
+        [
+          0.6459429786222389,
+          -0.4023599197421522,
+          94.48210560208645
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.001720121877825754,
+          "max_velocity_error_rad_s": 8.597275950233962e-05,
+          "max_motor_force_error_N": 1.8474111129762605e-13,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.0004306836136036542,
+          "max_velocity_error_rad_s": 2.151307007630665e-05,
+          "max_motor_force_error_N": 1.9895196601282805e-13,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 0.0001077119648914136,
+          "max_velocity_error_rad_s": 5.379512393766106e-06,
+          "max_motor_force_error_N": 2.1316282072803006e-13,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 2.6930561492702585e-05,
+          "max_velocity_error_rad_s": 1.3449559583267323e-06,
+          "max_motor_force_error_N": 2.1316282072803006e-13,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 14,
+      "parameters": {
+        "mass_kg": 26.728789636290934,
+        "inertia_kg_m2": 16.37853164516972,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.5921647242441328,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.46272063683923204,
+        "body_anchor_z_m": 1.1551564797328566,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 0.5491042058124618,
+        "temperature_C": 1.32185709997583,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 7.2646156210615125,
+        "strut_damping_N_s_m_each": 0.359752235581015,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 1.0009589655970033,
+        "actuator_time_constant_s": 0.10876755169664035,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        0.0935465649515439,
+        0.6558495830132038
+      ],
+      "command_N_each": [
+        0.6778744890951316,
+        -0.35329622764879076,
+        23.124894930924242,
+        53.67756285822445,
+        -37.52998135349452
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          0.0935465649515439,
+          0.6558495830132038
+        ],
+        [
+          0.7007796733681071,
+          -0.054160511904150666,
+          0.6628269968016772
+        ],
+        [
+          0.6957077229593085,
+          -0.19881979818388026,
+          0.35004696268558455
+        ],
+        [
+          0.6850107243871012,
+          -0.33340727311131824,
+          7.365020236513864
+        ],
+        [
+          0.6693301945485373,
+          -0.44605554578172213,
+          21.63189756194171
+        ],
+        [
+          0.6493603525526492,
+          -0.5554111655962257,
+          3.415858968366164
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.001684373529505472,
+          "max_velocity_error_rad_s": 0.0001387698460391107,
+          "max_motor_force_error_N": 1.0658141036401503e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.00042132612586286985,
+          "max_velocity_error_rad_s": 3.469920160803497e-05,
+          "max_motor_force_error_N": 1.0658141036401503e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 0.00010534608642977991,
+          "max_velocity_error_rad_s": 8.675221506049269e-06,
+          "max_motor_force_error_N": 1.0658141036401503e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 2.633743155459768e-05,
+          "max_velocity_error_rad_s": 2.1688317146661973e-06,
+          "max_motor_force_error_N": 1.5987211554602254e-14,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 15,
+      "parameters": {
+        "mass_kg": 35.33039145376735,
+        "inertia_kg_m2": 12.993154804804686,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.47337050396588737,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.4964663043262489,
+        "body_anchor_z_m": 1.1650319737629742,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 1.2162440841084017,
+        "temperature_C": 55.39676391125762,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 9.010774748871327,
+        "strut_damping_N_s_m_each": 6.149312170095879,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 0.7010292437159477,
+        "actuator_time_constant_s": 0.06894270308329012,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        0.026323873532936082,
+        8.569069679085992
+      ],
+      "command_N_each": [
+        37.85810911086536,
+        76.63889419257093,
+        8.99499315358743,
+        -35.34983464264454,
+        30.075439453955227
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          0.026323873532936082,
+          8.569069679085992
+        ],
+        [
+          0.7028926508718032,
+          0.11990499884919492,
+          16.47987869581507
+        ],
+        [
+          0.7098204321907785,
+          0.23012915809493803,
+          32.87600634247658
+        ],
+        [
+          0.7211974521712351,
+          0.3337102248411284,
+          21.179539546566076
+        ],
+        [
+          0.7359929895113297,
+          0.3984739534931479,
+          0.9471745912484819
+        ],
+        [
+          0.7528571392573408,
+          0.4455919408850274,
+          9.811483557093922
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.002339588306556319,
+          "max_velocity_error_rad_s": 0.0001279526421306132,
+          "max_motor_force_error_N": 7.105427357601002e-15,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.0005853809312533481,
+          "max_velocity_error_rad_s": 3.200872020231449e-05,
+          "max_motor_force_error_N": 7.105427357601002e-15,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 0.00014637550923533578,
+          "max_velocity_error_rad_s": 8.003466637263035e-06,
+          "max_motor_force_error_N": 2.1316282072803006e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 3.6595770169834576e-05,
+          "max_velocity_error_rad_s": 2.0009471090043363e-06,
+          "max_motor_force_error_N": 1.9761969838327786e-14,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 16,
+      "parameters": {
+        "mass_kg": 24.580414949750498,
+        "inertia_kg_m2": 15.110233149845822,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.5586481423833746,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.4480160684963691,
+        "body_anchor_z_m": 1.1684178510293615,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 1.0969375465651479,
+        "temperature_C": 0.14426988776439487,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 4.309016408544968,
+        "strut_damping_N_s_m_each": 7.477500805921838,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 0.9659000148531878,
+        "actuator_time_constant_s": 0.03453824533225644,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        0.10580072337373217,
+        18.736155752939176
+      ],
+      "command_N_each": [
+        107.81979674871693,
+        6.367170938757823,
+        109.1674427608169,
+        111.25734607288362,
+        111.24759105173604
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          0.10580072337373217,
+          18.736155752939176
+        ],
+        [
+          0.7060719208098012,
+          0.2119019064847371,
+          77.31929124911976
+        ],
+        [
+          0.7166749788190105,
+          0.30509198482000677,
+          28.502240157831633
+        ],
+        [
+          0.7307383374244159,
+          0.4101559402901406,
+          81.27940236860894
+        ],
+        [
+          0.7500073716261353,
+          0.556168184247241,
+          99.23981704421031
+        ],
+        [
+          0.7752931328684302,
+          0.7074901163945828,
+          104.87419811000535
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.0021970805147598204,
+          "max_velocity_error_rad_s": 0.00014499923874200515,
+          "max_motor_force_error_N": 3.836930773104541e-13,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.000549202412422593,
+          "max_velocity_error_rad_s": 3.6249851251279885e-05,
+          "max_motor_force_error_N": 3.836930773104541e-13,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 0.00013729618867863226,
+          "max_velocity_error_rad_s": 9.062468884768471e-06,
+          "max_motor_force_error_N": 3.979039320256561e-13,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 3.432376857851241e-05,
+          "max_velocity_error_rad_s": 2.265617695340616e-06,
+          "max_motor_force_error_N": 3.979039320256561e-13,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 17,
+      "parameters": {
+        "mass_kg": 18.441510589317346,
+        "inertia_kg_m2": 12.12248343986926,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.6240570580320676,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.47614254314541393,
+        "body_anchor_z_m": 1.1892577459610085,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 0.812821140727912,
+        "temperature_C": -2.2159382224546675,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 6.818375043743693,
+        "strut_damping_N_s_m_each": 7.824320946741004,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 0.7218493427981773,
+        "actuator_time_constant_s": 0.04820648277776756,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        0.11036434089806998,
+        8.199922485320997
+      ],
+      "command_N_each": [
+        -18.862041681903776,
+        -38.16518635939128,
+        93.87317928944609,
+        87.31779859362274,
+        81.11453165944573
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          0.11036434089806998,
+          8.199922485320997
+        ],
+        [
+          0.7041966436471886,
+          0.09542029256292821,
+          -4.10068411245507
+        ],
+        [
+          0.7072971799669177,
+          0.05545655818057364,
+          -17.322254660489254
+        ],
+        [
+          0.7092359642148043,
+          0.056379405667871155,
+          30.65247664659296
+        ],
+        [
+          0.7125489450363138,
+          0.11450906603415353,
+          48.908637230423956
+        ],
+        [
+          0.7186160978647976,
+          0.18981610505000426,
+          54.346291487763764
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.00025814614552308,
+          "max_velocity_error_rad_s": 2.0068003120404798e-05,
+          "max_motor_force_error_N": 4.263256414560601e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 6.438745906290666e-05,
+          "max_velocity_error_rad_s": 5.012969666512435e-06,
+          "max_motor_force_error_N": 3.552713678800501e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 1.608748429219353e-05,
+          "max_velocity_error_rad_s": 1.252992344435988e-06,
+          "max_motor_force_error_N": 4.263256414560601e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 4.021283817022274e-06,
+          "max_velocity_error_rad_s": 3.132324928878383e-07,
+          "max_motor_force_error_N": 4.263256414560601e-14,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 18,
+      "parameters": {
+        "mass_kg": 22.880502725229142,
+        "inertia_kg_m2": 13.10780376249495,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.5160820042298557,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.4916254839633811,
+        "body_anchor_z_m": 1.1697745553992915,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 1.0884618616736006,
+        "temperature_C": 12.293000556312386,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 0.4985298174306303,
+        "strut_damping_N_s_m_each": 10.075147584339906,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 0.6324639433396844,
+        "actuator_time_constant_s": 0.09297263141344206,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        0.08003491160126644,
+        12.209714965471655
+      ],
+      "command_N_each": [
+        -40.63379341072377,
+        82.34279917225786,
+        -10.598094557117442,
+        128.14269261543402,
+        126.49543781250802
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          0.08003491160126644,
+          12.209714965471655
+        ],
+        [
+          0.7050977738722656,
+          0.17052980594935657,
+          -1.0449524006664472
+        ],
+        [
+          0.7137020614538452,
+          0.2644631070081341,
+          17.52942421138055
+        ],
+        [
+          0.7262753228295586,
+          0.36079474133494316,
+          9.056752476099563
+        ],
+        [
+          0.7427193136299117,
+          0.4675315181705518,
+          34.22717468591136
+        ],
+        [
+          0.7640360611446712,
+          0.6013589482508646,
+          50.232661493332955
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.0019995323889996585,
+          "max_velocity_error_rad_s": 0.00013479784653447346,
+          "max_motor_force_error_N": 1.4210854715202004e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.0005000156957816053,
+          "max_velocity_error_rad_s": 3.370995707352442e-05,
+          "max_motor_force_error_N": 1.4210854715202004e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 0.00012501220344925788,
+          "max_velocity_error_rad_s": 8.428146202388298e-06,
+          "max_motor_force_error_N": 2.1316282072803006e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 3.125356838785974e-05,
+          "max_velocity_error_rad_s": 2.1070776605736086e-06,
+          "max_motor_force_error_N": 6.394884621840902e-14,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 19,
+      "parameters": {
+        "mass_kg": 29.24998786666972,
+        "inertia_kg_m2": 12.020092363148043,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.4763810416999426,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.4443247832436723,
+        "body_anchor_z_m": 1.1987918365752797,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 0.5525903253365498,
+        "temperature_C": 42.47844604482527,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 10.412248439537022,
+        "strut_damping_N_s_m_each": 11.661733775074246,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 0.8394568162106635,
+        "actuator_time_constant_s": 0.057280205856470354,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        -0.03412123761706996,
+        -17.825265787290846
+      ],
+      "command_N_each": [
+        -8.84874174741688,
+        -1.431240933143684,
+        59.85284752487718,
+        103.38919205807312,
+        118.42228080922388
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          -0.03412123761706996,
+          -17.825265787290846
+        ],
+        [
+          0.6955371278280101,
+          -0.18602711894461235,
+          -12.599871553793447
+        ],
+        [
+          0.6853771641963957,
+          -0.31856716164103843,
+          -6.87125484772108
+        ],
+        [
+          0.6706792026789984,
+          -0.4055581121993044,
+          21.833697691159678
+        ],
+        [
+          0.6538558221837589,
+          -0.4238219749827789,
+          54.479850518854406
+        ],
+        [
+          0.6375588211826156,
+          -0.3828532338294015,
+          77.06106321517197
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.001957581801886594,
+          "max_velocity_error_rad_s": 9.15883931134065e-05,
+          "max_motor_force_error_N": 1.7763568394002505e-15,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.0004901806333856532,
+          "max_velocity_error_rad_s": 2.2909875969090443e-05,
+          "max_motor_force_error_N": 1.4210854715202004e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 0.00012259437373748496,
+          "max_velocity_error_rad_s": 5.728267446103441e-06,
+          "max_motor_force_error_N": 7.105427357601002e-15,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 3.065167186780299e-05,
+          "max_velocity_error_rad_s": 1.4321167863817763e-06,
+          "max_motor_force_error_N": 2.842170943040401e-14,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 20,
+      "parameters": {
+        "mass_kg": 23.53497337854338,
+        "inertia_kg_m2": 8.598237668600756,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.48649859533728135,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.480088163463946,
+        "body_anchor_z_m": 1.1555243544410452,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 1.2947912579164467,
+        "temperature_C": -7.5710106421873125,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 10.706838486623884,
+        "strut_damping_N_s_m_each": 2.7477807993205907,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 0.5169410264976998,
+        "actuator_time_constant_s": 0.04705122158973812,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        -0.05510946943275126,
+        -18.03966905636306
+      ],
+      "command_N_each": [
+        -31.479959656121647,
+        113.7306070152649,
+        -27.48864897766485,
+        -8.41319645435783,
+        18.65886600397772
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          -0.05510946943275126,
+          -18.03966905636306
+        ],
+        [
+          0.7008464511955049,
+          0.09648649596435419,
+          -17.028158904726514
+        ],
+        [
+          0.7085404227741005,
+          0.3049938105061095,
+          26.389791698492978
+        ],
+        [
+          0.7251027349509128,
+          0.509343946138857,
+          3.140568282746634
+        ],
+        [
+          0.7485813487349654,
+          0.6590638462868943,
+          -1.1483586620205086
+        ],
+        [
+          0.777597370687726,
+          0.7904440347838391,
+          5.032696262233862
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.004175380315005033,
+          "max_velocity_error_rad_s": 0.00025992783235484485,
+          "max_motor_force_error_N": 3.552713678800501e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.001044731665771457,
+          "max_velocity_error_rad_s": 6.501572166173197e-05,
+          "max_motor_force_error_N": 4.263256414560601e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 0.0002612383734403178,
+          "max_velocity_error_rad_s": 1.625604869792685e-05,
+          "max_motor_force_error_N": 2.1316282072803006e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 6.531306005336284e-05,
+          "max_velocity_error_rad_s": 4.06414468701044e-06,
+          "max_motor_force_error_N": 5.684341886080802e-14,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 21,
+      "parameters": {
+        "mass_kg": 33.66469388850459,
+        "inertia_kg_m2": 18.228903934754914,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.5531275318551967,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.4510153354793867,
+        "body_anchor_z_m": 1.1423030444527549,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 0.8029853500119766,
+        "temperature_C": 34.80172308848405,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 6.817187853002334,
+        "strut_damping_N_s_m_each": 9.240693013216081,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 0.8022623982220372,
+        "actuator_time_constant_s": 0.04734819931475194,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        -0.07987264328251499,
+        -1.1516191203130148
+      ],
+      "command_N_each": [
+        34.127236872465744,
+        46.721134092463615,
+        132.91414569783936,
+        145.40163686203007,
+        -18.22187151578141
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          -0.07987264328251499,
+          -1.1516191203130148
+        ],
+        [
+          0.6950311337403001,
+          -0.1645660868725545,
+          15.121073090490722
+        ],
+        [
+          0.6871280829863456,
+          -0.22721747844079415,
+          27.875174398798436
+        ],
+        [
+          0.6774653838143156,
+          -0.2457111372288922,
+          72.79484378882299
+        ],
+        [
+          0.6680878161883679,
+          -0.21733988700280585,
+          97.80817456350242
+        ],
+        [
+          0.6596134504086568,
+          -0.21956077107533337,
+          33.6844921255483
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.0009830272829317885,
+          "max_velocity_error_rad_s": 3.7683321776199596e-05,
+          "max_motor_force_error_N": 5.684341886080802e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.00024604705248928174,
+          "max_velocity_error_rad_s": 9.429943061189938e-06,
+          "max_motor_force_error_N": 4.263256414560601e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 6.152996485949177e-05,
+          "max_velocity_error_rad_s": 2.358056554657706e-06,
+          "max_motor_force_error_N": 8.526512829121202e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 1.5383629862990573e-05,
+          "max_velocity_error_rad_s": 5.895498399466348e-07,
+          "max_motor_force_error_N": 5.684341886080802e-14,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 22,
+      "parameters": {
+        "mass_kg": 30.910489573523016,
+        "inertia_kg_m2": 13.4317323375684,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.5082070942370562,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.47170182278401296,
+        "body_anchor_z_m": 1.1684478958523663,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 0.6583489647335476,
+        "temperature_C": 4.789379881249882,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 9.06828822852823,
+        "strut_damping_N_s_m_each": 7.182057129958915,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 0.8211972046735048,
+        "actuator_time_constant_s": 0.09135502191816751,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        -0.06015146061604991,
+        17.80953201355524
+      ],
+      "command_N_each": [
+        38.8295661055833,
+        39.91949336250242,
+        -30.77166531087059,
+        -31.320730395144114,
+        105.1829416102625
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          -0.06015146061604991,
+          17.80953201355524
+        ],
+        [
+          0.6954743930976673,
+          -0.16386180857110255,
+          22.801009090143424
+        ],
+        [
+          0.6870624845004468,
+          -0.25468586895984324,
+          26.339978069473712
+        ],
+        [
+          0.6749920987261019,
+          -0.35281165364974815,
+          8.040311274732506
+        ],
+        [
+          0.6586131312134924,
+          -0.4679292528423391,
+          -3.930557026009841
+        ],
+        [
+          0.6379923568887013,
+          -0.5519701759111894,
+          28.090215980402395
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.001957998513091155,
+          "max_velocity_error_rad_s": 0.00010930994951918738,
+          "max_motor_force_error_N": 7.105427357601002e-15,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.0004898455909629808,
+          "max_velocity_error_rad_s": 2.7331802782470938e-05,
+          "max_motor_force_error_N": 1.509903313490213e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 0.0001224830395022489,
+          "max_velocity_error_rad_s": 6.833219493240783e-06,
+          "max_motor_force_error_N": 1.7763568394002505e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 3.062211298848203e-05,
+          "max_velocity_error_rad_s": 1.7083216909963284e-06,
+          "max_motor_force_error_N": 1.7763568394002505e-14,
+          "contacts": 0
+        }
+      ]
+    },
+    {
+      "case": 23,
+      "parameters": {
+        "mass_kg": 33.330750859693225,
+        "inertia_kg_m2": 13.083467880195734,
+        "gravity_m_s2": 9.80665,
+        "com_radius_m": 0.5039084954113382,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.4708354712672204,
+        "body_anchor_z_m": 1.1656845072436373,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 1.1837986271711634,
+        "temperature_C": 47.98136791212646,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 3.3775648287555096,
+        "strut_damping_N_s_m_each": 4.529530911851468,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 0.8264535061646211,
+        "actuator_time_constant_s": 0.0625528990702526,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        0.7,
+        -0.05625622860865294,
+        -17.481345611902505
+      ],
+      "command_N_each": [
+        115.39695282908718,
+        70.28223436051731,
+        81.93580723779729,
+        115.29366936519406,
+        74.286304108752
+      ],
+      "command_interval_s": 0.04,
+      "comparison_times_s": [
+        0.0,
+        0.04,
+        0.08,
+        0.12,
+        0.16,
+        0.2
+      ],
+      "reference_states": [
+        [
+          0.7,
+          -0.05625622860865294,
+          -17.481345611902505
+        ],
+        [
+          0.698907037219158,
+          0.017256021629608216,
+          35.83222771531837
+        ],
+        [
+          0.7020356891993504,
+          0.1417316877459592,
+          46.34492895151666
+        ],
+        [
+          0.710426940143797,
+          0.27975675562959407,
+          56.441159353379625
+        ],
+        [
+          0.7246638380530034,
+          0.4358524699569871,
+          74.79178121040488
+        ],
+        [
+          0.7452377014170437,
+          0.5888019209291414,
+          68.4624564784664
+        ]
+      ],
+      "errors": [
+        {
+          "dt_s": 0.02,
+          "max_angle_error_deg": 0.0024866994273151023,
+          "max_velocity_error_rad_s": 0.00024160656032645722,
+          "max_motor_force_error_N": 2.1316282072803006e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.01,
+          "max_angle_error_deg": 0.000621661033731019,
+          "max_velocity_error_rad_s": 6.0430500801400555e-05,
+          "max_motor_force_error_N": 1.4210854715202004e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.005,
+          "max_angle_error_deg": 0.00015541433211369683,
+          "max_velocity_error_rad_s": 1.5109435458460219e-05,
+          "max_motor_force_error_N": 1.4210854715202004e-14,
+          "contacts": 0
+        },
+        {
+          "dt_s": 0.0025,
+          "max_angle_error_deg": 3.885352420565565e-05,
+          "max_velocity_error_rad_s": 3.7774721083350116e-06,
+          "max_motor_force_error_N": 2.842170943040401e-14,
+          "contacts": 0
+        }
+      ]
+    }
+  ],
+  "motor_reversal_contacts": [
+    {
+      "name": "fast_reversal_above_impact_limit",
+      "parameters": {
+        "mass_kg": 25.0,
+        "inertia_kg_m2": 12.0,
+        "gravity_m_s2": 0,
+        "com_radius_m": 0.55,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.47,
+        "body_anchor_z_m": 1.17,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 0,
+        "temperature_C": 20.0,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 0,
+        "strut_damping_N_s_m_each": 0,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 1.0,
+        "actuator_time_constant_s": 0.001,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        1.3599568165555769,
+        0.2,
+        330
+      ],
+      "command_N_each": -330,
+      "dt_s": 0.02,
+      "reference_contact": true,
+      "actual_contacts": [
+        {
+          "type": "upper_stop",
+          "time_offset_s": 0.008050520944957718,
+          "incident_speed_rad_s": 0.13054030761726892,
+          "kinetic_energy_loss_J": 0.1022446314768672
+        }
+      ],
+      "classification_matches": true,
+      "reference_time_s": 0.008050887580490548,
+      "reference_speed_rad_s": 0.130528681647134,
+      "time_error_s": 3.6663553282939576e-07,
+      "speed_error_rad_s": 1.162597013493194e-05
+    },
+    {
+      "name": "fast_reversal_previously_missed_contact",
+      "parameters": {
+        "mass_kg": 25.0,
+        "inertia_kg_m2": 12.0,
+        "gravity_m_s2": 0,
+        "com_radius_m": 0.55,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.47,
+        "body_anchor_z_m": 1.17,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 0,
+        "temperature_C": 20.0,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 0,
+        "strut_damping_N_s_m_each": 0,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 1.0,
+        "actuator_time_constant_s": 0.001,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        1.359356816555577,
+        0.2,
+        330
+      ],
+      "command_N_each": -330,
+      "dt_s": 0.02,
+      "reference_contact": true,
+      "actual_contacts": [
+        {
+          "type": "upper_stop",
+          "time_offset_s": 0.014450755837415261,
+          "incident_speed_rad_s": 0.05701249513987338,
+          "kinetic_energy_loss_J": 0.019502547612444514
+        }
+      ],
+      "classification_matches": true,
+      "reference_time_s": 0.014450551005041144,
+      "reference_speed_rad_s": 0.05704668652531209,
+      "time_error_s": 2.0483237411772492e-07,
+      "speed_error_rad_s": 3.4191385438711586e-05
+    },
+    {
+      "name": "nominal_lag_previously_false_contact",
+      "parameters": {
+        "mass_kg": 25.0,
+        "inertia_kg_m2": 12.0,
+        "gravity_m_s2": 0,
+        "com_radius_m": 0.55,
+        "com_offset_rad": 0.15,
+        "hinge_height_m": 1.76,
+        "body_anchor_x_m": -0.47,
+        "body_anchor_z_m": 1.17,
+        "hatch_anchor_x_m": 0.018,
+        "hatch_anchor_down_m": 0.3,
+        "max_angle_rad": 1.361356816555577,
+        "gas_force_extended_N_each": 165.0,
+        "gas_force_compressed_N_each": 212.0,
+        "gas_scale": 0,
+        "temperature_C": 20.0,
+        "gas_reference_temperature_C": 20.0,
+        "friction_coulomb_Nm": 0,
+        "friction_static_Nm": 0,
+        "friction_viscous_Nm_s": 0,
+        "strut_damping_N_s_m_each": 0,
+        "external_closing_torque_Nm": 0.0,
+        "motor_force_max_N_each": 330.0,
+        "motor_efficiency": 1.0,
+        "actuator_time_constant_s": 0.06,
+        "holding_brake_Nm": 0.0,
+        "sensor_bias_rad": 0.0,
+        "sensor_noise_std_rad": 0.0,
+        "controller_kp_Nm_rad": 178.0,
+        "controller_kd_Nm_s_rad": 68.0,
+        "opening_duration_s": 4.8,
+        "power_loss_time_s": 4.8,
+        "speed_limit_rad_s": 1.15
+      },
+      "initial_state": [
+        1.360756816555577,
+        0.1,
+        -330
+      ],
+      "command_N_each": 330,
+      "dt_s": 0.02,
+      "reference_contact": false,
+      "actual_contacts": [],
+      "classification_matches": true
+    }
+  ]
+}

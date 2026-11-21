@@ -13,6 +13,8 @@ RecursiveCal connects a physical simulator to an investigator that chooses exper
 
 The [physical inquiry foundation](docs/PHYSICAL_INQUIRY.md) is the main development path. The earlier normalized benchmark, learned-policy pilots, v0.3 release evidence and manuscript remain reproducible research records. The connected physical investigator currently uses Bayesian inference, not a learned RL policy.
 
+**Current focus: verify the environment first.** The SI simulator and persistent rig now share the version 2 mechanical kernel. The [physics validation record](docs/PHYSICS_VALIDATION.md) separates analytical checks, independent numerical comparisons and the measured-hardware evidence still needed. Saved version 1 replays retain their original source hashes and are labelled as archived evidence.
+
 [Open recorded workbench](https://venkat-rj.github.io/recursivecal-lab/) · [User guide](docs/USER_GUIDE.md) · [Experiment protocol](docs/EXPERIMENT_PROTOCOL.md) · [Paper draft](paper/README.md) · [Citation](#citation) · [Legacy 3D CAD explorer](https://venkat-rj.github.io/recursivecal/)
 
 The browser preview displays saved release evidence. Running new simulations and fits uses the local Python workbench. The banner is [AI-generated concept artwork](assets/README.md), not a built test rig.
@@ -123,7 +125,7 @@ The learned policy is a small NumPy contextual bandit with a fixed first test, o
 
 ## Physical verification and its limits
 
-The [SI physical audit](research/releases/physical-v1/audit.json) includes explicit numerical gates, geometry/virtual-work checks, energy behavior, step refinement, force fitting, and known failure demonstrations. Nominal opening has about 1.07 degrees simulated tracking RMSE. The default unpowered support balance still lacks about 57.75 Nm after assumed static friction. Passing numerical gates does not turn that failure into a hardware pass.
+The [current mechanics audit](research/releases/physics-v2/validation.json) includes independent trajectory and contact comparisons, timestep refinement and long conservative-motion checks. The [archived version 1 audit](research/releases/physical-v1/audit.json) retains its original geometry, force-fitting and failure demonstrations; its approximately 1.07-degree opening RMSE belongs to that earlier model. The default unpowered support balance still lacks about 57.75 Nm after assumed static friction. Passing numerical gates does not turn that failure into a hardware pass.
 
 No OEM model or real actuator dataset was used to train or validate this release. A public NHTSA report motivates the architecture-dependent hold test and is documented in [provenance](docs/PROVENANCE.md); its vehicle measurements are not transferred to this geometry. The [physical measurement protocol](docs/HARDWARE_PROTOCOL.md) specifies the independent evidence needed for a later physical claim.
 

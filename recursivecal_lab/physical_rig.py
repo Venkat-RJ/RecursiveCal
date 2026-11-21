@@ -1,7 +1,7 @@
 """Persistent SI liftgate rig used by the physical inquiry protocol.
 
-This version reuses the published CAD geometry and mechanical constitutive
-functions. The v1 simulator and its archived results remain byte-for-byte intact.
+This version uses the same stepping kernel as the standalone SI simulator.
+Archived v1 results remain historical evidence under their original source hashes.
 All coefficients and sensor specifications here are declared synthetic assumptions.
 """
 from __future__ import annotations
@@ -11,9 +11,9 @@ import math
 import random
 from typing import Any
 
-from .physics import ModelParameters, geometry, gas_force, gravity_torque, _friction_velocity
+from .physics import ModelParameters, geometry, gas_force, advance_mechanics
 
-MODEL_ID = "recursivecal.physical-rig/1"
+MODEL_ID = "recursivecal.physical-rig/2"
 MAX_FORCE_N = 330.0
 MAX_SPEED_RAD_S = 1.15
 MAX_ANGLE_RAD = math.radians(78.0)
@@ -159,40 +159,28 @@ class PhysicalRig:
         not a claim that real hardware can be arrested instantaneously.
         """
         finite(command_N_each, "command_N_each", -1e6, 1e6)
-        finite(dt_s, "dt_s", 1e-6, 0.02)
+        finite(dt_s, "dt_s", 0, 0.02)
+        if dt_s == 0:
+            raise ValueError("dt_s must be positive")
         if not isinstance(powered, bool):
             raise ValueError("powered must be boolean")
         p, s = self.parameters, self.state
         cap = min(MAX_FORCE_N, p.motor_force_max_N_each)
         requested = max(-cap, min(cap, command_N_each)) if powered else 0.0
         delivered = requested * p.motor_efficiency
-        fm = delivered + (s.motor_force_N_each - delivered) * math.exp(-0.5 * dt_s / p.actuator_time_constant_s)
-        fn = delivered + (s.motor_force_N_each - delivered) * math.exp(-dt_s / p.actuator_time_constant_s)
-        qm = max(0.0, min(p.max_angle_rad, s.angle_rad + 0.5 * dt_s * s.velocity_rad_s))
-        arm = geometry(qm, p)["lever_m"]
-        net = 2 * (fm + gas_force(qm, p)) * arm - gravity_torque(qm, p)
-        damping = p.friction_viscous_Nm_s + 2 * p.strut_damping_N_s_m_each * arm**2
-        friction_model = p
-        if self.closing_friction_extra_Nm and (s.velocity_rad_s < -1e-9 or (abs(s.velocity_rad_s) <= 1e-9 and net < 0)):
-            friction_model = replace(p, friction_coulomb_Nm=p.friction_coulomb_Nm + self.closing_friction_extra_Nm,
-                                     friction_static_Nm=p.friction_static_Nm + self.closing_friction_extra_Nm)
-        vn = _friction_velocity(s.velocity_rad_s, net, damping, dt_s, friction_model,
-                                p.holding_brake_Nm if not powered else 0.0)
-        qn = s.angle_rad + 0.5 * dt_s * (s.velocity_rad_s + vn)
-        incident = abs(vn)
-        event = None
-        if qn < 0 or qn > p.max_angle_rad:
-            event = {"type": "lower_stop" if qn < 0 else "upper_stop", "incident_speed_rad_s": incident}
-            qn = max(0.0, min(p.max_angle_rad, qn))
-            vn = 0.0
-        speed_breach = max(abs(s.velocity_rad_s), incident) > min(MAX_SPEED_RAD_S, p.speed_limit_rad_s)
-        work = 2 * fm * arm * (qn - s.angle_rad)
-        if not all(math.isfinite(value) for value in (qn, vn, fn, work)):
-            raise ValueError("nonfinite mechanical state")
-        self.state = RigState(s.time_s + dt_s, qn, vn, fn, s.mechanical_work_abs_J + abs(work))
+        step = advance_mechanics(s.angle_rad, s.velocity_rad_s, s.motor_force_N_each,
+                                 delivered, dt_s, p, powered=powered,
+                                 closing_extra=self.closing_friction_extra_Nm)
+        incident = step["peak_speed_rad_s"]
+        event = step["contacts"][0] if step["contacts"] else None
+        speed_breach = incident > min(MAX_SPEED_RAD_S, p.speed_limit_rad_s)
+        self.state = RigState(s.time_s + dt_s, step["angle_rad"], step["velocity_rad_s"],
+                              step["motor_force_N_each"], s.mechanical_work_abs_J + step["mechanical_work_abs_J"])
         return {"command_N_each": requested, "saturated": powered and abs(command_N_each) > cap,
                 "contact": event, "speed_breach": speed_breach, "precontact_speed_rad_s": incident,
-                "mechanical_work_signed_J": work}
+                "contacts": step["contacts"], "friction_dissipation_J": step["friction_dissipation_J"],
+                "impact_dissipation_J": step["impact_dissipation_J"],
+                "mechanical_work_signed_J": step["mechanical_work_signed_J"]}
 
     def fixture(self, angle_rad: float = math.radians(20), duration_s: float = 0.1) -> None:
         """Explicit external fixturing: resets motion/force, preserves elapsed time/work.
@@ -261,20 +249,25 @@ def run_motion(rig: PhysicalRig, *, start_angle_rad: float, target_angle_rad: fl
 
     initial = rig.observe(noisy=noisy)
     record(0.0, 0.0, start_angle_rad, initial)
-    while elapsed < duration_s - 1e-12:
+    power_loss_recorded = False
+    if power_loss_s == 0:
+        events.append({"time_s": 0.0, "type": "power_loss"})
+        power_loss_recorded = True
+    while elapsed < duration_s:
         target = smooth_reference(elapsed, start_angle_rad, target_angle_rad, profile_s)
         # An explicitly ideal filtered control signal, distinct from logged noise.
         control_reading = rig.observe(noisy=False)
-        enabled = powered and (power_loss_s is None or elapsed < power_loss_s - 1e-12)
+        enabled = powered and (power_loss_s is None or elapsed < power_loss_s)
         command = controller_command(control_reading, target, estimate) if enabled else 0.0
-        h = min(dt_s, duration_s - elapsed, samples[sample_index] - elapsed)
-        if power_loss_s is not None and elapsed < power_loss_s < elapsed + h:
-            h = power_loss_s - elapsed
+        boundary = min(elapsed + dt_s, duration_s, samples[sample_index])
+        if power_loss_s is not None and elapsed < power_loss_s < boundary:
+            boundary = power_loss_s
+        h = boundary - elapsed
         error_sum += h * (target[0] - rig.state.angle_rad)**2
+        before_step = elapsed
         step = rig.advance(command, h, powered=enabled)
-        elapsed = min(duration_s, rig.state.time_s - start_time)
-        if abs(elapsed - samples[sample_index]) < 1e-10:
-            elapsed = samples[sample_index]
+        elapsed = boundary
+        rig.state = replace(rig.state, time_s=start_time + elapsed)
         if step["saturated"]:
             sat_time += h
         peak_speed = max(peak_speed, step["precontact_speed_rad_s"])
@@ -282,16 +275,17 @@ def run_motion(rig: PhysicalRig, *, start_angle_rad: float, target_angle_rad: fl
         measured = rig.observe(noisy=noisy)
         new_target = smooth_reference(elapsed, start_angle_rad, target_angle_rad, profile_s)[0]
         record(elapsed, step["command_N_each"], new_target, measured)
-        if step["contact"]:
-            events.append({"time_s": elapsed, **step["contact"]})
-        if power_loss_s is not None and abs(elapsed - power_loss_s) < 1e-10:
+        for contact in step["contacts"]:
+            events.append({"time_s": before_step + contact["time_offset_s"], **contact})
+        if power_loss_s is not None and not power_loss_recorded and elapsed >= power_loss_s:
             events.append({"time_s": elapsed, "type": "power_loss"})
+            power_loss_recorded = True
         if step["speed_breach"]:
             events.append({"time_s": elapsed, "type": "speed_limit"})
             termination = "aborted_speed_limit"
-        elif step["contact"] and step["contact"]["incident_speed_rad_s"] > 0.12:
+        elif any(contact["incident_speed_rad_s"] > 0.12 for contact in step["contacts"]):
             termination = "aborted_stop_impact"
-        if abs(elapsed - samples[sample_index]) < 1e-10:
+        if elapsed == samples[sample_index]:
             observations.append({"sample_time_s": elapsed, **measured})
             sample_index += 1
         if termination != "completed":
@@ -318,10 +312,12 @@ def run_experiment(rig: PhysicalRig, name: str, start_observation: dict[str, flo
     if action.fixture:
         previous = asdict(rig.state) if include_truth else None
         began = rig.state.time_s
-        rig.fixture(action.target_angle_rad, action.duration_s)
-        observations = [{**rig.observe(noisy=noisy), "sample_time_s": action.duration_s * index / 3,
-                         "time_s": began + action.duration_s * index / 3} for index in (1, 2, 3)]
-        result = {"observations": observations, "trace": [], "events": [{"time_s": action.duration_s, "type": "external_fixture"}],
+        observations = []
+        for index in (1, 2, 3):
+            rig.fixture(action.target_angle_rad, action.duration_s / 3)
+            rig.state = replace(rig.state, time_s=began + action.duration_s * index / 3)
+            observations.append({**rig.observe(noisy=noisy), "sample_time_s": action.duration_s * index / 3})
+        result = {"observations": observations, "trace": [], "events": [{"time_s": 0.0, "type": "external_fixture"}],
                   "metrics": {"termination": "completed", "completed_duration_s": action.duration_s},
                   "final_observation": observations[-1], "duration_s": action.duration_s}
         if include_truth:

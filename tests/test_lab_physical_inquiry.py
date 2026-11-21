@@ -63,13 +63,15 @@ class MechanicalFoundationTests(unittest.TestCase):
         self.assertLess(errors[2], errors[1] / 2)
 
     def test_contact_cannot_hide_speed_breach(self):
-        rig = PhysicalRig(replace(ModelParameters(), inertia_kg_m2=0.02),
-                          state=RigState(angle_rad=1.35, velocity_rad_s=1.0, motor_force_N_each=330))
-        event = rig.advance(330, 0.02)
+        p = replace(ModelParameters(), gravity_m_s2=0, gas_scale=0, friction_coulomb_Nm=0,
+                    friction_static_Nm=0, friction_viscous_Nm_s=0, strut_damping_N_s_m_each=0,
+                    external_closing_torque_Nm=-24, speed_limit_rad_s=.03)
+        rig = PhysicalRig(p, state=RigState(angle_rad=p.max_angle_rad - .0005, velocity_rad_s=.01))
+        event = rig.advance(0, 0.02, powered=False)
         self.assertIsNotNone(event['contact'])
         self.assertTrue(event['speed_breach'])
         self.assertEqual(rig.state.velocity_rad_s, 0)
-        self.assertGreater(event['precontact_speed_rad_s'], 1.15)
+        self.assertGreater(event['precontact_speed_rad_s'], .03)
 
     def test_sensor_seed_and_noise_do_not_change_physics(self):
         a, b = PhysicalRig(seed=7), PhysicalRig(seed=7)

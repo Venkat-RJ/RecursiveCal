@@ -1,0 +1,18 @@
+{
+  "schema_version": "recursivecal.historical-physics/1",
+  "source_commit": "8d51692799b1eaffb18c3f91def12fac44a1b8af",
+  "source_url": "https://github.com/Venkat-RJ/RecursiveCal/tree/8d51692799b1eaffb18c3f91def12fac44a1b8af",
+  "historical_source_sha256": {
+    "physics.py": "f3a459018a8c9567c89ec8b3d5dc014783a16844e8d2f2a137531774e8553a6c",
+    "physical_rig.py": "6cad9dfbfd1b40873934ade184ac349c78a61871b67d5b781f6fe18977808381",
+    "inquiry.py": "05be82e64f5b75fc95749fb63f7478b321b702b48ce0a7bba93548e36d9fa09e"
+  },
+  "historical_artifacts_sha256": {
+    "research/releases/physical-v1/audit.json": "e2833b4b3432c060ffc5dc3ca2d4f80bb07620fced243777335d075ec786b9ba",
+    "research/releases/physical-v1/open_run.json": "fd2c6c76965967d47141307a273e7888a22a3f2e7422f42c3d1486cbbf3d7e87",
+    "research/releases/physical-inquiry-v1/summary.json": "900d83996840bf443368cee148632a8e60756eeb6a4b4e67de7962e5f911c7e0",
+    "research/releases/physical-inquiry-v1/manifest.json": "72514d5f28f006ab48311b3628ace30f91d14f0da6fd62d307ae2beae374ab36",
+    "recursivecal_lab/web/inquiry-reference.js": "0f6e0cde875eefab03786c66d24d09c284565785de40111ec2358091e2c6a1c2"
+  },
+  "scope": "Archived model /1 evidence remains tied to this original source commit. Current model /2 numerical evidence is validation.json."
+}
