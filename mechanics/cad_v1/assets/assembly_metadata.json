@@ -1,0 +1,38 @@
+{
+  "identity": "RecursiveCal parametric mechanical assembly",
+  "CAD_units": "mm",
+  "references": "illustrative engineering design, no OEM measurements",
+  "hinge_height_m": 1.76,
+  "opening_angle_deg": 78,
+  "body_strut_mount_xz_m": [
+    -0.47,
+    1.17
+  ],
+  "hatch_local_strut_mount_xz_m": [
+    0.018,
+    -0.3
+  ],
+  "strut_closed_length_mm": 567.67,
+  "strut_open_length_mm": 941.2,
+  "strut_stroke_mm": 373.53,
+  "snapshots": [
+    {
+      "pose_deg": 0,
+      "step": "recursivecal_tailgate_closed.step",
+      "glb": "recursivecal_tailgate_closed.glb",
+      "components": 69,
+      "triangles": 52636,
+      "step_bytes": 2485740,
+      "glb_bytes": 966256
+    },
+    {
+      "pose_deg": 78,
+      "step": "recursivecal_tailgate_open.step",
+      "glb": "recursivecal_tailgate_open.glb",
+      "components": 69,
+      "triangles": 52636,
+      "step_bytes": 2554511,
+      "glb_bytes": 966192
+    }
+  ]
+}

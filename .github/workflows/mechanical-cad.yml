@@ -1,0 +1,48 @@
+name: RecursiveCal Mechanical CAD build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'mechanics/cad_v1/**'
+      - '.github/workflows/mechanical-cad.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cad-model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install geometry and scientific dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'cadquery>=2.5,<3' 'numpy>=1.24' 'trimesh>=4'
+      - name: Parametric STEP and GLB assemblies
+        working-directory: mechanics/cad_v1
+        run: python cad/build_assembly.py
+      - name: Generate CAD-derived viewer mesh and standalone demo
+        working-directory: mechanics/cad_v1
+        run: |
+          python cad/export_viewer_mesh.py
+          python viewer/build.py
+      - name: Test geometry and Python/JavaScript dynamics parity
+        working-directory: mechanics/cad_v1
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Upload original CAD and viewer artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: RecursiveCal-parametric-CAD
+          path: |
+            mechanics/cad_v1/assets/*.step
+            mechanics/cad_v1/assets/*.glb
+            mechanics/cad_v1/assets/assembly_metadata.json
+            mechanics/cad_v1/assets/bill_of_materials.csv
+            mechanics/cad_v1/viewer/RecursiveCal_CAD_Lab.html
+          if-no-files-found: error

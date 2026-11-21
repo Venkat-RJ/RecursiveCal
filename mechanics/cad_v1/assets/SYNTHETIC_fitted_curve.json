@@ -1,0 +1,14 @@
+{
+  "open_force_N_each": 165.607,
+  "slope_N_per_m": 125.1599,
+  "rmse_N_each": 1.11042,
+  "n": 14,
+  "measurement_type": [
+    "SYNTHETIC_NOT_HARDWARE"
+  ],
+  "angle_range_deg": [
+    0.0,
+    78.0
+  ],
+  "status": "fitted only to supplied data; not validated on independent hardware"
+}
