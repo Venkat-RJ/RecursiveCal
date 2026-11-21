@@ -93,13 +93,16 @@ def run(output: Path, browser_path: str | None = None, visual_only: bool = False
                     paused = page.locator("#workspace").get_attribute("data-time")
                     page.wait_for_timeout(150)
                     assert page.locator("#workspace").get_attribute("data-time") == paused
-                    page.locator("#anglePlot").evaluate("""plot => {
+                    page.locator("#anglePlot").scroll_into_view_if_needed()
+                    click_point = page.locator("#anglePlot").evaluate("""plot => {
                         const point = plot.createSVGPoint(); point.x = 43 + .25*(584-43); point.y = 70;
-                        const client = point.matrixTransform(plot.getScreenCTM());
-                        plot.dispatchEvent(new MouseEvent('click', {bubbles:true, clientX:client.x, clientY:client.y}));
+                        const matrix = plot.getScreenCTM(), client = point.matrixTransform(matrix);
+                        return {x:client.x, y:client.y, secondsPerPixel:Number(plot.dataset.duration)/(541*matrix.a)};
                     }""")
+                    page.mouse.click(click_point["x"], click_point["y"])
+                    # MouseEvent client coordinates quantize to CSS pixels.
                     assert math.isclose(float(page.locator("#workspace").get_attribute("data-time")),
-                                        rows[-1]["time_s"]*.25, abs_tol=.002)
+                                        rows[-1]["time_s"]*.25, abs_tol=click_point["secondsPerPixel"])
                     checked("Scrubbing, next/previous samples, pause and plot clicks keep pose, extension and time synchronized")
                     page.locator("#showCutaway").uncheck()
                     assert not page.locator("#actuatorPane").is_visible()
