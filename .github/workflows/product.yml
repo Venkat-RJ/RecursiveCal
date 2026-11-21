@@ -83,6 +83,9 @@ jobs:
         run: |
           node tests/workbench_contracts.cjs
           python tests/workbench_smoke.py
+      - name: Exercise physical inquiry, CAD replay, evidence export and independent rejection
+        if: always()
+        run: |
           python tests/inquiry_smoke.py
       - name: Preserve browser evidence
         if: always()
