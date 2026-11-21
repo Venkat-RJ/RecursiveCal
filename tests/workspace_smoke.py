@@ -137,7 +137,7 @@ def run(output: Path, browser_path: str | None = None, visual_only: bool = False
                     page.locator("#timeline").fill("5000")
                     page.locator("#timeline").dispatch_event("input")
                     assert page.locator("#anglePlot path").count() >= 4
-                    assert "Delivered force" not in page.locator("#inspector").inner_text()
+                    assert "delivered force" not in page.locator("#inspector").inner_text().lower()
                     expect(page.locator("#plotsHeading")).to_have_text("Predictions & observations")
                     page.screenshot(path=str(output / "investigation-desktop.png"), full_page=True)
                     recorded = download_current("investigation.json")
@@ -154,7 +154,7 @@ def run(output: Path, browser_path: str | None = None, visual_only: bool = False
                     page.get_by_role("button", name="Calibrate", exact=True).click()
                     assert page.locator(".parameter-table tbody tr").count() == 5
                     assert "Committed" in page.locator(".parameter-table").inner_text()
-                    assert "Sealed" in page.locator("#runState").inner_text()
+                    expect(page.locator("#runState")).to_have_text("Sealed")
                     page.screenshot(path=str(output / "calibration-desktop.png"), full_page=True)
                     page.get_by_role("button", name="Verify", exact=True).click()
                     assert page.locator("#sideNav .nav-item").count() == 4
@@ -196,7 +196,7 @@ def run(output: Path, browser_path: str | None = None, visual_only: bool = False
                         page.locator("#condition").select_option("compound")
                         page.locator("#investigationForm .dialog-run").click()
                         expect(page.locator("body")).to_have_attribute("data-busy", "true")
-                        page.wait_for_function("""() => document.body.dataset.busy === 'true' &&
+                        page.wait_for_function("""() => document.body.dataset.busy === 'true' && document.body.dataset.study === 'empty' &&
                             document.querySelectorAll('#sideNav .nav-item').length > 0 &&
                             document.querySelectorAll('#anglePlot path').length >= 4""", timeout=60000)
                         page.screenshot(path=str(output / "investigation-computing.png"), full_page=True)

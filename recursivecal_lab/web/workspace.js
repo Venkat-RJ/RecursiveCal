@@ -403,7 +403,7 @@
     }
   }
   function setTime(value) {
-    const d=S.data;S.time=C.clamp(value,0,d?.end||0);
+    const d=S.data,start=d?.rows[0]?.t||0;S.time=C.clamp(value,start,Math.max(start,d?.end||0));
     const current=C.sample(d?.rows,S.time),before=C.sample(d?.before,S.time);
     $("workspace").dataset.time=String(S.time);
     text("timeReadout",fmt(S.time)+" s");text("endReadout",fmt(d?.end||0)+" s");
