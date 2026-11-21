@@ -11,6 +11,7 @@ import csv
 import io
 import json
 from pathlib import Path
+import re
 import socket
 import subprocess
 import sys
@@ -21,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def run(browser_path: str | None, output: Path) -> None:
-    from playwright.sync_api import sync_playwright
+    from playwright.sync_api import expect, sync_playwright
 
     output.mkdir(parents=True, exist_ok=True)
     with socket.socket() as listener:
@@ -62,14 +63,14 @@ def run(browser_path: str | None, output: Path) -> None:
                     report["console_errors"].append(message.text)
             page.on("console", record_console)
             page.goto(base, wait_until="networkidle")
-            page.wait_for_function("document.body.dataset.ready === 'connected'")
+            expect(page.locator("body")).to_have_attribute("data-ready", "connected")
             assert page.locator("#runButton").is_enabled()
             assert page.locator("#exportRun").is_disabled()
-            assert page.evaluate("document.getElementById('simulationForm').checkValidity()")
+            assert page.locator("#simulationForm").evaluate("form => form.checkValidity()")
             report["checks"].append("Live API and valid initial configuration")
 
             page.locator("#runButton").click()
-            page.wait_for_function("document.getElementById('runStatus').textContent === 'Completed'")
+            expect(page.locator("#runStatus")).to_have_text("Completed")
             assert page.locator("#anglePlot path").count() >= 2
             assert "insufficient holding capacity" in page.locator("#holdSummary").inner_text()
             assert "n/a" not in page.locator("#metricRmse").inner_text()
@@ -93,7 +94,7 @@ def run(browser_path: str | None, output: Path) -> None:
             page.locator("#pinRun").click()
             page.locator("#mass").fill("30")
             page.locator("#runButton").click()
-            page.wait_for_function("!document.getElementById('runButton').disabled")
+            expect(page.locator("#runButton")).to_be_enabled()
             assert page.locator("#compareLegend").is_visible()
             assert page.locator("#anglePlot path").count() == 3
             report["checks"].append("Pinned-run overlay after a changed plant")
@@ -101,14 +102,14 @@ def run(browser_path: str | None, output: Path) -> None:
             page.locator("#resetConfig").click()
             page.locator("#scenario").select_option("passive_hold")
             page.locator("#runButton").click()
-            page.wait_for_function("!document.getElementById('runButton').disabled")
+            expect(page.locator("#runButton")).to_be_enabled()
             assert "aborted" in page.locator("#runStatus").inner_text().lower()
             assert "Simulation stopped" in page.locator("#globalMessage").inner_text()
             assert "Speed Limit" in page.locator("#events").inner_text()
             report["checks"].append("Early termination remains visible as a stopped simulation")
 
             page.locator("#importRun").set_input_files(run_path)
-            page.wait_for_function("document.getElementById('runStatus').textContent === 'Completed'")
+            expect(page.locator("#runStatus")).to_have_text("Completed")
             page.locator("[data-view='measurements']").click()
             page.locator("#forceExample").click()
             assert page.locator("#forceKind").input_value() == "synthetic"
@@ -124,13 +125,13 @@ def run(browser_path: str | None, output: Path) -> None:
             page.locator("#view-simulation").wait_for(state="visible")
             assert "Fitted curve applied" in page.locator("#globalMessage").inner_text()
             page.locator("#runButton").click()
-            page.wait_for_function("!document.getElementById('runButton').disabled")
+            expect(page.locator("#runButton")).to_be_enabled()
             provenance = json.loads(page.locator("#runProvenance").inner_text())["provenance"]
             assert provenance["source_kind"] == "synthetic"
             assert provenance["parameter_provenance"]["source_kind"] == "synthetic"
             report["checks"].append("Applying a fitted curve retains its provenance in a new synthetic run")
             page.locator("#importRun").set_input_files(run_path)
-            page.wait_for_function("document.getElementById('runIdentity').textContent.includes('Imported')")
+            expect(page.locator("#runIdentity")).to_contain_text("Imported")
             page.locator("[data-view='measurements']").click()
 
             page.locator("#replayCsv").fill("time_s,angle_rad\n" + "\n".join(f"{row['time_s']},{row['angle_rad']}" for row in saved_run["trace"][::10]))
@@ -146,7 +147,7 @@ def run(browser_path: str | None, output: Path) -> None:
             page.locator("#forceCsv").fill("length_m,force_N_each,split\n0.4,200,train\n")
             expected_invalid_fit = True
             page.locator("#fitButton").click()
-            page.wait_for_function("document.getElementById('forceMessage').classList.contains('error')")
+            expect(page.locator("#forceMessage")).to_have_class(re.compile(r"\berror\b"))
             assert not page.locator("#forceResults").is_visible()
             report["checks"].append("Invalid measurement errors are visible without a stale fit result")
 
@@ -163,7 +164,7 @@ def run(browser_path: str | None, output: Path) -> None:
                 page.set_viewport_size({"width": width, "height": 950})
                 for view in ("simulation", "measurements", "evidence"):
                     page.locator(f"[data-view='{view}']").click()
-                    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 1"), (width, view)
+                    assert page.evaluate("() => document.documentElement.scrollWidth <= window.innerWidth + 1"), (width, view)
                 if width == 390:
                     page.locator("[data-view='simulation']").click()
                     page.screenshot(path=str(output / "simulation_mobile.png"), full_page=True)
@@ -173,18 +174,18 @@ def run(browser_path: str | None, output: Path) -> None:
             hostile = json.loads(run_path.read_text())
             hostile["provenance"]["source"] = '<img src=x onerror="window.fixtureInjected=true">'
             page.locator("#importRun").set_input_files({"name": "untrusted.json", "mimeType": "application/json", "buffer": json.dumps(hostile).encode()})
-            page.wait_for_function("document.getElementById('runProvenance').textContent.includes('fixtureInjected')")
+            expect(page.locator("#runProvenance")).to_contain_text("fixtureInjected")
             assert page.locator("img[src='x']").count() == 0
-            assert page.evaluate("window.fixtureInjected === undefined")
+            assert page.evaluate("() => window.fixtureInjected === undefined")
             report["checks"].append("Imported provenance is text, never executable HTML")
 
             await_route = lambda route: route.fulfill(status=200, content_type="application/json", body='{"error":"API unavailable for import-only test"}')
             page.route("**/api/capabilities", await_route)
             page.reload(wait_until="networkidle")
-            page.wait_for_function("document.body.dataset.ready === 'offline'")
+            expect(page.locator("body")).to_have_attribute("data-ready", "offline")
             assert page.locator("#runButton").is_disabled()
             page.locator("#importRun").set_input_files(run_path)
-            page.wait_for_function("!document.getElementById('exportRun').disabled")
+            expect(page.locator("#exportRun")).to_be_enabled()
             assert page.locator("#anglePlot path").count() >= 2
             report["checks"].append("Import-only mode works without the computation API")
             assert page.locator("#loadReferenceRun").is_enabled()

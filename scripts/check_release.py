@@ -4,10 +4,12 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import sys
 import tarfile
 import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--archive", type=Path, help="also verify the built source distribution")
 args = parser.parse_args()
