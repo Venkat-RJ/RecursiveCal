@@ -1,0 +1,59 @@
+name: RecursiveCal sequential inquiry research gate
+
+on:
+  push:
+    branches: ['research/sequential-inquiry-v0']
+    paths:
+      - 'research/sequential_inquiry/**'
+      - 'tests/test_sequential_inquiry.py'
+      - '.github/workflows/sequential-inquiry.yml'
+  pull_request:
+    paths:
+      - 'research/sequential_inquiry/**'
+      - 'tests/test_sequential_inquiry.py'
+      - '.github/workflows/sequential-inquiry.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sequential-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install explicit CPU numerical dependency
+        run: python -m pip install 'numpy==2.3.5'
+      - name: Run observed-only, cost, and replay contracts
+        run: python -m unittest discover -s tests -p 'test_sequential_inquiry.py' -v
+      - name: Exploratory sequential Bayesian baseline comparison
+        run: |
+          python -m research.sequential_inquiry.benchmark \
+            --train 256 --validation 128 --test 64 --quadrature 5 \
+            --output artifacts/sequential-inquiry-v0
+      - name: Check output integrity and describe differences
+        run: |
+          python - <<'PY'
+          import csv, hashlib, json, math
+          from pathlib import Path
+          root = Path('artifacts/sequential-inquiry-v0')
+          summary = json.loads((root/'summary.json').read_text())
+          rows = list(csv.DictReader((root/'episodes.csv').open()))
+          assert len(rows) == 5*3*64
+          assert hashlib.sha256((root/'episodes.csv').read_bytes()).hexdigest() == summary['episodes_sha256']
+          assert all(math.isfinite(float(r['reward'])) and float(r['cost']) <= 3.5 and int(r['probes']) <= 3 for r in rows)
+          for cohort, policies in summary['results'].items():
+              print(cohort, {k:round(v['mean_reward'],6) for k,v in policies.items()}, flush=True)
+          print('Sequential evidence integrity PASS',len(rows),'policy-case records')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recursivecal-sequential-inquiry-v0
+          path: artifacts/sequential-inquiry-v0/
+          if-no-files-found: ignore
+          retention-days: 30

@@ -17,6 +17,7 @@ from typing import Callable
 import numpy as np
 
 import recursivecal as legacy
+import recursivecal_lab.experiments as frozen_experiments
 from recursivecal_lab.experiments import COST_COEFFICIENT, EvaluationData, FiniteBank
 
 STOP = -1
@@ -102,7 +103,9 @@ class SequentialEpisode:
         return {"episode_id": self.episode_id, "reward": quality - COST_COEFFICIENT * self._cost,
                 "quality": quality, "cost": self._cost, "probes": len(self._history),
                 "calibration": calibration,
-                "actions": [int(a) for a, _ in self._history]}
+                "actions": [int(a) for a, _ in self._history],
+                "measurements": [{"action": int(a), "observed": v.tolist()}
+                                 for a, v in self._history]}
 
 
 def choose_myopic(bank: FiniteBank, state: dict) -> int:
@@ -205,7 +208,12 @@ def run_study(output: Path | str, *, train_size: int = 128, validation_size: int
                "max_distinct_probes": MAX_PROBES, "max_cost": MAX_COST,
                "train_size": train_size, "validation_size": validation_size, "test_size_per_cohort": test_size,
                "selection": selection, "results": {},
-               "scope": "independent fixture reset for each probe; no physical hardware or model revision"}
+               "scope": "independent fixture reset for each probe; no physical hardware or model revision",
+               "source_sha256": {
+                   "research/sequential_inquiry/benchmark.py": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+                   "recursivecal_lab/experiments.py": hashlib.sha256(Path(frozen_experiments.__file__).read_bytes()).hexdigest(),
+                   "recursivecal.py": hashlib.sha256(Path(legacy.__file__).read_bytes()).hexdigest(),
+               }, "numpy_version": np.__version__}
     for cohort in COHORTS:
         print(f"[sequential] evaluating {cohort}", flush=True)
         data = bank.make_data(test_size, cohort)
@@ -221,12 +229,13 @@ def run_study(output: Path | str, *, train_size: int = 128, validation_size: int
                 "mean_probes": float(np.mean([r["probes"] for r in rows])),
             }
     path = out / "episodes.csv"
-    fields = ("cohort", "policy", "episode_id", "reward", "quality", "cost", "probes", "calibration", "actions")
+    fields = ("cohort", "policy", "episode_id", "reward", "quality", "cost", "probes", "calibration", "actions", "measurements")
     with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
         for row in all_records:
-            writer.writerow({**row, "actions": json.dumps(row["actions"])})
+            writer.writerow({**row, "actions": json.dumps(row["actions"]),
+                             "measurements": json.dumps(row["measurements"])})
     summary["episodes_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
     (out / "summary.json").write_text(json.dumps(summary, indent=2, allow_nan=False) + "\n", encoding="utf-8")
     return summary
