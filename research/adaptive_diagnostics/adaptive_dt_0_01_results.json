@@ -1,0 +1,915 @@
+{
+  "source": "Original RecursiveCal normalized dynamics, custom preregistered finite mixture, NOT empirically validated physics",
+  "hypotheses": [
+    {
+      "name": "nominal_a",
+      "plant": {
+        "motor": 1.0,
+        "friction": 0.1,
+        "load": 0.12,
+        "damping": 0.23,
+        "sensor_bias": 0.0,
+        "torque_deadzone": 0.0
+      }
+    },
+    {
+      "name": "nominal_b",
+      "plant": {
+        "motor": 0.98,
+        "friction": 0.12,
+        "load": 0.13,
+        "damping": 0.23,
+        "sensor_bias": 0.0,
+        "torque_deadzone": 0.0
+      }
+    },
+    {
+      "name": "bias_plus",
+      "plant": {
+        "motor": 1.0,
+        "friction": 0.1,
+        "load": 0.12,
+        "damping": 0.23,
+        "sensor_bias": 0.075,
+        "torque_deadzone": 0.0
+      }
+    },
+    {
+      "name": "bias_minus",
+      "plant": {
+        "motor": 1.0,
+        "friction": 0.1,
+        "load": 0.12,
+        "damping": 0.23,
+        "sensor_bias": -0.075,
+        "torque_deadzone": 0.0
+      }
+    },
+    {
+      "name": "motor_weak_a",
+      "plant": {
+        "motor": 0.69,
+        "friction": 0.115,
+        "load": 0.12,
+        "damping": 0.23,
+        "sensor_bias": 0.0,
+        "torque_deadzone": 0.0
+      }
+    },
+    {
+      "name": "motor_weak_b",
+      "plant": {
+        "motor": 0.78,
+        "friction": 0.12,
+        "load": 0.12,
+        "damping": 0.23,
+        "sensor_bias": 0.0,
+        "torque_deadzone": 0.0
+      }
+    },
+    {
+      "name": "high_friction_a",
+      "plant": {
+        "motor": 0.92,
+        "friction": 0.3,
+        "load": 0.14,
+        "damping": 0.23,
+        "sensor_bias": 0.0,
+        "torque_deadzone": 0.0
+      }
+    },
+    {
+      "name": "high_friction_b",
+      "plant": {
+        "motor": 0.95,
+        "friction": 0.27,
+        "load": 0.14,
+        "damping": 0.23,
+        "sensor_bias": 0.0,
+        "torque_deadzone": 0.0
+      }
+    },
+    {
+      "name": "torque_deadzone_a",
+      "plant": {
+        "motor": 0.91,
+        "friction": 0.14,
+        "load": 0.14,
+        "damping": 0.23,
+        "sensor_bias": 0.0,
+        "torque_deadzone": 0.25
+      }
+    },
+    {
+      "name": "torque_deadzone_b",
+      "plant": {
+        "motor": 1.02,
+        "friction": 0.17,
+        "load": 0.14,
+        "damping": 0.23,
+        "sensor_bias": 0.0,
+        "torque_deadzone": 0.31
+      }
+    }
+  ],
+  "train_count": 512,
+  "first_probe": "pulse_pos_low",
+  "model_predictions": [
+    {
+      "probe": "pulse_pos_low",
+      "mu": [
+        [
+          0.054325032373904944,
+          0.18350069799780686
+        ],
+        [
+          0.05078170611653341,
+          0.16992630612420762
+        ],
+        [
+          0.054325032373904944,
+          0.18350069799780686
+        ],
+        [
+          0.054325032373904944,
+          0.18350069799780686
+        ],
+        [
+          0.03367284897750723,
+          0.10946847682453661
+        ],
+        [
+          0.038549282215252514,
+          0.12657288977189285
+        ],
+        [
+          0.029262747552949487,
+          0.0842118970024598
+        ],
+        [
+          0.03346956781849001,
+          0.10076117663657966
+        ],
+        [
+          0.01625448092892863,
+          0.046951372547243256
+        ],
+        [
+          0.011075673801404564,
+          0.02938113526614967
+        ]
+      ]
+    },
+    {
+      "probe": "pulse_pos_high",
+      "mu": [
+        [
+          0.11162297719679343,
+          0.38424486649826345
+        ],
+        [
+          0.10651932314998809,
+          0.36558774193220755
+        ],
+        [
+          0.11162297719679343,
+          0.38424486649826345
+        ],
+        [
+          0.11162297719679343,
+          0.38424486649826345
+        ],
+        [
+          0.071859575732551,
+          0.2446113828119259
+        ],
+        [
+          0.08216050833851712,
+          0.2805930691127227
+        ],
+        [
+          0.07664004595602635,
+          0.25502304143372384
+        ],
+        [
+          0.08388777909991858,
+          0.2815694279323694
+        ],
+        [
+          0.06306282004394896,
+          0.21234356670256546
+        ],
+        [
+          0.06022362085927938,
+          0.20112524191072123
+        ]
+      ]
+    },
+    {
+      "probe": "pulse_neg_low",
+      "mu": [
+        [
+          -0.054325032373904944,
+          -0.18350069799780686
+        ],
+        [
+          -0.05078170611653341,
+          -0.16992630612420762
+        ],
+        [
+          -0.054325032373904944,
+          -0.18350069799780686
+        ],
+        [
+          -0.054325032373904944,
+          -0.18350069799780686
+        ],
+        [
+          -0.03367284897750723,
+          -0.10946847682453661
+        ],
+        [
+          -0.038549282215252514,
+          -0.12657288977189285
+        ],
+        [
+          -0.029262747552949487,
+          -0.0842118970024598
+        ],
+        [
+          -0.03346956781849001,
+          -0.10076117663657966
+        ],
+        [
+          -0.01625448092892863,
+          -0.046951372547243256
+        ],
+        [
+          -0.011075673801404564,
+          -0.02938113526614967
+        ]
+      ]
+    },
+    {
+      "probe": "pulse_neg_high",
+      "mu": [
+        [
+          -0.11162297719679343,
+          -0.38424486649826345
+        ],
+        [
+          -0.10651932314998809,
+          -0.36558774193220755
+        ],
+        [
+          -0.11162297719679343,
+          -0.38424486649826345
+        ],
+        [
+          -0.11162297719679343,
+          -0.38424486649826345
+        ],
+        [
+          -0.071859575732551,
+          -0.2446113828119259
+        ],
+        [
+          -0.08216050833851712,
+          -0.2805930691127227
+        ],
+        [
+          -0.07664004595602635,
+          -0.25502304143372384
+        ],
+        [
+          -0.08388777909991858,
+          -0.2815694279323694
+        ],
+        [
+          -0.06306282004394896,
+          -0.21234356670256546
+        ],
+        [
+          -0.06022362085927938,
+          -0.20112524191072123
+        ]
+      ]
+    },
+    {
+      "probe": "pulse_pos_offset",
+      "mu": [
+        [
+          0.058973121354764624,
+          0.22187298444728593
+        ],
+        [
+          0.0546187903216957,
+          0.204095469711971
+        ],
+        [
+          0.058973121354764624,
+          0.22187298444728593
+        ],
+        [
+          0.058973121354764624,
+          0.22187298444728593
+        ],
+        [
+          0.034181835884533995,
+          0.12449379891399891
+        ],
+        [
+          0.04038100178826831,
+          0.14856588352605882
+        ],
+        [
+          0.03326513164243661,
+          0.11243305696102601
+        ],
+        [
+          0.0377959350689851,
+          0.13179217759626105
+        ],
+        [
+          0.021694983708638926,
+          0.0740910027775156
+        ],
+        [
+          0.018214912196117816,
+          0.059119235011675174
+        ]
+      ]
+    },
+    {
+      "probe": "pulse_neg_offset",
+      "mu": [
+        [
+          -0.058973121354764624,
+          -0.22187298444728593
+        ],
+        [
+          -0.0546187903216957,
+          -0.204095469711971
+        ],
+        [
+          -0.058973121354764624,
+          -0.22187298444728593
+        ],
+        [
+          -0.058973121354764624,
+          -0.22187298444728593
+        ],
+        [
+          -0.034181835884533995,
+          -0.12449379891399891
+        ],
+        [
+          -0.04038100178826831,
+          -0.14856588352605882
+        ],
+        [
+          -0.03326513164243661,
+          -0.11243305696102601
+        ],
+        [
+          -0.0377959350689851,
+          -0.13179217759626105
+        ],
+        [
+          -0.021694983708638926,
+          -0.0740910027775156
+        ],
+        [
+          -0.018214912196117816,
+          -0.059119235011675174
+        ]
+      ]
+    },
+    {
+      "probe": "reference_check",
+      "mu": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.075,
+          0.0
+        ],
+        [
+          -0.075,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ]
+      ]
+    }
+  ],
+  "distinct_terminal_calibrations_per_model": 9,
+  "calibration_argmax": {
+    "nominal_a": "Calibration(gain=0.75, friction_ff=0.0, sensor_offset=0.0)",
+    "nominal_b": "Calibration(gain=0.9, friction_ff=0.0, sensor_offset=0.0)",
+    "bias_plus": "Calibration(gain=0.75, friction_ff=0.0, sensor_offset=0.08)",
+    "bias_minus": "Calibration(gain=0.75, friction_ff=0.0, sensor_offset=-0.08)",
+    "motor_weak_a": "Calibration(gain=1.4, friction_ff=0.0, sensor_offset=0.0)",
+    "motor_weak_b": "Calibration(gain=1.12, friction_ff=0.0, sensor_offset=0.0)",
+    "high_friction_a": "Calibration(gain=1.4, friction_ff=0.16, sensor_offset=0.0)",
+    "high_friction_b": "Calibration(gain=1.4, friction_ff=0.08, sensor_offset=0.0)",
+    "torque_deadzone_a": "Calibration(gain=1.4, friction_ff=0.16, sensor_offset=0.0)",
+    "torque_deadzone_b": "Calibration(gain=1.12, friction_ff=0.32, sensor_offset=0.0)"
+  },
+  "best_fixed_schedule": [
+    2,
+    6
+  ],
+  "best_fixed_one": [
+    2
+  ],
+  "best_fixed_two": [
+    2,
+    6
+  ],
+  "training_fixed_scores": [
+    [
+      0.877577,
+      [
+        2,
+        6
+      ]
+    ],
+    [
+      0.876649,
+      [
+        0,
+        6
+      ]
+    ],
+    [
+      0.873293,
+      [
+        4,
+        6
+      ]
+    ],
+    [
+      0.869976,
+      [
+        1,
+        6
+      ]
+    ],
+    [
+      0.869501,
+      [
+        5,
+        6
+      ]
+    ],
+    [
+      0.867235,
+      [
+        3,
+        6
+      ]
+    ],
+    [
+      0.859024,
+      [
+        2
+      ]
+    ],
+    [
+      0.858253,
+      [
+        0
+      ]
+    ],
+    [
+      0.854695,
+      [
+        4
+      ]
+    ],
+    [
+      0.853268,
+      [
+        6
+      ]
+    ],
+    [
+      0.851387,
+      [
+        1
+      ]
+    ],
+    [
+      0.85092,
+      [
+        5
+      ]
+    ],
+    [
+      0.850903,
+      [
+        0,
+        3
+      ]
+    ],
+    [
+      0.850751,
+      [
+        0,
+        1
+      ]
+    ],
+    [
+      0.850106,
+      [
+        2,
+        3
+      ]
+    ],
+    [
+      0.849399,
+      [
+        1,
+        2
+      ]
+    ],
+    [
+      0.849224,
+      [
+        0,
+        4
+      ]
+    ],
+    [
+      0.849187,
+      [
+        0,
+        2
+      ]
+    ],
+    [
+      0.848741,
+      [
+        0,
+        5
+      ]
+    ],
+    [
+      0.848676,
+      [
+        3
+      ]
+    ],
+    [
+      0.848329,
+      [
+        2,
+        4
+      ]
+    ],
+    [
+      0.84772,
+      [
+        1,
+        4
+      ]
+    ],
+    [
+      0.847464,
+      [
+        2,
+        5
+      ]
+    ],
+    [
+      0.846583,
+      [
+        3,
+        4
+      ]
+    ],
+    [
+      0.845461,
+      [
+        4,
+        5
+      ]
+    ],
+    [
+      0.844028,
+      [
+        1,
+        5
+      ]
+    ],
+    [
+      0.843074,
+      [
+        3,
+        5
+      ]
+    ],
+    [
+      0.841819,
+      [
+        1,
+        3
+      ]
+    ],
+    [
+      0.834001,
+      []
+    ]
+  ],
+  "evaluation": {
+    "in_model": {
+      "forced_two_minus_fixed_two": 0.00714,
+      "forced_two_minus_fixed_two_95pct_paired_bootstrap": [
+        0.005749,
+        0.008595
+      ],
+      "forced_second_action_counts": {
+        "pulse_pos_high": 176,
+        "pulse_neg_low": 163,
+        "pulse_neg_high": 163,
+        "pulse_pos_offset": 50,
+        "pulse_neg_offset": 61,
+        "reference_check": 411
+      },
+      "count": 1024,
+      "mean_net_reward": {
+        "no_probe": 0.832244,
+        "fixed_best": 0.877743,
+        "fixed_one": 0.855051,
+        "fixed_two": 0.877743,
+        "fixed_first_only": 0.855467,
+        "adaptive_second": 0.889235,
+        "adaptive_forced_two": 0.884883,
+        "shuffled_second_decision": 0.86183
+      },
+      "adaptive_minus_fixed": 0.011491,
+      "adaptive_minus_fixed_95pct_paired_bootstrap": [
+        0.009965,
+        0.013077
+      ],
+      "adaptive_minus_shuffled": 0.027405,
+      "second_action_counts": {
+        "STOP": 453,
+        "pulse_pos_high": 70,
+        "pulse_neg_low": 20,
+        "pulse_neg_high": 76,
+        "pulse_neg_offset": 1,
+        "reference_check": 404
+      },
+      "branch_by_family": {
+        "nominal_a": {
+          "n": 107,
+          "mean_reward": 0.86867,
+          "second_action_most_common": "reference_check"
+        },
+        "nominal_b": {
+          "n": 93,
+          "mean_reward": 0.88479,
+          "second_action_most_common": "reference_check"
+        },
+        "bias_plus": {
+          "n": 99,
+          "mean_reward": 0.86429,
+          "second_action_most_common": "reference_check"
+        },
+        "bias_minus": {
+          "n": 129,
+          "mean_reward": 0.86178,
+          "second_action_most_common": "reference_check"
+        },
+        "motor_weak_a": {
+          "n": 84,
+          "mean_reward": 0.89176,
+          "second_action_most_common": "STOP"
+        },
+        "motor_weak_b": {
+          "n": 107,
+          "mean_reward": 0.90142,
+          "second_action_most_common": "STOP"
+        },
+        "high_friction_a": {
+          "n": 106,
+          "mean_reward": 0.93404,
+          "second_action_most_common": "STOP"
+        },
+        "high_friction_b": {
+          "n": 117,
+          "mean_reward": 0.92028,
+          "second_action_most_common": "pulse_pos_high"
+        },
+        "torque_deadzone_a": {
+          "n": 84,
+          "mean_reward": 0.88034,
+          "second_action_most_common": "STOP"
+        },
+        "torque_deadzone_b": {
+          "n": 98,
+          "mean_reward": 0.88387,
+          "second_action_most_common": "STOP"
+        }
+      },
+      "note": "All policies receive same probe observations on each task and use same Bayes calibration table."
+    },
+    "continuous_jitter": {
+      "forced_two_minus_fixed_two": 0.004772,
+      "forced_two_minus_fixed_two_95pct_paired_bootstrap": [
+        0.001886,
+        0.007868
+      ],
+      "forced_second_action_counts": {
+        "pulse_pos_high": 19,
+        "pulse_neg_low": 22,
+        "pulse_neg_high": 23,
+        "pulse_pos_offset": 7,
+        "pulse_neg_offset": 6,
+        "reference_check": 51
+      },
+      "count": 128,
+      "mean_net_reward": {
+        "no_probe": 0.832525,
+        "fixed_best": 0.867598,
+        "fixed_one": 0.848213,
+        "fixed_two": 0.867598,
+        "fixed_first_only": 0.845555,
+        "adaptive_second": 0.874296,
+        "adaptive_forced_two": 0.87237,
+        "shuffled_second_decision": 0.859173
+      },
+      "adaptive_minus_fixed": 0.006698,
+      "adaptive_minus_fixed_95pct_paired_bootstrap": [
+        0.000728,
+        0.011476
+      ],
+      "adaptive_minus_shuffled": 0.015123,
+      "second_action_counts": {
+        "STOP": 62,
+        "pulse_pos_high": 6,
+        "pulse_neg_low": 4,
+        "pulse_neg_high": 9,
+        "reference_check": 47
+      },
+      "branch_by_family": {
+        "nominal_a": {
+          "n": 13,
+          "mean_reward": 0.85731,
+          "second_action_most_common": "reference_check"
+        },
+        "nominal_b": {
+          "n": 11,
+          "mean_reward": 0.88232,
+          "second_action_most_common": "reference_check"
+        },
+        "bias_plus": {
+          "n": 16,
+          "mean_reward": 0.83059,
+          "second_action_most_common": "reference_check"
+        },
+        "bias_minus": {
+          "n": 12,
+          "mean_reward": 0.86657,
+          "second_action_most_common": "reference_check"
+        },
+        "motor_weak_a": {
+          "n": 9,
+          "mean_reward": 0.88765,
+          "second_action_most_common": "STOP"
+        },
+        "motor_weak_b": {
+          "n": 12,
+          "mean_reward": 0.89232,
+          "second_action_most_common": "STOP"
+        },
+        "high_friction_a": {
+          "n": 12,
+          "mean_reward": 0.91588,
+          "second_action_most_common": "STOP"
+        },
+        "high_friction_b": {
+          "n": 17,
+          "mean_reward": 0.89793,
+          "second_action_most_common": "STOP"
+        },
+        "torque_deadzone_a": {
+          "n": 13,
+          "mean_reward": 0.85803,
+          "second_action_most_common": "STOP"
+        },
+        "torque_deadzone_b": {
+          "n": 13,
+          "mean_reward": 0.86651,
+          "second_action_most_common": "STOP"
+        }
+      },
+      "note": "All policies receive same probe observations on each task and use same Bayes calibration table."
+    },
+    "unseen_high_load": {
+      "forced_two_minus_fixed_two": 0.003143,
+      "forced_two_minus_fixed_two_95pct_paired_bootstrap": [
+        -0.001271,
+        0.007692
+      ],
+      "forced_second_action_counts": {
+        "pulse_pos_high": 24,
+        "pulse_neg_low": 7,
+        "pulse_neg_high": 20,
+        "pulse_pos_offset": 14,
+        "pulse_neg_offset": 15,
+        "reference_check": 48
+      },
+      "count": 128,
+      "mean_net_reward": {
+        "no_probe": 0.931927,
+        "fixed_best": 0.875053,
+        "fixed_one": 0.906876,
+        "fixed_two": 0.875053,
+        "fixed_first_only": 0.906613,
+        "adaptive_second": 0.896731,
+        "adaptive_forced_two": 0.878196,
+        "shuffled_second_decision": 0.897242
+      },
+      "adaptive_minus_fixed": 0.021678,
+      "adaptive_minus_fixed_95pct_paired_bootstrap": [
+        0.016821,
+        0.026435
+      ],
+      "adaptive_minus_shuffled": -0.000511,
+      "second_action_counts": {
+        "STOP": 89,
+        "reference_check": 39
+      },
+      "branch_by_family": {},
+      "note": "All policies receive same probe observations on each task and use same Bayes calibration table."
+    },
+    "unseen_extreme_deadzone": {
+      "forced_two_minus_fixed_two": 0.006,
+      "forced_two_minus_fixed_two_95pct_paired_bootstrap": [
+        0.006,
+        0.006
+      ],
+      "forced_second_action_counts": {
+        "pulse_pos_high": 9,
+        "pulse_neg_low": 58,
+        "pulse_neg_high": 8,
+        "pulse_pos_offset": 24,
+        "pulse_neg_offset": 29
+      },
+      "count": 128,
+      "mean_net_reward": {
+        "no_probe": 0.524871,
+        "fixed_best": 0.512302,
+        "fixed_one": 0.530302,
+        "fixed_two": 0.512302,
+        "fixed_first_only": 0.530302,
+        "adaptive_second": 0.530302,
+        "adaptive_forced_two": 0.518302,
+        "shuffled_second_decision": 0.530302
+      },
+      "adaptive_minus_fixed": 0.018,
+      "adaptive_minus_fixed_95pct_paired_bootstrap": [
+        0.018,
+        0.018
+      ],
+      "adaptive_minus_shuffled": 0.0,
+      "second_action_counts": {
+        "STOP": 128
+      },
+      "branch_by_family": {},
+      "note": "All policies receive same probe observations on each task and use same Bayes calibration table."
+    }
+  },
+  "dt_s": 0.01
+}

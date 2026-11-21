@@ -1,0 +1,31 @@
+{
+  "first_probe": "pulse_pos_low",
+  "first_probe_model_discrepancy_threshold_sigma": 2.25513,
+  "threshold_training_false_alarm_fraction": 0.05,
+  "cases": {
+    "in_model": {
+      "n": 2048,
+      "flag_rate": 0.04492,
+      "median_min_standardized_residual": 1.03113,
+      "p95_min_standardized_residual": 2.22014
+    },
+    "continuous_jitter": {
+      "n": 512,
+      "flag_rate": 0.0957,
+      "median_min_standardized_residual": 1.08896,
+      "p95_min_standardized_residual": 2.47055
+    },
+    "unseen_high_load": {
+      "n": 512,
+      "flag_rate": 0.33789,
+      "median_min_standardized_residual": 1.87429,
+      "p95_min_standardized_residual": 2.96441
+    },
+    "unseen_extreme_deadzone": {
+      "n": 512,
+      "flag_rate": 0.90625,
+      "median_min_standardized_residual": 3.74765,
+      "p95_min_standardized_residual": 5.75136
+    }
+  }
+}

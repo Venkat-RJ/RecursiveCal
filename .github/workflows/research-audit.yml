@@ -1,0 +1,49 @@
+name: RecursiveCal research numerical audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'recursivecal.py'
+      - 'mechanics/cad_v1/simulation/physics_v2.py'
+      - 'research/adaptive_diagnostics/**'
+      - '.github/workflows/research-audit.yml'
+  pull_request:
+    paths:
+      - 'recursivecal.py'
+      - 'mechanics/cad_v1/simulation/physics_v2.py'
+      - 'research/adaptive_diagnostics/**'
+      - '.github/workflows/research-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  numerical-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install numerical dependency
+        run: python -m pip install 'numpy>=1.24,<3'
+      - name: Test original seed protocol and CAD numerical invariants
+        run: python research/adaptive_diagnostics/TESTS.py
+      - name: Audit physical model and timestep sensitivity
+        run: |
+          python research/adaptive_diagnostics/audit_physics.py --output physics_audit_ci.json
+          python research/adaptive_diagnostics/test_exact_duration.py
+      - name: Smoke-check adaptive decision protocol on new seeds
+        run: |
+          python research/adaptive_diagnostics/adaptive_benchmark.py \
+            --train 96 --eval 128 --transfer 24 --dt 0.02 \
+            --output adaptive_ci_smoke.json
+      - name: Preserve CI evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: recursivecal-research-audit-${{ github.run_id }}
+          path: |
+            physics_audit_ci.json
+            adaptive_ci_smoke.json
+          if-no-files-found: ignore
+          retention-days: 14

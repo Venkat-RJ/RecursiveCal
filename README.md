@@ -58,6 +58,14 @@ net_reward = held_out_calibration_quality - 0.012 * diagnostic_cost
 
 Safety interventions affect calibration quality; the environment also enforces limits on allowable diagnostic actions. These are **simulation-level protections**, not evidence of real-world safety.
 
+## Independent physics and adaptive-experiment audit (November 2026)
+
+A new [numerical audit and adaptive diagnostic research module](research/adaptive_diagnostics/README.md) tests whether the simulated environment actually requires observation-dependent experiments. It includes the source, classical controls, a three-seed CPU contextual-bandit RL pilot, parameter-shift stress tests, and reproducible result JSONs.
+
+**What improved:** On a deliberately constructed ten-hypothesis synthetic task, three small learned policies chose different follow-up tests and scored 0.8891–0.8896, compared with 0.8779 for the best train-selected fixed schedule and 0.8900 for adaptive Bayesian design (2,048 held-out cases). This is *not* an RL victory over strong classical inference, nor physical-world validation. The original v0.2 neural pilot below remains a separate negative result.
+
+**What needs fixing:** A requested 0.55 s diagnostic pulse actually lasts 0.56 s at the v0.2 integration step. The study preserves those frozen equations to reproduce old scores and documents an exact-duration correction for a future version. In an unseen high-load stress test, doing no diagnostic test was better than both adaptive methods. No actual vehicle measurements were used.
+
 ## Results so far
 
 The strongest classical baseline uses particle-based Bayesian system identification and cost-aware probe selection. The maximum probe count was selected using training seeds, then evaluated on separate fixed seeds.
