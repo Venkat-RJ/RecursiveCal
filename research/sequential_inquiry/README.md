@@ -46,8 +46,7 @@ The program runs in the foreground, prints each stage, and saves per-policy `epi
 5. **Transfer:** held-out combinations and structural changes must be evaluated without tuning on those test outcomes.
 
 No generalization, novelty, hardware safety, or RL superiority claim follows merely from this interface or the first smoke run. This benchmark is an intermediate research instrument, not the destination.
-## Separate stateful mechanism gate
 
-The independent-reset benchmark was audited after the 64-case-per-cohort pilot in [INITIAL_GATE_AUDIT.md](INITIAL_GATE_AUDIT.md). Its myopic Bayesian policy never used a third probe, so it did not demonstrate a longer investigation process.
+## Pilot with real multi-step interventions
 
-[STATEFUL_PROTOCOL.md](STATEFUL_PROTOCOL.md) describes a separate synthetic actuator in [stateful_plant.py](stateful_plant.py), where hidden thermal-friction state persists across fixture resets and makes test order matter. [The contract tests](../../tests/test_stateful_inquiry.py) verify that mechanism and non-disclosure. **No Bayesian stateful planner or RL policy has yet been trained or evaluated against this new simulator.**
+[STATEFUL_PILOT_AUDIT.md](STATEFUL_PILOT_AUDIT.md) documents an exploratory two-cohort, 32-case-per-cohort comparison of a thermal-aware Bayesian one-step planner, a deliberately misspecified ablation, no-test and fixed schedules, and three trained REINFORCE policies. The learned policies use several different follow-up sequences but do **not** beat the informed Bayesian comparator. First probes remain constant within each learned seed, so this is not autonomous model discovery. Reproduction commands and artifact requirements are in the audit.

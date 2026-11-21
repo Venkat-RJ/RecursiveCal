@@ -1,6 +1,6 @@
 # Stateful investigation environment v0: exploratory specification
 
-**Status: mechanism and boundary tests only. No trained RL policies, model-inference evidence, or hardware validation.** The parameters and stress cases are synthetic choices made during development, not pre-registered discoveries or measured actuator characteristics.
+**Status: synthetic mechanism, classical Bayesian baseline, and an exploratory small multi-step RL pilot. No demonstrated RL advantage, autonomous model-structure discovery, or hardware validation.** The parameters and stress cases are synthetic choices made during development, not pre-registered discoveries or measured actuator characteristics.
 
 ## What changed from the fixed-fixture benchmark?
 
@@ -41,4 +41,4 @@ Known families include nominal, weak motor, high friction, high load, sensor bia
 5. Use one held-out structural family (directional friction) and at least one independent stress family not used to develop the policy. Avoid changing test cases after seeing outcomes without labeling the analysis exploratory.
 6. Run numerical step-size checks and parameter sensitivity before calling the synthetic dynamics a useful scientific testbed. No real-hardware claims without independent measurements.
 
-No trained policy comparison has been run in the stateful environment. The previous 960-row result archive belongs to the **independent-reset** benchmark and cannot be transferred to the stateful simulator.
+A small multi-seed trained policy comparison has now been run and is recorded in [STATEFUL_PILOT_AUDIT.md](STATEFUL_PILOT_AUDIT.md). It did **not** demonstrate RL superiority. The previous 960-row result archive belongs to the **independent-reset** benchmark and cannot be transferred to the stateful simulator. The sequential Bayesian filter tracks latent thermal state but uses one-step Monte Carlo utility, not full-horizon planning.
