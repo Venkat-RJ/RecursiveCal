@@ -1,4 +1,4 @@
-# SafeCal results, November 2026
+# RecursiveCal / SafeCal classical benchmark, November 2026
 
 These are **classical-policy simulation results**, not reinforcement-learning results. All means are over 60 seeded tasks per evaluation split. Higher terminal net reward is better. `net reward = frozen calibration quality - 0.012 * diagnostic cost`.
 
@@ -36,7 +36,7 @@ The new shifted split includes a synthetic motor-torque deadzone absent from the
 - Synthetic normalized dynamics, no calibrated industrial plant or hardware validation.
 - The shifted split is one invented deadzone mechanism, not broad out-of-distribution physics.
 - The Bayesian policy approximates information gain with finite Monte Carlo samples and calibration selection with a small posterior representative set. It is **not** a globally optimal Bayes-adaptive controller.
-- The reward coefficients, calibration grid, simulator faults, and allowed probes are provisional. No RL agent has been trained. No claim of generalization to real physical systems is warranted.
+- The reward coefficients, calibration grid, simulator faults, and allowed probes are provisional. A separate CPU neural diagnostic policy was trained and audited in [RL_PILOT.md](RL_PILOT.md), but it did not learn adaptive experiment selection. No language model has been RL-trained. No claim of generalization to real physical systems is warranted.
 - Safety is a simulator-side constraint, not a validated hardware safety guarantee.
 
-Reproduce with the README commands. Raw per-seed JSON is included in the full research archive and can be regenerated from seeded scripts.
+Reproduce with the README commands. Raw per-seed JSON is not committed to this standalone repository. It can be regenerated from the seeded scripts. The checked-in [PUBLIC_RESULTS.json](PUBLIC_RESULTS.json) contains the classical summary. The later neural experiment is documented separately in [RL_PILOT.md](RL_PILOT.md).
