@@ -8,6 +8,12 @@ The current task is a synthetic single-axis actuator. Its dynamics are hidden. A
 
 This is a **research simulator**, not an industrial calibration product, real-hardware controller, or certified safety system.
 
+## Parametric mechanical CAD test cell
+
+**[Explore RecursiveCal's editable mechanical CAD module](mechanics/cad_v1/README.md)**
+
+This newer test cell is built from an original 69-component parametric assembly, with native STEP/GLB exports, articulated hinge/strut geometry, CAD-linked force calculations, a load-cell fitting workflow, and an interactive CAD-mesh viewer. Its hardware dimensions and forces are illustrative, not measured or OEM-validated. The original RL benchmark remains unchanged.
+
 ## 3D physical systems test cell
 
 **[Open the new physical tailgate demo](visualization/physical_twin/demo.html)** · [Source and model notes](visualization/physical_twin/README.md)
