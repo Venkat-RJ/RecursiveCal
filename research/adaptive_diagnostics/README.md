@@ -73,21 +73,29 @@ First-pulse discrepancy is the Euclidean distance to the closest prior predictio
 
 The check flags some model inadequacy, but **misses most unseen high-load cases**. On unseen high-load tasks, not testing scored **0.933216**, whereas the nominal adaptive Bayesian policy scored **0.896695**. The posterior can be falsely confident about an incorrect calibration. On the extreme deadzone split, all second decisions collapsed to STOP. These tests are a warning against real-hardware claims and against measuring only relative improvement over a weak fixed diagnostic schedule.
 
+## Independent liftgate evidence and a physical requirement our model fails
+
+A public **June 2008 U.S. NHTSA engineering investigation** examined the 2004–2006 Toyota Sienna power liftgate ([original report](https://static.nhtsa.gov/odi/inv/2006/INCR-EA06020-29305P.pdf)). Its measurements describe a 71 lb liftgate, new strut A exerting 147 lb at full compression and 119 lb at full extension at 72°F, with material temperature dependence (at 35°F and 110°F, that strut changed its full-extension force from 113 lb to 129 lb). The report's tested *pairs* showed that at 189 lb of combined full-extension support the liftgate remained open, at 176 lb it descended slowly, and at 145 lb it dropped and the vehicle motor engaged. **Those are not measurements from our own geometry.** We must not import them as fake RecursiveCal calibration labels.
+
+They do establish a qualitative physical test requirement that our present CAD model misses: a nominal gas-assisted tailgate must either hold open passively when the opening motor disengages, or explicitly model the separate device that does so. Our current `cad_v1` 78° open position has **68.85 Nm gas-spring opening torque** against **134.65 Nm gravity closing torque**, a **65.79 Nm closing deficit**. To balance gravity with these mounting coordinates would require around **322.67 N per strut**, versus the currently assumed **165 N**. That means our nominal CAD hatch **cannot remain open without active motor support**, unlike the gas-strut-supported mechanism depicted in the real reference. `physical_requirements.py` records this failed check and the external reference without applying mismatched vehicle parameters.
+
+The model also has no latch, motor-disengagement logic, direction-dependent friction/hysteresis, measured temperature effects, obstacle detection, or anti-pinch. This is a **physical-model adequacy failure**, not a numerical implementation failure. A future model must make this requirement pass through proper geometry, mass and force validation, not by copying another vehicle's numbers.
+
 ## Independent physical evidence still missing
 
-No sensor or actuator measurements were used in these experiments. Required external checks include independently measured mounting geometry, hatch mass/inertia, strut force and hysteresis vs stroke/temperature, instrumented position/current traces, direction-dependent friction, latch and anti-pinch logic, and validation against **held-out physical cycles**. The Stabilus example is useful to reason about force/stroke ranges, but is not matched to our mounting geometry or actuator. This phase provides a simulator structure and reproducible numerical checks, not certified SiL/HiL capability.
+No sensor or actuator measurements from our own CAD/test bench were used in these experiments. Required external checks include independently measured mounting geometry, hatch mass/inertia, strut force and hysteresis vs stroke/temperature, instrumented position/current traces, direction-dependent friction, latch and anti-pinch logic, and validation against **held-out physical cycles**. The Stabilus example is useful to reason about force/stroke ranges, but is not matched to our mounting geometry or actuator. This phase provides a simulator structure and reproducible numerical checks, not certified SiL/HiL capability.
 
 ## Reproduce in a clean Python environment
 
 ```bash
 python -m pip install 'numpy>=1.24' 'torch>=2'
-python research/adaptive_diagnostics/TESTS.py
-python research/adaptive_diagnostics/audit_physics.py --output physics_audit.json
-python research/adaptive_diagnostics/test_exact_duration.py
-python research/adaptive_diagnostics/adaptive_benchmark.py --train 1024 --eval 2048 --transfer 256 --dt .02 --output adaptive_results.json
-python research/adaptive_diagnostics/adaptive_benchmark.py --train 512 --eval 1024 --transfer 128 --dt .01 --output adaptive_dt_0_01_results.json
-python research/adaptive_diagnostics/train_adaptive_rl.py --train 15000 --steps 450 --eval 2048 --transfer 256 --out rl_adaptive_results.json
-python research/adaptive_diagnostics/check_mismatch.py
+python TESTS.py
+python audit_physics.py --output physics_audit.json
+python test_exact_duration.py
+python adaptive_benchmark.py --train 1024 --eval 2048 --transfer 256 --dt .02 --output adaptive_results.json
+python adaptive_benchmark.py --train 512 --eval 1024 --transfer 128 --dt .01 --output adaptive_dt_0_01_results.json
+python train_adaptive_rl.py --train 15000 --steps 450 --eval 2048 --transfer 256 --out rl_adaptive_results.json
+python check_mismatch.py
 ```
 
 All numbers above are deterministic for these seeds under the tested Python/NumPy/PyTorch versions. Cross-platform floating-point variation is possible. `adaptive_benchmark.py` uses a local copy of the published RecursiveCal v0.2 equations; it does not change the original frozen benchmark. The CAD test physics is copied from the previously generated mechanical CAD source kit. Output JSON contains model assumptions, per-policy metrics and paired confidence intervals (but not every episode-level trace). This is exploratory evidence, not an external independent replication.
@@ -100,5 +108,3 @@ All numbers above are deterministic for these seeds under the tested Python/NumP
 4. Only after these pass, test multiple trained RL policies against robust Bayesian design, uncertainty-aware model-mismatch checks and a conservative classical fallback.
 
 **No real-hardware use or safety claims are authorized by this work.**
-
-Additional reproducibility: [full first-turn downloadable source archive](https://github.com/Venkat-RJ/RecursiveCal/tree/main/research/adaptive_diagnostics) also contains the result JSONs below.

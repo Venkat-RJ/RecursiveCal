@@ -10,6 +10,7 @@ import numpy as np
 import recursivecal as rc
 import adaptive_benchmark as ab
 import audit_physics as ap
+import physical_requirements as pr
 try:
     import train_adaptive_rl as arl
 except ModuleNotFoundError as error:
@@ -42,6 +43,12 @@ class ResearchAuditTests(unittest.TestCase):
             q=math.radians(deg);h=1e-5
             finite=(cad.geometry(q+h)['length_m']-cad.geometry(q-h)['length_m'])/(2*h)
             self.assertLess(abs(finite-cad.geometry(q)['lever_m']),1e-8)
+    def test_passive_open_balance_has_valid_units(self):
+        result=pr.evaluate()
+        self.assertGreater(result['modeled_gravity_closing_torque_Nm'],0)
+        self.assertAlmostEqual(result['passive_net_opening_torque_Nm'],
+            result['modeled_strut_opening_torque_Nm_total']-result['modeled_gravity_closing_torque_Nm'],delta=2e-4)
+        self.assertFalse(result['passive_open_hold_without_motor']) # known v0.2 limitation
     def test_true_pulse_duration_not_roundable(self):
         # Deliberately captures the known v0.2 numerical limitation.
         self.assertAlmostEqual(int(round(.55/.02))*.02,.56)

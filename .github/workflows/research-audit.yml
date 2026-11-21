@@ -32,6 +32,8 @@ jobs:
         run: |
           python research/adaptive_diagnostics/audit_physics.py --output physics_audit_ci.json
           python research/adaptive_diagnostics/test_exact_duration.py
+      - name: Record passive-open physical adequacy gate
+        run: python research/adaptive_diagnostics/physical_requirements.py --output physical_requirements_ci.json
       - name: Smoke-check adaptive decision protocol on new seeds
         run: |
           python research/adaptive_diagnostics/adaptive_benchmark.py \
@@ -45,5 +47,6 @@ jobs:
           path: |
             physics_audit_ci.json
             adaptive_ci_smoke.json
+            physical_requirements_ci.json
           if-no-files-found: ignore
           retention-days: 14

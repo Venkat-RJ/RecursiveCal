@@ -64,7 +64,7 @@ A new [numerical audit and adaptive diagnostic research module](research/adaptiv
 
 **What improved:** On a deliberately constructed ten-hypothesis synthetic task, three small learned policies chose different follow-up tests and scored 0.8891–0.8896, compared with 0.8779 for the best train-selected fixed schedule and 0.8900 for adaptive Bayesian design (2,048 held-out cases). This is *not* an RL victory over strong classical inference, nor physical-world validation. The original v0.2 neural pilot below remains a separate negative result.
 
-**What needs fixing:** A requested 0.55 s diagnostic pulse actually lasts 0.56 s at the v0.2 integration step. The study preserves those frozen equations to reproduce old scores and documents an exact-duration correction for a future version. In an unseen high-load stress test, doing no diagnostic test was better than both adaptive methods. No actual vehicle measurements were used.
+**What needs fixing:** A requested 0.55 s diagnostic pulse actually lasts 0.56 s at the v0.2 integration step. The study preserves those frozen equations to reproduce old scores and documents an exact-duration correction for a future version. In an unseen high-load stress test, doing no diagnostic test was better than both adaptive methods. Our CAD simulator also fails a nominal passive open-hold check: at 78°, the current gas struts supply 68.9 Nm against 134.6 Nm of gravity torque; it needs separate hold logic or a mechanically justified correction. Public NHTSA liftgate data motivate this gate but are not transplanted across vehicle geometries. No actual RecursiveCal vehicle measurements were used.
 
 ## Results so far
 

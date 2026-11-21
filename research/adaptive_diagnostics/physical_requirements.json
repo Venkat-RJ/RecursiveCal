@@ -1,0 +1,60 @@
+{
+  "model": "RecursiveCal CAD v0.2, synthetic rigid 1-DOF model",
+  "units": {
+    "force": "N per strut",
+    "torque": "Nm",
+    "angle": "deg"
+  },
+  "nominal_open_angle_deg": 78.0,
+  "open_strut_lever_m": 0.208649,
+  "modeled_strut_force_N_each": 165.0,
+  "modeled_strut_opening_torque_Nm_total": 68.8543,
+  "modeled_gravity_closing_torque_Nm": 134.6493,
+  "passive_net_opening_torque_Nm": -65.795,
+  "minimum_strut_force_to_balance_gravity_N_each": 322.6687,
+  "force_shortfall_N_each": 157.6687,
+  "passive_open_hold_without_motor": false,
+  "external_reference": {
+    "source": "https://static.nhtsa.gov/odi/inv/2006/INCR-EA06020-29305P.pdf",
+    "document": "NHTSA EA06-020, Engineering Analysis Report, June 2008, 2004-2006 Toyota Sienna",
+    "vehicle_hatch_weight_lb": 71,
+    "new_strut_A_full_compression_lb_at_F": {
+      "35F": 140,
+      "72F": 147,
+      "110F": 160
+    },
+    "new_strut_A_full_extension_lb_at_F": {
+      "35F": 113,
+      "72F": 119,
+      "110F": 129
+    },
+    "observed_combined_ext_force_and_state": [
+      {
+        "configuration": "C/D",
+        "extension_force_lb": 189,
+        "state": "did_not_drop"
+      },
+      {
+        "configuration": "C/H",
+        "extension_force_lb": 176,
+        "state": "dropped_slowly"
+      },
+      {
+        "configuration": "G/H",
+        "extension_force_lb": 145,
+        "state": "dropped_and_motor_engaged"
+      }
+    ],
+    "warning": "Different hatch, mounting coordinates, actuator and control design; do not fit our CAD forces to these measurements."
+  },
+  "status": "SIMULATED NOMINAL PASSIVE HOLD FAILS",
+  "additional_missing_behaviors": [
+    "latched closed state",
+    "motor disengagement at open",
+    "temperature-dependent force",
+    "direction-dependent force and stiction",
+    "contact/anti-pinch and motor re-engagement",
+    "real-world parameter measurements"
+  ],
+  "scope": "A model-plausibility calculation, not a verification of real vehicle safe operation"
+}
