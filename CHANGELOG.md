@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.2 - 2026-11-22
+
+Added opt-in, source-bound deterministic physical replay for both sealed RL episodes and built-in inquiry reports. Replay reconstructs the synthetic experiment from the declared seed and recorded actions, then compares diagnostic observations, drive and motion traces, decisions, and terminal scores with the reproduced run. Existing fast verification remains available and existing core physics, reward functions and preserved evidence are unchanged.
+
+Added real-rig tests showing that a coherently rehashed intermediate motion record can pass the fast consistency verifier but must fail source replay. The replay mode explicitly rejects mismatched core source revisions. It is not an authenticity signature, independently implemented physics check or measured-hardware validation.
+
+Updated package license metadata to its non-deprecated SPDX form.
+
 ## 0.5.1 - 2026-11-22
 
 Strengthened inquiry report verification and browser imports so acceptance and outcomes are checked against the recorded motion and the prescribed verification profiles. Changing a summary metric and recomputing a report digest cannot promote an unchanged failing trajectory to success.
