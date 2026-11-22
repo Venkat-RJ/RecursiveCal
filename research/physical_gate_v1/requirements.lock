@@ -1,0 +1,4 @@
+# Numerical versions used for the frozen CPU pilot on Python 3.12.14.
+# This does not replace the historical v0.3 research dependency lock.
+numpy==2.3.5
+scipy==1.17.0

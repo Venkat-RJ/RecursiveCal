@@ -137,7 +137,7 @@ These trajectories and their outcomes are unavailable to the investigator before
 
 A motion profile passes only when it completes, its tracking RMSE is at most 3 degrees, its absolute final error is at most 2 degrees, peak speed is at most 1.15 rad/s and command saturation occupies at most 35% of the observation interval. A candidate must pass all four profiles to receive `verified_in_simulation`. A failed profile yields `verification_failed`. Insufficient evidence, a model mismatch or a diagnostic limit yields `abstained` with the nominal controller retained.
 
-Separate passive-hold and power-loss runs expose structural requirements. The default mechanism lacks enough unpowered holding capacity. Even a motion-verified calibration therefore does not make the mechanism ready for hardware. Increasing a simulated brake parameter would change a stated architecture assumption; it would not demonstrate that a real brake exists or can meet the requirement.
+Separate passive-hold and power-loss runs expose structural requirements. The legacy version 2 mechanism lacks enough unpowered holding capacity. The default version 3 research rig explicitly includes a 120 Nm spring-applied brake with a 20 ms engagement delay and tests that declared architecture. Even a motion-verified calibration does not make the mechanism ready for hardware: the modeled brake is a synthetic assumption, not evidence that a real brake exists or can meet the requirement.
 
 ## Reproduction and evidence
 
