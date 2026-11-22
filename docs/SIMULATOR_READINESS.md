@@ -71,6 +71,8 @@ python scripts/validate_physics.py --output artifacts/physics-validation.json
 python scripts/validate_research_rig.py --output artifacts/research-rig-validation.json
 ```
 
+Use `recursivecal verify-rl runs/physical-rl.json --replay` for source-bound regeneration of a complete synthetic RL episode. For inquiries, `recursivecal verify-inquiry runs/physical-inquiry.json --replay` performs the analogous seeded rerun. This optional stronger check rejects source mismatches and compares physical trajectories, observations, and recorded decisions against a fresh execution. It is not independent-implementation validation or hardware validation.
+
 Existing output files require the CLI's explicit overwrite option where applicable. Reports preserve their model identifier. The older force-domain model remains available with `--rig-version 2`; historical evidence is preserved with its original provenance.
 
 ## What remains outside this release
