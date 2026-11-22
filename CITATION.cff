@@ -6,7 +6,7 @@ authors:
   - given-names: "Venkateshwar Reddy"
     family-names: "Jambula"
     website: "https://github.com/Venkat-RJ"
-version: "0.5.0"
+version: "0.5.1"
 date-released: "2026-11-22"
 license: MIT
 repository-code: "https://github.com/Venkat-RJ/RecursiveCal"

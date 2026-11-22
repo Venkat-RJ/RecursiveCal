@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "recursivecal-v1"
-version = "0.5.0"
+version = "0.5.1"
 description = "Reproducible active calibration experiments and a local software-in-the-loop workbench"
 authors = [{name = "Venkateshwar Reddy Jambula"}]
 readme = "README.md"

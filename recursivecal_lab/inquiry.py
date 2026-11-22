@@ -21,7 +21,8 @@ import numpy as np
 
 from .physics import ModelParameters, passive_hold
 from .physical_rig import (CATALOG, MODEL_ID, OBSERVATION_FIELDS, SENSOR_SIGMA, Calibration,
-                           PhysicalRig, RigState, catalog, finite, integer, run_experiment, run_motion)
+                           PhysicalRig, RigState, catalog, finite, integer, run_experiment, run_motion,
+                           smooth_reference)
 
 PROTOCOL_ID = "recursivecal.physical-inquiry/1"
 INFERENCE_SIGMA = np.array([0.004, 0.016, 3.0])
@@ -29,6 +30,12 @@ MAX_TESTS = 5
 BUDGET = 8.0
 ACCEPTANCE = {"tracking_rmse_deg_max": 3.0, "final_error_deg_max": 2.0,
               "peak_speed_rad_s_max": 1.15, "saturation_fraction_max": 0.35}
+VERIFICATION_PROFILES = (
+    ("full_open", 0.0, 78.0, 4.8, 5.8, 20.0),
+    ("full_close", 78.0, 0.0, 5.6, 6.6, 20.0),
+    ("partial_reverse", 64.0, 27.0, 3.1, 4.1, 20.0),
+    ("cold_open", 0.0, 78.0, 5.2, 6.2, -10.0),
+)
 CASE_LABELS = {
     "nominal": "Nominal mechanism", "weak_motor": "Reduced drive effectiveness",
     "payload": "Additional hatch mass", "friction": "Increased hinge friction",
@@ -334,17 +341,179 @@ def _accepted(run: dict[str, Any]) -> bool:
             and m["saturation_fraction"] <= ACCEPTANCE["saturation_fraction_max"])
 
 
+def verification_trace_errors(verification: dict[str, Any], *, model_id: str,
+                              parameters: dict[str, Any], closing_friction_extra_Nm: float = 0.0) -> list[str]:
+    """Check declared profiles and derived metrics without rerunning the plant.
+
+    Version 1 and early version 2 archives did not retain interval saturation
+    flags. Their recorded saturation remains a provenance limitation. Version 3
+    must supply every flag. Internal speed extrema are not all exported, so a
+    trace can establish a lower bound on peak speed, not its exact value.
+    """
+    errors = []
+    if not isinstance(verification, dict):
+        return ["verification must be an object"]
+    if model_id not in {"recursivecal.physical-rig/1", "recursivecal.physical-rig/2", "recursivecal.physical-rig/3"}:
+        return ["unsupported physical model"]
+    parameters = ModelParameters(**parameters).validate()
+    extra = finite(closing_friction_extra_Nm, "closing friction", 0, 1e6)
+    guard_speed = min(1.15, parameters.speed_limit_rad_s)
+    if verification.get("model_id", model_id) != model_id:
+        errors.append("verification model differs from the report")
+    if digest(verification["acceptance_limits"]) != digest(ACCEPTANCE):
+        errors.append("motion acceptance limits differ from the protocol")
+    profiles = {row[0]: row for row in VERIFICATION_PROFILES}
+    comparisons = verification["comparisons"]
+    if len(comparisons) != len(profiles) or {row["name"] for row in comparisons} != set(profiles):
+        return errors + ["independent motion profiles differ from the protocol"]
+    recomputed_rmse = {"before": [], "after": []}
+
+    def number(value: Any) -> bool:
+        return not isinstance(value, bool) and isinstance(value, (float, int)) and math.isfinite(value)
+
+    def check_run(run, prefix, start, target, profile_s, requested_s, temperature, *,
+                  unpowered=False, power_loss_s=None, motion_acceptance=False):
+        rows, metrics = run["trace"], run["metrics"]
+        metric_names = ("tracking_rmse_deg", "final_error_deg", "peak_speed_rad_s", "saturation_fraction",
+                        "completed_duration_s", "mechanical_work_abs_J", "mechanical_work_signed_J")
+        if (any(not number(metrics[key]) for key in metric_names)
+                or metrics["tracking_rmse_deg"] < 0 or metrics["peak_speed_rad_s"] < 0
+                or metrics["mechanical_work_abs_J"] < 0 or not 0 <= metrics["saturation_fraction"] <= 1):
+            errors.append(prefix + "invalid motion metrics")
+            return None
+        fields = ("time_s", "absolute_time_s", "target_angle_rad", "true_angle_rad", "true_velocity_rad_s",
+                  "true_motor_force_N_each", "ambient_temperature_C", "command_N_each")
+        if (len(rows) < 2 or any(not number(row[key]) for row in rows for key in fields)
+                or rows[0]["time_s"] != 0
+                or any(b["time_s"] <= a["time_s"] for a, b in zip(rows, rows[1:]))):
+            errors.append(prefix + "verification trace times or values are invalid")
+            return None
+        elapsed = rows[-1]["time_s"]
+        if (not number(run["duration_s"]) or abs(run["duration_s"] - requested_s) > 1e-9
+                or elapsed > requested_s + 1e-9
+                or abs(elapsed - metrics["completed_duration_s"]) > 1e-9
+                or (metrics["termination"] == "completed" and abs(elapsed - requested_s) > 1e-9)):
+            errors.append(prefix + "duration differs from the declared motion")
+        if (abs(rows[0]["true_angle_rad"] - math.radians(start)) > 1e-9
+                or abs(rows[0]["true_velocity_rad_s"]) > 1e-9
+                or any(abs(row["absolute_time_s"] - row["time_s"]) > 1e-9
+                       or abs(row["ambient_temperature_C"] - temperature) > 1e-9 for row in rows)):
+            errors.append(prefix + "initial state, time or temperature differs from the declared motion")
+        if any(abs(row["target_angle_rad"] - smooth_reference(
+                row["time_s"], math.radians(start), math.radians(target), profile_s)[0]) > 1e-9 for row in rows):
+            errors.append(prefix + "target trajectory differs from the declared motion")
+        integral = sum((b["time_s"] - a["time_s"]) * (a["target_angle_rad"] - a["true_angle_rad"])**2
+                       for a, b in zip(rows, rows[1:]))
+        rmse = math.degrees(math.sqrt(integral / elapsed))
+        if abs(rmse - metrics["tracking_rmse_deg"]) > 1e-7:
+            errors.append(prefix + "tracking metric differs from the complete trace")
+        if abs(target - math.degrees(rows[-1]["true_angle_rad"]) - metrics["final_error_deg"]) > 1e-7:
+            errors.append(prefix + "final error differs from the requested endpoint")
+        flags = [row.get("force_saturated") for row in rows]
+        if model_id == "recursivecal.physical-rig/3" or any("force_saturated" in row for row in rows):
+            if not all(type(flag) is bool for flag in flags):
+                errors.append(prefix + "interval saturation flags are missing or invalid")
+            else:
+                saturation = sum((b["time_s"] - a["time_s"]) * b["force_saturated"]
+                                 for a, b in zip(rows, rows[1:])) / elapsed
+                if abs(saturation - metrics["saturation_fraction"]) > 1e-9:
+                    errors.append(prefix + "saturation differs from the complete trace")
+        for state_name, row in (("initial_state", rows[0]), ("final_state", rows[-1])):
+            state = run[state_name]
+            for key, field in (("time_s", "absolute_time_s"), ("angle_rad", "true_angle_rad"),
+                               ("velocity_rad_s", "true_velocity_rad_s"), ("motor_force_N_each", "true_motor_force_N_each")):
+                if not number(state[key]) or abs(state[key] - row[field]) > 1e-9:
+                    errors.append(prefix + state_name + " differs from its trace endpoint")
+        initial_work, final_work = run["initial_state"]["mechanical_work_abs_J"], run["final_state"]["mechanical_work_abs_J"]
+        if (not number(initial_work) or not number(final_work)
+                or abs(final_work - initial_work - metrics["mechanical_work_abs_J"]) > 1e-7):
+            errors.append(prefix + "absolute work differs from the state history")
+        work_fields = ("left_shaft_work_J", "right_shaft_work_J", "coupling_residual_J")
+        if any(key in row for row in (rows[0], rows[-1]) for key in work_fields):
+            if any(not number(row[key]) for row in (rows[0], rows[-1]) for key in work_fields):
+                errors.append(prefix + "invalid drive work history")
+            else:
+                signed = sum(rows[-1][key] - rows[0][key] for key in work_fields[:2])
+                signed -= rows[-1]["coupling_residual_J"] - rows[0]["coupling_residual_J"]
+                if abs(signed - metrics["mechanical_work_signed_J"]) > 1e-7:
+                    errors.append(prefix + "signed work differs from drive and coupling history")
+        lower_peak = max(abs(row["true_velocity_rad_s"]) for row in rows)
+        events, impact = run["events"], False
+        for event in events:
+            if not number(event["time_s"]) or not -1e-9 <= event["time_s"] <= elapsed + 1e-9:
+                errors.append(prefix + "event time is outside the recorded motion")
+            if event["type"] in ("lower_stop", "upper_stop"):
+                incident = event["incident_speed_rad_s"]
+                if not number(incident) or incident < 0:
+                    errors.append(prefix + "invalid contact speed")
+                else:
+                    lower_peak = max(lower_peak, incident)
+                    impact = impact or incident > 0.12
+        if metrics["peak_speed_rad_s"] + 1e-9 < lower_peak:
+            errors.append(prefix + "peak speed is below a recorded speed")
+        kinds = {event["type"] for event in events}
+        if ("speed_limit" in kinds) != (metrics["peak_speed_rad_s"] > guard_speed):
+            errors.append(prefix + "peak speed contradicts the declared speed guard")
+        expected_termination = ("aborted_speed_limit" if "speed_limit" in kinds else
+                                "aborted_stop_impact" if impact else
+                                "aborted_drive_trip" if "drive_trip" in kinds else "completed")
+        if metrics["termination"] != expected_termination:
+            errors.append(prefix + "termination differs from recorded guard events")
+        losses = [event for event in events if event["type"] == "power_loss"]
+        expected_loss = power_loss_s is not None and elapsed >= power_loss_s
+        if (len(losses) != int(expected_loss)
+                or (expected_loss and abs(losses[0]["time_s"] - power_loss_s) > 1e-9)):
+            errors.append(prefix + "power-loss event differs from the declared schedule")
+        if any((unpowered or power_loss_s is not None and row["time_s"] > power_loss_s + 1e-9)
+               and abs(row["command_N_each"]) > 1e-9 for row in rows):
+            errors.append(prefix + "motor command persists after source disconnection")
+        if motion_acceptance and (type(run["accepted"]) is not bool or run["accepted"] != _accepted(run)):
+            errors.append(prefix + "profile acceptance differs from declared thresholds")
+        return rmse
+
+    for pair in comparisons:
+        name, start, target, profile_s, requested_s, temperature = profiles[pair["name"]]
+        if pair["temperature_C"] != temperature or pair["profile_duration_s"] != profile_s:
+            errors.append(f"{name}: verification conditions differ from the protocol")
+        for label in ("before", "after"):
+            rmse = check_run(pair[label], f"{name}/{label}: ", start, target, profile_s, requested_s,
+                             temperature, motion_acceptance=True)
+            if rmse is not None:
+                recomputed_rmse[label].append(rmse)
+    for label in ("before", "after"):
+        recorded = verification[label + "_mean_rmse_deg"]
+        if (not number(recorded) or len(recomputed_rmse[label]) != len(profiles)
+                or abs(recorded - sum(recomputed_rmse[label]) / len(profiles)) > 1e-7):
+            errors.append(label + " mean tracking error differs from the complete traces")
+    if (type(verification["all_motion_profiles_passed"]) is not bool
+            or verification["all_motion_profiles_passed"] != all(_accepted(pair["after"]) for pair in comparisons)):
+        errors.append("overall motion acceptance differs from the individual profiles")
+    if verification["hardware_validated"] is not False or verification["system_ready_for_hardware"] is not False:
+        errors.append("synthetic verification cannot claim hardware readiness")
+    upper = math.degrees(parameters.max_angle_rad)
+    check_run(verification["passive_hold"]["run"], "passive_hold: ", upper, upper, 0.8, 0.8,
+              parameters.temperature_C, unpowered=True)
+    check_run(verification["power_loss"], "power_loss: ", 55.0, 70.0, 1.7, 2.2,
+              parameters.temperature_C, power_loss_s=0.8)
+    expected_static = passive_hold(replace(parameters,
+        friction_static_Nm=parameters.friction_static_Nm + extra,
+        friction_coulomb_Nm=parameters.friction_coulomb_Nm + extra))
+    static = verification["passive_hold"]["static"]
+    for key, value in expected_static.items():
+        if isinstance(value, bool):
+            if static[key] is not value:
+                errors.append("static passive support differs from disclosed parameters")
+        elif isinstance(value, (int, float)):
+            if not number(static[key]) or abs(static[key] - value) > 1e-8:
+                errors.append("static passive support differs from disclosed parameters")
+    return errors
+
+
 def verify_calibration(parameters: ModelParameters, closing_extra: float, calibration: Calibration, *, seed: int,
                        rig_factory: Callable[..., PhysicalRig] = PhysicalRig) -> dict[str, Any]:
     """Post-commit evaluator with new trajectories, temperatures and sensor seeds."""
-    profiles = (
-        ("full_open", 0.0, 78.0, 4.8, 5.8, 20.0),
-        ("full_close", 78.0, 0.0, 5.6, 6.6, 20.0),
-        ("partial_reverse", 64.0, 27.0, 3.1, 4.1, 20.0),
-        ("cold_open", 0.0, 78.0, 5.2, 6.2, -10.0),
-    )
     comparisons = []
-    for index, (name, start, target, profile, duration, temperature) in enumerate(profiles):
+    for index, (name, start, target, profile, duration, temperature) in enumerate(VERIFICATION_PROFILES):
         pair = {}
         for label, estimate in (("before", Calibration()), ("after", calibration)):
             rig = rig_factory(replace(parameters, temperature_C=temperature), seed=seed + 10000 + index,
@@ -522,28 +691,9 @@ def verify_report(report: Any) -> dict[str, Any]:
         if len(report["agent_history"]) > report["configuration"]["max_tests"]:
             errors.append("diagnostic test count violates protocol")
         Calibration.from_dict(report["commitment"]["estimates"])
-        comparisons = report["verification"]["comparisons"]
-        if len(comparisons) != 4 or {x["name"] for x in comparisons} != {"full_open", "full_close", "partial_reverse", "cold_open"}:
-            errors.append("independent motion profiles differ from the protocol")
-        for pair in comparisons:
-            for side in ("before", "after"):
-                run = pair[side]
-                rows = run["trace"]
-                elapsed = rows[-1]["time_s"]
-                if rows[0]["time_s"] != 0 or elapsed <= 0 or any(b["time_s"] <= a["time_s"] for a,b in zip(rows, rows[1:])):
-                    errors.append("verification trace times are invalid")
-                    continue
-                integral = sum((b["time_s"] - a["time_s"]) * (a["target_angle_rad"] - a["true_angle_rad"])**2
-                               for a, b in zip(rows, rows[1:]))
-                rmse = math.degrees(math.sqrt(integral / elapsed))
-                if abs(rmse - run["metrics"]["tracking_rmse_deg"]) > 1e-7:
-                    errors.append("tracking metric differs from the complete trace")
-                if abs(elapsed - run["metrics"]["completed_duration_s"]) > 1e-9:
-                    errors.append("duration differs from the trace")
-                if run["accepted"] != _accepted(run):
-                    errors.append("profile acceptance differs from declared thresholds")
-        if report["verification"]["all_motion_profiles_passed"] != all(_accepted(item["after"]) for item in comparisons):
-            errors.append("overall motion acceptance differs from the individual profiles")
+        errors.extend(verification_trace_errors(report["verification"], model_id=report["model_id"],
+                      parameters=report["evaluator_only_truth"]["parameters"],
+                      closing_friction_extra_Nm=report["evaluator_only_truth"]["closing_friction_extra_Nm"]))
         expected = "verified_in_simulation" if report["commitment"]["disposition"] == "candidate" and all(
             _accepted(item["after"]) for item in report["verification"]["comparisons"]) else (
                 "verification_failed" if report["commitment"]["disposition"] == "candidate" else "abstained")
@@ -554,8 +704,9 @@ def verify_report(report: Any) -> dict[str, Any]:
                 if set(sample) - {"sample_time_s", "time_s", "sensor_sample_time_s", "sensor_age_s",
                                   "ambient_temperature_C", *OBSERVATION_FIELDS}:
                     errors.append("unexpected agent observation field")
-    except (KeyError, IndexError, TypeError, ValueError, OverflowError) as exc:
+    except (KeyError, IndexError, TypeError, ValueError, OverflowError, AttributeError, RecursionError) as exc:
         errors.append(f"invalid report content: {exc}")
     return {"valid": not errors, "errors": errors, "model_id": report.get("model_id"),
             "report_sha256": report.get("report_sha256"),
-            "scope": "Integrity and protocol checks, not a scientific result replication or authenticity signature."}
+            "scope": "Integrity and protocol checks, not a scientific result replication or authenticity signature. "
+                     "Legacy rig 1/2 reports without interval saturation flags retain their recorded saturation fractions."}

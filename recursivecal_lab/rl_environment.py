@@ -15,8 +15,9 @@ from pathlib import Path
 import random
 from typing import Any, Callable
 
-from .inquiry import ACCEPTANCE, InquirySession, digest, public_result, verify_calibration
-from .physical_rig import CATALOG, Calibration, RigState, finite, integer
+from .inquiry import (ACCEPTANCE, VERIFICATION_PROFILES, InquirySession, digest, public_result,
+                      verification_trace_errors, verify_calibration)
+from .physical_rig import CATALOG, OBSERVATION_FIELDS, Calibration, RigState, catalog, finite, integer
 from .physics import ModelParameters
 
 TASK_ID = "recursivecal.physical-calibration-rl/1"
@@ -44,8 +45,8 @@ MAX_TURNS = 8  # Five tests, up to two invalid turns, and one terminal decision.
 TEST_COST_WEIGHT = 0.012
 REJECTED_COMMIT_PENALTY = 1.0
 FORCED_END_PENALTY = 1.0
-PROFILE_NAMES = ("full_open", "full_close", "partial_reverse", "cold_open")
-PROFILE_TARGET_DEGREES = {"full_open": 78.0, "full_close": 0.0, "partial_reverse": 27.0, "cold_open": 78.0}
+PROFILE_NAMES = tuple(row[0] for row in VERIFICATION_PROFILES)
+PROFILE_TARGET_DEGREES = {row[0]: row[2] for row in VERIFICATION_PROFILES}
 
 
 def _seed(*parts: Any, reserve: int = 0) -> int:
@@ -186,30 +187,6 @@ def _motion_accepted(run: dict[str, Any]) -> bool:
             and abs(m["final_error_deg"]) <= ACCEPTANCE["final_error_deg_max"]
             and m["peak_speed_rad_s"] <= ACCEPTANCE["peak_speed_rad_s_max"]
             and m["saturation_fraction"] <= ACCEPTANCE["saturation_fraction_max"])
-
-
-def _trace_metrics_consistent(run: dict[str, Any], final_target_deg: float) -> bool:
-    """Recompute score-driving tracking values from the complete sealed trace."""
-    rows, metrics = run["trace"], run["metrics"]
-    if len(rows) < 2 or rows[0]["time_s"] != 0:
-        return False
-    for row in rows:
-        for name in ("time_s", "target_angle_rad", "true_angle_rad", "true_velocity_rad_s"):
-            if isinstance(row[name], bool) or not isinstance(row[name], (float, int)) or not math.isfinite(row[name]):
-                return False
-    if any(b["time_s"] <= a["time_s"] for a, b in zip(rows, rows[1:])):
-        return False
-    duration = rows[-1]["time_s"]
-    integral = sum((b["time_s"] - a["time_s"]) * (a["target_angle_rad"] - a["true_angle_rad"])**2
-                   for a, b in zip(rows, rows[1:]))
-    rmse = math.degrees(math.sqrt(integral / duration))
-    # An aborted run has not yet reached the target reference. Its final error
-    # is against the profile's requested endpoint, not its intermediate target.
-    final_error = final_target_deg - math.degrees(rows[-1]["true_angle_rad"])
-    return (abs(rmse - metrics["tracking_rmse_deg"]) < 1e-7
-            and abs(final_error - metrics["final_error_deg"]) < 1e-7
-            and abs(duration - metrics["completed_duration_s"]) < 1e-9
-            and metrics["peak_speed_rad_s"] + 1e-9 >= max(abs(row["true_velocity_rad_s"]) for row in rows))
 
 
 def reward_components(verification: dict[str, Any], cost: float, *, disposition: str,
@@ -419,6 +396,109 @@ class PhysicalCalibrationEnv:
         return deepcopy(self.__report)
 
 
+def _public_measurement_consistent(row: dict[str, Any], temperature: float) -> bool:
+    required = {"time_s", "ambient_temperature_C", "sensor_sample_time_s", "sensor_age_s", *OBSERVATION_FIELDS}
+    if not required <= set(row) <= required | {"sample_time_s"}:
+        return False
+    if any(isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value)
+           for value in row.values()):
+        return False
+    return (row["time_s"] >= 0 and row["sensor_sample_time_s"] >= 0 and row["sensor_age_s"] >= -1e-9
+            and row["sensor_sample_time_s"] <= row["time_s"] + 1e-9
+            and abs(row["time_s"] - row["sensor_sample_time_s"] - row["sensor_age_s"]) <= 1e-9
+            and abs(row["ambient_temperature_C"] - temperature) <= 1e-9
+            and ("sample_time_s" not in row or 0 <= row["sample_time_s"] <= row["time_s"] + 1e-9))
+
+
+def _policy_transcript_errors(report: dict[str, Any]) -> list[str]:
+    """Rebuild every public view from the initial instrument and causal history.
+
+    This rejects private fields and contradictory budgets/timing. It cannot
+    authenticate observations or establish their physical truth without replay.
+    """
+    errors = []
+    transcript, actions = report["policy_transcript"], report["actions"]
+    history, diagnostics = report["session"]["agent_history"], report["session"]["diagnostics"]
+    measurement = transcript[0]["observation"]["measurement"]
+    temperature = report["episode"]["parameters"]["temperature_C"]
+    if (not _public_measurement_consistent(measurement, temperature)
+            or measurement["time_s"] != 0 or measurement["sensor_sample_time_s"] != 0
+            or measurement["sensor_age_s"] != 0):
+        return ["initial_policy_measurement"]
+    seen, invalid, cost, aborted = [], 0, 0.0, False
+    legal = [name for name, action in CATALOG.items()
+             if report["max_tests"] > 0 and action.cost <= report["budget"] + 1e-10]
+    for index, item in enumerate(transcript):
+        if index:
+            action = actions[index - 1]
+            if action["kind"] == "experiment":
+                if action["value"] not in legal:
+                    errors.append("policy_illegal_experiment")
+                record, private = history[len(seen)], diagnostics[len(seen)]
+                if digest(record["start_observation"]) != digest(measurement):
+                    errors.append("policy_measurement_continuity")
+                began, elapsed = measurement["time_s"], record["elapsed_s"]
+                finite(elapsed, "diagnostic elapsed time", 0, CATALOG[action["value"]].duration_s + 1e-9)
+                if elapsed <= 0:
+                    errors.append("diagnostic_timing")
+                readings = [*record["observations"], record["final_observation"]]
+                previous_time, previous_acquisition = began, measurement["sensor_sample_time_s"]
+                for reading in readings:
+                    if not _public_measurement_consistent(reading, temperature):
+                        errors.append("policy_measurement_fields")
+                        continue
+                    if (reading["time_s"] < previous_time - 1e-9
+                            or reading["time_s"] > began + elapsed + 1e-9
+                            or reading["sensor_sample_time_s"] < previous_acquisition - 1e-9
+                            or ("sample_time_s" in reading
+                                and abs(reading["time_s"] - began - reading["sample_time_s"]) > 1e-9)):
+                        errors.append("diagnostic_timing")
+                    previous_time, previous_acquisition = reading["time_s"], reading["sensor_sample_time_s"]
+                if (abs(record["final_observation"]["time_s"] - began - elapsed) > 1e-9
+                        or abs(private["initial_state"]["time_s"] - began) > 1e-9
+                        or abs(private["final_state"]["time_s"] - began - elapsed) > 1e-9):
+                    errors.append("diagnostic_timing")
+                for event in record["events"]:
+                    if (set(event) != {"time_s", "type"}
+                            or event["type"] not in {"external_fixture", "lower_stop", "upper_stop",
+                                                    "speed_limit", "drive_trip", "power_loss"}):
+                        errors.append("policy_event_fields")
+                    finite(event["time_s"], "event time", -1e-9, elapsed + 1e-9)
+                seen.append(record)
+                cost += CATALOG[action["value"]].cost
+                measurement = record["final_observation"]
+                aborted = record["termination"] != "completed"
+            elif action["kind"] == "invalid":
+                invalid += 1
+        terminal = index == len(actions)
+        legal = ([] if terminal or aborted or len(seen) >= report["max_tests"] else
+                 [name for name, action in CATALOG.items() if action.cost <= report["budget"] - cost + 1e-10])
+        expected_view = {
+            "schema_version": "recursivecal.agent-observation/1", "model_id": MODEL_ID,
+            "measurement": measurement, "history": seen, "catalog": catalog(),
+            "legal_actions": legal, "can_commit": not terminal,
+            "tests_remaining": report["max_tests"] - len(seen), "cost_used": cost,
+            "budget_remaining": report["budget"] - cost, "task_id": TASK_ID,
+            "status": "terminated" if terminal else "active",
+            "invalid_actions_remaining": MAX_INVALID_ACTIONS - invalid,
+            "turns_remaining": max(0, report["max_tests"] + MAX_INVALID_ACTIONS + 1 - index),
+            "calibration_bounds": {name: list(bounds) for name, bounds in CALIBRATION_BOUNDS.items()},
+        }
+        info = {"task_id": TASK_ID, "model_id": MODEL_ID}
+        if terminal:
+            info["completion_reason"] = report["completion_reason"]
+        elif index and actions[index - 1]["kind"] == "invalid":
+            info["error"] = "invalid_action"
+        expected_item = {"kind": "reset" if index == 0 else "step", "observation": expected_view, "info": info}
+        if index:
+            expected_item.update(action=actions[index - 1], reward=report["score"]["reward"] if terminal else 0.0,
+                                 terminated=report["terminated"] if terminal else False,
+                                 truncated=report["truncated"] if terminal else False)
+        if digest(item) != digest(expected_item):
+            errors.append("policy_observation_contract")
+    return errors
+
+
 def verify_episode_report(report: dict[str, Any]) -> dict[str, Any]:
     """Check integrity and protocol consistency; this does not rerun the physics."""
     failures = []
@@ -514,17 +594,11 @@ def verify_episode_report(report: dict[str, Any]) -> dict[str, Any]:
         if ((reason == "diagnostic_aborted" and (not history or aborted != [len(history) - 1]))
                 or (reason != "diagnostic_aborted" and aborted)):
             failures.append("diagnostic_termination")
+        failures.extend(_policy_transcript_errors(report))
         verification = report["verification"]
-        for row in verification["comparisons"]:
-            for label in ("before", "after"):
-                if row[label]["accepted"] != _motion_accepted(row[label]):
-                    failures.append("acceptance")
-                if not _trace_metrics_consistent(row[label], PROFILE_TARGET_DEGREES[row["name"]]):
-                    failures.append("verification_trace")
-        if verification["all_motion_profiles_passed"] != all(_motion_accepted(row["after"]) for row in verification["comparisons"]):
-            failures.append("overall_acceptance")
-        if verification["model_id"] != MODEL_ID:
-            failures.append("physical_model")
+        if verification_trace_errors(verification, model_id=MODEL_ID, parameters=episode["parameters"],
+                                     closing_friction_extra_Nm=episode["closing_friction_extra_Nm"]):
+            failures.append("verification_trace")
         expected_score = reward_components(verification, expected_cost,
                                             disposition=commitment["disposition"], forced_end=forced)
         if report["score"] != expected_score:
@@ -535,7 +609,7 @@ def verify_episode_report(report: dict[str, Any]) -> dict[str, Any]:
             failures.append("terminal_transcript")
         if report["hardware_validated"] is not False or verification["hardware_validated"] is not False:
             failures.append("hardware_claim")
-    except (ValueError, TypeError, KeyError, AttributeError, OverflowError, IndexError):
+    except (ValueError, TypeError, KeyError, AttributeError, OverflowError, IndexError, RecursionError):
         failures.append("invalid_report")
     return {"valid": not failures, "failures": sorted(set(failures)),
             "scope": "Integrity and protocol consistency; not independent physical replay or authorship authentication."}

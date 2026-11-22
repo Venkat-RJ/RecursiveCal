@@ -26,7 +26,7 @@ Python 3.11 or later:
 ```bash
 git clone https://github.com/Venkat-RJ/RecursiveCal.git
 cd RecursiveCal
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e .
 recursivecal doctor
@@ -179,7 +179,7 @@ If you use RecursiveCal in your research or build on the code, please cite it:
 @software{Jambula_RecursiveCal_2026,
   author = {Jambula, Venkateshwar Reddy},
   title = {{RecursiveCal: Reproducible Active Calibration and a Software-in-the-Loop Workbench}},
-  version = {0.5.0},
+  version = {0.5.1},
   year = {2026},
   month = nov,
   url = {https://github.com/Venkat-RJ/RecursiveCal},

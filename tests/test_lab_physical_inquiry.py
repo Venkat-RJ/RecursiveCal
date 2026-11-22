@@ -210,6 +210,57 @@ class EndToEndTests(unittest.TestCase):
         altered['report_sha256'] = digest({k:v for k,v in altered.items() if k != 'report_sha256'})
         self.assertFalse(verify_report(altered)['valid'])
 
+    def test_rehashed_endpoint_metrics_cannot_promote_failed_verification(self):
+        altered = deepcopy(self.compound)
+        cold = next(pair for pair in altered['verification']['comparisons'] if pair['name'] == 'cold_open')
+        cold['after']['metrics']['final_error_deg'] = 0.
+        cold['after']['accepted'] = True
+        altered['verification']['all_motion_profiles_passed'] = True
+        altered['outcome'] = 'verified_in_simulation'
+        altered['report_sha256'] = digest({k:v for k,v in altered.items() if k != 'report_sha256'})
+        checked = verify_report(altered)
+        self.assertFalse(checked['valid'])
+        self.assertTrue(any('final error' in error for error in checked['errors']))
+
+    def test_rehashed_reference_curve_cannot_hide_tracking_error(self):
+        altered = deepcopy(self.weak)
+        after = altered['verification']['comparisons'][0]['after']
+        for row in after['trace']:
+            row['target_angle_rad'] = row['true_angle_rad']
+        after['metrics']['tracking_rmse_deg'] = 0.
+        altered['verification']['after_mean_rmse_deg'] = sum(
+            pair['after']['metrics']['tracking_rmse_deg'] for pair in altered['verification']['comparisons']) / 4
+        altered['report_sha256'] = digest({k:v for k,v in altered.items() if k != 'report_sha256'})
+        checked = verify_report(altered)
+        self.assertFalse(checked['valid'])
+        self.assertTrue(any('target trajectory' in error for error in checked['errors']))
+
+    def test_rehashed_auxiliary_and_guard_evidence_must_remain_consistent(self):
+        def fake_peak(report):
+            before = report['verification']['comparisons'][0]['before']
+            before['metrics']['peak_speed_rad_s'] = 1.2
+            before['accepted'] = False
+
+        mutations = {
+            'peak_guard': fake_peak,
+            'state_snapshot': lambda r: r['verification']['comparisons'][0]['after']['final_state'].update(angle_rad=.2),
+            'static_margin': lambda r: r['verification']['passive_hold']['static'].update(holding_margin_Nm=-999),
+            'static_boolean': lambda r: r['verification']['passive_hold']['static'].update(can_hold_open_without_motor=True),
+            'power_loss_metric': lambda r: r['verification']['power_loss']['metrics'].update(tracking_rmse_deg=0),
+            'power_loss_event': lambda r: r['verification']['power_loss'].update(events=[]),
+            'passive_metric': lambda r: r['verification']['passive_hold']['run']['metrics'].update(final_error_deg=0),
+            'acceptance_limits': lambda r: r['verification']['acceptance_limits'].update(final_error_deg_max=999),
+            'temperature': lambda r: r['verification']['comparisons'][0].update(temperature_C=-10),
+            'duration': lambda r: r['verification']['comparisons'][0]['after'].update(duration_s=1),
+            'malformed_verification': lambda r: r.update(verification=[]),
+        }
+        for name, mutate in mutations.items():
+            with self.subTest(name=name):
+                altered = deepcopy(self.weak)
+                mutate(altered)
+                altered['report_sha256'] = digest({k:v for k,v in altered.items() if k != 'report_sha256'})
+                self.assertFalse(verify_report(altered)['valid'])
+
     def test_posterior_replays_from_measurements_without_truth(self):
         report = self.weak
         replay = BayesianInvestigator(report['initial_observation']['measurement'], seed=7)

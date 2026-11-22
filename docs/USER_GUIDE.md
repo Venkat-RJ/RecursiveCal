@@ -7,7 +7,7 @@ RecursiveCal provides a synthetic physical liftgate workspace, an observation-on
 Use Python 3.11 or later. From a checkout of this repository:
 
 ```bash
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e .
 recursivecal doctor

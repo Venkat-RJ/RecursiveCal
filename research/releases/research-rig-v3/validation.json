@@ -13,10 +13,10 @@
   "convergence_scope": "PI voltage is held between internal updates. State accuracy is measured by refinement; global second-order convergence is not asserted.",
   "full_report": {
     "path": "validation.json.gz",
-    "sha256": "a9f905e030eb1d2ac6d23b797fbe757c9bb527236d7a2a80b7fae5fd9b1efe04",
-    "size_bytes": 633489,
-    "uncompressed_sha256": "4c4b6798a834a2d906281e7887002fd0c666f2454c74df066588d1769d49d947",
-    "uncompressed_size_bytes": 3720179
+    "sha256": "504600934fdb7c112439f8c08cc495a5b7b30920b02264299953b263cca99812",
+    "size_bytes": 633507,
+    "uncompressed_sha256": "96b45444b5321835eadbc7001e1802bda4139c22e0eb07749af32aa486a8631c",
+    "uncompressed_size_bytes": 3720178
   },
   "gates": {
     "all_motion_electrical_energy_identities_hold": true,
@@ -486,7 +486,7 @@
     "numpy": "2.3.5",
     "python": "3.12.14",
     "scipy": "1.17.0",
-    "wall_time_s": 17.038055163000536
+    "wall_time_s": 17.18006954199882
   },
   "schema_version": "recursivecal.research-rig-validation-summary/1",
   "scope": "Numerical verification of specified synthetic DC-drive equations and finite development conditions. No measured hardware validation or worst-case bound over all accepted inputs.",
@@ -515,7 +515,7 @@
     }
   ],
   "source_sha256": {
-    "recursivecal_lab/inquiry.py": "54ce5d04ebab38d9a50f92f7ae90eeed29defe1939870a3e724ba6660ffc850f",
+    "recursivecal_lab/inquiry.py": "f16c49711fd26ca5dccdf9c758ca6758390c700f53994daf98632d4c11e450a6",
     "recursivecal_lab/physical_rig.py": "b1964498dc1aace4fb1f0dfe49336d47c20f16956fce0059835df7549651e984",
     "recursivecal_lab/physics.py": "0aaa356e6d7dfb794f74a46097b7b06c7ab116a731b632cec7ce48f2e9302ec8",
     "recursivecal_lab/research_rig.py": "a5490484df5c8f11debf22e4497640c09eed735eb277ed46c26c0dd35a46643c",
@@ -523,7 +523,7 @@
     "scripts/validate_research_rig.py": "66f43f31c8283311d898f763df80b7fa7a51b4ce839737591f92dc592c91b992"
   },
   "source_sha256_after_audit": {
-    "recursivecal_lab/inquiry.py": "54ce5d04ebab38d9a50f92f7ae90eeed29defe1939870a3e724ba6660ffc850f",
+    "recursivecal_lab/inquiry.py": "f16c49711fd26ca5dccdf9c758ca6758390c700f53994daf98632d4c11e450a6",
     "recursivecal_lab/physical_rig.py": "b1964498dc1aace4fb1f0dfe49336d47c20f16956fce0059835df7549651e984",
     "recursivecal_lab/physics.py": "0aaa356e6d7dfb794f74a46097b7b06c7ab116a731b632cec7ce48f2e9302ec8",
     "recursivecal_lab/research_rig.py": "a5490484df5c8f11debf22e4497640c09eed735eb277ed46c26c0dd35a46643c",
