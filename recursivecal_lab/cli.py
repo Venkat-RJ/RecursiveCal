@@ -78,9 +78,13 @@ def parser() -> argparse.ArgumentParser:
     _output(rollout)
     check_rl = commands.add_parser("verify-rl", help="verify a sealed physical RL episode and its terminal reward")
     check_rl.add_argument("report", type=Path)
+    check_rl.add_argument("--replay", action="store_true",
+                          help="re-run the source-matched synthetic episode and compare all evidence")
     commands.add_parser("rl-schema", help="print the versioned physical observation/action/reward contract")
     check = commands.add_parser("verify-inquiry", help="check a physical inquiry report's integrity and protocol")
     check.add_argument("report", type=Path)
+    check.add_argument("--replay", action="store_true",
+                       help="re-run the source-matched synthetic investigation and compare all evidence")
     web = commands.add_parser("serve", help="serve the workbench in the foreground on loopback")
     web.add_argument("--host", choices=["127.0.0.1", "localhost"], default="127.0.0.1")
     web.add_argument("--port", type=int, default=8765)
@@ -151,12 +155,18 @@ def main(argv: list[str] | None = None) -> int:
                               "reward": result.get("score", {}).get("reward"), "hardware_validated": False}, indent=2, allow_nan=False))
             return 0
         if args.command == "verify-inquiry":
-            from .inquiry import verify_report
+            if args.replay:
+                from .evidence_replay import verify_inquiry_replay as verify_report
+            else:
+                from .inquiry import verify_report
             result = verify_report(read_json(args.report, max_bytes=MAX_REPORT_BYTES))
             print(json.dumps(result, indent=2, allow_nan=False))
             return 0 if result["valid"] else 1
         if args.command == "verify-rl":
-            from .rl_environment import verify_episode_report
+            if args.replay:
+                from .evidence_replay import verify_rl_replay as verify_episode_report
+            else:
+                from .rl_environment import verify_episode_report
             result = verify_episode_report(read_json(args.report, max_bytes=MAX_REPORT_BYTES))
             print(json.dumps(result, indent=2, allow_nan=False))
             return 0 if result["valid"] else 1
