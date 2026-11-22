@@ -179,7 +179,7 @@ If you use RecursiveCal in your research or build on the code, please cite it:
 @software{Jambula_RecursiveCal_2026,
   author = {Jambula, Venkateshwar Reddy},
   title = {{RecursiveCal: Reproducible Active Calibration and a Software-in-the-Loop Workbench}},
-  version = {0.5.1},
+  version = {0.5.2},
   year = {2026},
   month = nov,
   url = {https://github.com/Venkat-RJ/RecursiveCal},
