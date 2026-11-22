@@ -1,0 +1,96 @@
+name: RecursiveCal sequential inquiry research gate
+
+on:
+  push:
+    branches: ['research/sequential-inquiry-v0']
+    paths:
+      - 'research/sequential_inquiry/**'
+      - 'tests/test_*inquiry.py'
+      - 'tests/test_*stateful*.py'
+      - '.github/workflows/sequential-inquiry.yml'
+  pull_request:
+    paths:
+      - 'research/sequential_inquiry/**'
+      - 'tests/test_*inquiry.py'
+      - 'tests/test_*stateful*.py'
+      - '.github/workflows/sequential-inquiry.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sequential-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install explicit CPU numerical dependency
+        run: python -m pip install 'numpy==2.3.5'
+      - name: Run observation, model, optimizer, and replay contracts
+        run: |
+          python -m unittest discover -s tests -p 'test_*inquiry.py' -v
+          python -m unittest discover -s tests -p 'test_*stateful*.py' -v
+      - name: Exploratory independent-reset sequential baseline
+        run: |
+          python -m research.sequential_inquiry.benchmark \
+            --train 256 --validation 128 --test 64 --quadrature 5 \
+            --output artifacts/sequential-inquiry-v0
+      - name: Exploratory stateful Bayesian and misspecified comparison
+        run: |
+          python -m research.sequential_inquiry.bayes_stateful \
+            --particles 32 --train 64 --validation 24 --test 32 --samples 32 \
+            --output artifacts/stateful-bayes-v0
+      - name: Exploratory multi-seed RL experiment selector
+        run: |
+          python -m research.sequential_inquiry.train_rl \
+            --particles 32 --episodes 800 --validation 24 --test 32 \
+            --seeds 13 37 103 --output artifacts/stateful-rl-v0
+      - name: Verify output hashes, legal actions, and paired seed ranges
+        run: |
+          python - <<'PY'
+          import csv, hashlib, json, math
+          from pathlib import Path
+          root = Path('artifacts')
+          first = root / 'sequential-inquiry-v0'
+          first_summary = json.loads((first/'summary.json').read_text())
+          rows = list(csv.DictReader((first/'episodes.csv').open()))
+          assert len(rows) == 5*3*64
+          assert hashlib.sha256((first/'episodes.csv').read_bytes()).hexdigest() == first_summary['episodes_sha256']
+          assert all(math.isfinite(float(r['reward'])) and float(r['cost']) <= 3.5 and int(r['probes']) <= 3 for r in rows)
+          bayes = root / 'stateful-bayes-v0'
+          b = json.loads((bayes/'summary.json').read_text())
+          assert b['test_cases_per_cohort'] == 32 and b['test_seed_range_start'] == 20000
+          assert hashlib.sha256((bayes/'episodes.json').read_bytes()).hexdigest() == b['episodes_sha256']
+          episode_rows = json.loads((bayes/'episodes.json').read_text())
+          assert len(episode_rows) == 2*4*32
+          rl = root / 'stateful-rl-v0'
+          e = json.loads((rl/'summary.json').read_text())
+          assert e['test_n_per_cohort'] == 32 and e['test_seed_range_start'] == 20000
+          assert len(e['seed_results']) == 3
+          for name, expected in e['artifact_sha256'].items():
+              assert hashlib.sha256((rl/name).read_bytes()).hexdigest() == expected
+          for seed in (13, 37, 103):
+              for cohort in ('finite_test', 'directional_shift'):
+                  episodes = json.loads((rl/f'episodes_{cohort}_{seed}.json').read_text())
+                  assert len(episodes) == 32
+                  assert [row['seed'] for row in episodes] == list(range(20000,20032))
+                  assert all(len(r['measurements']) == len(r['actions']) == r['probes'] <= 3
+                             and r['cost'] <= 3.5 and math.isfinite(r['reward'])
+                             for r in episodes)
+          for cohort in ('finite_test', 'directional_shift'):
+              print('COHORT', cohort, {p:round(v['mean_reward'],6) for p,v in b['results'][cohort].items()})
+              for result in e['seed_results']:
+                  print('RL',result['seed'],cohort,round(result['test'][cohort]['mean_reward'],6))
+          print('INTEGRITY PASS: independent reset + stateful Bayesian + multi-seed RL; exploratory only')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recursivecal-sequential-stateful-research-v0
+          path: artifacts/
+          if-no-files-found: ignore
+          retention-days: 30
