@@ -103,7 +103,7 @@ recursivecal rl-rollout --split test --seed 7 --policy fixed \
 recursivecal verify-rl runs/physical-rl.json
 ```
 
-This task runs research rig 3. The policy selects a legal experiment, commits one calibration, or abstains. Reward is produced only after commitment and independent verification. Training, validation and test use disjoint parameter-cell assignments; `--split ood` adds declared structural changes. The rollout command exercises the fixed or no-probe baseline. It does not train a learned policy or establish learned superiority. `verify-rl` checks the saved episode, protocol and terminal scoring. The full completed report is evaluator evidence and must not be fed back as a pre-commit observation.
+This task runs research rig 3. The policy selects a legal experiment, commits one calibration, or abstains. Reward is produced only after commitment and independent verification. Training, validation and test use disjoint parameter-cell assignments; `--split ood` adds declared structural changes. The rollout command exercises the fixed or no-probe baseline. It does not train a learned policy or establish learned superiority. `verify-rl` checks the saved episode, protocol and terminal scoring. Add `--replay` to rerun a source-matched synthetic episode and compare all recorded evidence; this costs more computation and cannot establish hardware accuracy. `verify-inquiry` supports the same optional flag. The full completed report is evaluator evidence and must not be fed back as a pre-commit observation.
 
 ## Fit a force curve and use it
 

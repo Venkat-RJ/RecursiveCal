@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "recursivecal-v1"
-version = "0.5.1"
+version = "0.5.2"
 description = "Reproducible active calibration experiments and a local software-in-the-loop workbench"
 authors = [{name = "Venkateshwar Reddy Jambula"}]
 readme = "README.md"
 requires-python = ">=3.11"
-license = {text = "MIT"}
+license = "MIT"
 dependencies = ["numpy>=1.24,<3"]
 
 [project.scripts]

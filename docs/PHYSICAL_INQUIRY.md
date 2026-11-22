@@ -162,7 +162,9 @@ Reports contain the complete diagnostic history, decision scores, conditional po
 
 `verify-inquiry` and the workspace importer check the prescribed verification profiles, target trajectories and recording durations. They derive tracking RMSE and signed final error from the motion trace, check recorded speed and guard evidence, and check saturation accounting where the model's trace contract records it. They then check acceptance, aggregate metrics and the reported outcome. The CLI also checks the committed history and diagnostic budget. Recomputing a digest after changing a summary metric does not bypass those consistency checks.
 
-Archived model 1 and early model 2 traces may omit interval saturation flags. Their recorded saturation fraction cannot be independently reconstructed from the available trace, so verification has explicitly narrower coverage for that legacy field. Model 3 requires the flags. A valid report remains a consistency result, not an authorship signature, an independent simulator replay, or proof of measured physical accuracy.
+Use `recursivecal verify-inquiry runs/weak-motor.json --replay` to rerun an inquiry against the same source revision, case, seed and policy, then compare the complete diagnostic and verification evidence. This is slower than the normal consistency check. Source revision mismatches are rejected, including older archives that need their original source checkout. Replay still does not establish authorship or measured-hardware accuracy.
+
+Archived model 1 and early model 2 traces may omit interval saturation flags. Their recorded saturation fraction cannot be independently reconstructed from the available trace, so normal verification has explicitly narrower coverage for that legacy field. Model 3 requires the flags. A valid report remains a consistency result unless source-bound replay is explicitly requested.
 
 The CAD renderer and mesh are copied byte-for-byte from the authored assembly and checked against their source by `scripts/check_release.py`. The small browser geometry adapter only moves that assembly using stored hinge angles. It contains no second dynamics engine.
 
