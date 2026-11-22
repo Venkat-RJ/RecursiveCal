@@ -1,8 +1,10 @@
 # RecursiveCal: learn the machine
 
+The default CLI and workspace now select [research rig 3](RESEARCH_RIG.md). The observation/commitment protocol below is shared across versions. Use `run_study(rig_version=3)` in Python or `--rig-version 3` in the CLI. The earlier force-domain rig remains available with version 2. Version 3 replaces the motor-force lag and ideal control sensor with DC drives and sampled instrumentation, and adds an explicit spring-applied brake.
+
 RecursiveCal's central system is an investigator coupled to a physical simulator. The investigator chooses an experiment, receives instrument readings, revises its belief, and eventually commits a calibration. A separate evaluator then tests that commitment on new trajectories. The evaluator can reject the calibration even when the diagnosis is correct.
 
-The connected foundation is implemented in `physical_rig.py` and `inquiry.py`, with a CAD workbench at `/inquiry.html`. Its current identifiers are `recursivecal.physical-rig/2` and `recursivecal.physical-inquiry/1`. The report protocol is unchanged; the mechanics are versioned separately. Archived rig `/1` evidence remains attached to its original source revision. See [physics validation](PHYSICS_VALIDATION.md) for the current mechanical checks.
+The connected foundation is implemented in `physical_rig.py`, `research_rig.py` and `inquiry.py`, with the physical workspace at `/`. The new rig identifier is `recursivecal.physical-rig/3`; both current rigs use the `recursivecal.physical-inquiry/1` evidence contract. The report protocol is unchanged; the mechanics are versioned separately. Archived rig `/1` evidence remains attached to its original source revision. See [physics validation](PHYSICS_VALIDATION.md) for the current mechanical checks.
 
 ## Run the complete loop
 
@@ -18,7 +20,9 @@ Open `http://127.0.0.1:8765/inquiry.html`. The CLI logs each actual test in the 
 
 The browser can run new investigations against the local API, import and export complete reports, replay the authored CAD assembly before and after calibration, inspect the investigator's journal, and review every independent motion check. The packaged recorded investigation is explicitly labeled as saved evidence. It does not run new physics in JavaScript.
 
-## The physical model
+## The retained version 2 physical model
+
+The mechanics and existing Bayesian calibration fields below remain shared. Read the [version 3 specification](RESEARCH_RIG.md) for its drive, sensor, brake and numerical definitions. Statements about an ideal sensor, force lag or absent electrical model below describe version 2.
 
 The plant is a rigid liftgate with one rotational degree of freedom and two identical powered struts. It shares the authored CAD mount geometry with the existing SI model. The force-to-torque conversion uses the derivative of strut length with respect to hinge angle, so the mechanical advantage changes through the stroke.
 
@@ -62,10 +66,11 @@ Existing CSV force fitting and trajectory comparison remain available in the Mod
 
 ```python
 from dataclasses import asdict
-from recursivecal_lab.physical_rig import PhysicalRig, Calibration
+from recursivecal_lab.physical_rig import Calibration
+from recursivecal_lab.research_rig import ResearchRig
 from recursivecal_lab.inquiry import InquirySession
 
-session = InquirySession(PhysicalRig(), max_tests=5, budget=8)
+session = InquirySession(ResearchRig(), max_tests=5, budget=8)
 view = session.observe()
 view = session.step("high_sweep")
 commitment = session.commit(asdict(Calibration()), disposition="abstain",
@@ -86,7 +91,7 @@ After commitment, no further diagnostic steps or replacement commitment are allo
 | `high_sweep` | Smooth command to 60 degrees | 2.4 s | 2.4 |
 | `mid_sweep` | Smooth command to 40 degrees | 1.8 s | 1.8 |
 | `hold` | Hold the current measured angle | 0.7 s | 0.7 |
-| `coast` | Remove motor demand while force decays with lag | 0.18 s | 0.8 |
+| `coast` | Disconnect the drive supply and observe the unpowered response | 0.18 s | 0.8 |
 | `reference` | External 20-degree encoder fixture check | 0.1 s | 1.5 |
 
 These costs are declared protocol units including setup assumptions. They are neither financial costs nor a claim that every fixture can be repositioned in 0.1 physical seconds. Fixture repositioning is externally supplied and outside the actuator trajectory. The following stationary fixture interval acquires three observations at their actual recorded times. The default budget is 8 units with at most five tests. API bounds are 12 units and six tests.

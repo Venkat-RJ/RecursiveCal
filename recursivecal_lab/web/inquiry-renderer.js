@@ -5,6 +5,28 @@
 'use strict';
 const P=global.RecursivePhysics;const CAD=global.RecursiveCAD;
 const PI=Math.PI;
+const CAMERA_SCHEMA='recursivecal.inspection-camera/1';
+const CAMERA_LIMITS=Object.freeze({distance:[.8,11],elevation:[-.35,PI/2],fov:[25,70],target:[[-3,3],[-3,3],[-.5,4.5]]});
+const CAMERA_BASE={
+ assembly:{yaw:.73,elevation:.34,distance:3.45,target:[-.12,0,1.27]},
+ mechanism:{yaw:.78,elevation:.25,distance:2.75,target:[-.18,0,1.32]}
+};
+const bounded=(v,range)=>Math.min(range[1],Math.max(range[0],v));
+const wrapAngle=v=>Math.atan2(Math.sin(v),Math.cos(v));
+function validatedCamera(value){
+ const keys=['schema_version','focus','yaw_rad','elevation_rad','distance_m','target_m','vertical_fov_deg'];
+ if(!value||typeof value!=='object'||Array.isArray(value)||Object.keys(value).sort().join()!==keys.sort().join())throw new TypeError('A complete inspection camera state is required.');
+ if(value.schema_version!==CAMERA_SCHEMA)throw new TypeError('Unsupported inspection camera schema.');
+ if(typeof value.focus!=='string'||!Object.hasOwn(CAMERA_BASE,value.focus))throw new TypeError('Unknown camera focus.');
+ const finite=(n,range,label)=>{if(typeof n!=='number'||!Number.isFinite(n)||n<range[0]||n>range[1])throw new RangeError('Invalid camera '+label+'.');return n;};
+ if(!Array.isArray(value.target_m)||value.target_m.length!==3)throw new TypeError('Camera target must have three coordinates.');
+ return {schema_version:CAMERA_SCHEMA,focus:value.focus,
+  yaw_rad:finite(value.yaw_rad,[-PI,PI],'yaw'),elevation_rad:finite(value.elevation_rad,CAMERA_LIMITS.elevation,'elevation'),
+  distance_m:finite(value.distance_m,CAMERA_LIMITS.distance,'distance'),
+  target_m:value.target_m.map((n,i)=>finite(n,CAMERA_LIMITS.target[i],'target')),
+  vertical_fov_deg:finite(value.vertical_fov_deg,CAMERA_LIMITS.fov,'field of view')};
+}
+
 const V={
   add:(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]],
   sub:(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],
@@ -20,7 +42,7 @@ const M={
  scale:(x,y,z)=>[x,0,0,0,0,y,0,0,0,0,z,0,0,0,0,1],
  ry:(a)=>[Math.cos(a),0,-Math.sin(a),0,0,1,0,0,Math.sin(a),0,Math.cos(a),0,0,0,0,1],
  rz:(a)=>[Math.cos(a),Math.sin(a),0,0,-Math.sin(a),Math.cos(a),0,0,0,0,1,0,0,0,0,1],
- lookAt:(eye,target,up=[0,0,1])=>{const z=V.norm(V.sub(eye,target)),x=V.norm(V.cross(up,z)),y=V.cross(z,x);return [x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-V.dot(x,eye),-V.dot(y,eye),-V.dot(z,eye),1];},
+ lookAt:(eye,target,up=[0,0,1])=>{const z=V.norm(V.sub(eye,target));if(Math.abs(V.dot(up,z))>.99999)up=[0,1,0];const x=V.norm(V.cross(up,z)),y=V.cross(z,x);return [x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-V.dot(x,eye),-V.dot(y,eye),-V.dot(z,eye),1];},
  persp:(fov,aspect,n=0.1,f=60)=>{const c=1/Math.tan(fov/2);return [c/aspect,0,0,0,0,c,0,0,0,0,-(f+n)/(f-n),-1,0,0,-2*f*n/(f-n),0];},
  box:(pos,size,rot=0)=>M.mul(M.translate(...pos),M.mul(M.ry(rot),M.scale(...size))),
  between:(a,b,r,ry=r)=>{
@@ -86,8 +108,9 @@ function compile(gl,t,src){let s=gl.createShader(t);gl.shaderSource(s,src);gl.co
 function makeProgram(gl){let p=gl.createProgram();gl.attachShader(p,compile(gl,gl.VERTEX_SHADER,VS));gl.attachShader(p,compile(gl,gl.FRAGMENT_SHADER,FS));gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(p));return p;}
 function gpuGeometry(gl,obj){const vao=gl.createVertexArray();gl.bindVertexArray(vao);for(const [name,data] of [['position',obj.positions],['normal',obj.normals]]){let b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(data),gl.STATIC_DRAW);let i=name==='position'?0:1;gl.enableVertexAttribArray(i);gl.vertexAttribPointer(i,3,gl.FLOAT,false,0,0);}gl.bindVertexArray(null);return {vao,count:obj.positions.length/3};}
 class PhysicalRenderer {
- constructor(canvas){
-  this.canvas=canvas;this.gl=canvas.getContext('webgl2',{alpha:false,antialias:true,depth:true,preserveDrawingBuffer:true,powerPreference:'high-performance'});
+ constructor(canvas,options={}){
+  this.light=options.theme==='light';this.selected='left';this.trailAngle=null;
+  this.canvas=canvas;this.gl=options.software===true?null:canvas.getContext('webgl2',{alpha:false,antialias:true,depth:true,preserveDrawingBuffer:true,powerPreference:'high-performance'});
   this.software=!this.gl;
   if(this.software){this.ctx=canvas.getContext('2d',{alpha:false});}
   else {
@@ -98,8 +121,8 @@ class PhysicalRenderer {
   const b=createGeometry();this.G={};for(const n of ['box','cylinder','sphere'])this.G[n]=this.software?b.g[n]:gpuGeometry(this.gl,b.g[n]);
   this.custom=(vertices)=>this.software?vertices:gpuGeometry(this.gl,vertices);
   this.parts=[];this.q=0;this.q2=0;this.compare=false;this.mechanics=false;this.labels=false;
-  this.yaw=.73;this.elev=.34;this.radius=3.45;this.target=[-.12,0,1.27];
-  this.drag=null;this.pointerStart=null;
+  this.yaw=.73;this.elev=.34;this.radius=3.45;this.target=[-.12,0,1.27];this.fovDeg=43;
+  this.pointers=new Map();this.gesture=null;
   this.makeScene(b);
   this.hatchTr=(q)=>M.mul(M.translate(0,0,CAD.hinge_z),M.ry(-q));
   this.attachControls();this.resize();
@@ -114,10 +137,10 @@ class PhysicalRenderer {
   // All vehicle/hatch triangle meshes are tessellated from the STEP CAD source.
   // Strut cylinders use the exact CAD outer diameters and CAD mount points with
   // length/orientation recomputed from the hinge angle for every simulation frame.
-  this.box([-.15,0,.423],[3.1,3.1,.02],{c:'#1a2730',metal:.1},'floor');
+  this.box([-.15,0,.423],[3.1,3.1,.02],{c:this.light?'#e4e5de':'#1a2730',metal:.1},'floor');
   for(let i=-10;i<=10;i++){
-   this.box([i*.15,0,.435],[.0015,2.75,.001],{c:'#415563',a:.22},'floorLine');
-   this.box([-.15,i*.14,.435],[2.9,.0015,.001],{c:'#415563',a:.22},'floorLine');
+   this.box([i*.15,0,.435],[.0015,2.75,.001],{c:this.light?'#aeb4a5':'#415563',a:.22},'floorLine');
+   this.box([-.15,i*.14,.435],[2.9,.0015,.001],{c:this.light?'#aeb4a5':'#415563',a:.22},'floorLine');
   }
   for(const part of CAD.parts){
    const model=part.group==='hatch'?((q)=>M.mul(M.translate(0,0,CAD.hinge_z),M.ry(-q))):M.id();
@@ -131,7 +154,7 @@ class PhysicalRenderer {
    const a=[CAD.body_anchor[0],sign*CAD.strut_y,CAD.body_anchor[1]];
    const b=(q)=>{const p=P.geometry(q);return[p.hatch_point_x_m,sign*CAD.strut_y,p.hatch_point_z_m]};
    const point=(q,at)=>{const B=b(q),d=V.norm(V.sub(B,a));return V.add(a,V.mul(d,at));};
-   const cyl=(from,to,r,material)=>this.add('cylinder',(q)=>M.between(point(q,from),point(q,typeof to==='function'?to(len(q)):to),r),material,'mechanism');
+   const cyl=(from,to,r,material)=>this.add('cylinder',(q)=>M.between(point(q,from),point(q,typeof to==='function'?to(len(q)):to),r),material,'mechanism',{side:sign===1?'left':'right'});
    cyl(.035,.155,.038,{c:'#3c5260',metal:.63}); // motor
    cyl(.140,.402,.031,{c:'#3c5260',metal:.72}); // outer housing
    cyl(.391,.421,.035,{c:'#bdccd7',metal:.91}); // gland
@@ -142,35 +165,114 @@ class PhysicalRenderer {
    this.add('sphere',(q)=>M.box(b(q),[.014,.014,.014]),{c:'#c6ced8',metal:.95},'mechanism');
   }
  }
+ // This camera is for human inspection. Its state is not a calibrated sensor.
+ getCamera(){return {schema_version:CAMERA_SCHEMA,focus:this.mechanics?'mechanism':'assembly',
+  yaw_rad:this.yaw,elevation_rad:this.elev,distance_m:this.radius,target_m:[...this.target],vertical_fov_deg:this.fovDeg};}
+ setCamera(value){
+  const c=validatedCamera(value); // Validate everything before changing the current view.
+  this.mechanics=c.focus==='mechanism';this.yaw=c.yaw_rad;this.elev=c.elevation_rad;
+  this.radius=c.distance_m;this.target=c.target_m;this.fovDeg=c.vertical_fov_deg;
+  this.draw();this.cameraChanged();return this.getCamera();
+ }
+ getView(){
+  const b=CAMERA_BASE[this.mechanics?'mechanism':'assembly'];
+  const views={isometric:[b.yaw,b.elevation],front:[0,0],side:[PI/2,0],top:[0,PI/2]};
+  return Object.keys(views).find(k=>Math.abs(wrapAngle(this.yaw-views[k][0]))<1e-9&&Math.abs(this.elev-views[k][1])<1e-9)||'custom';
+ }
+ cameraDescription(){const name=this.getView();return `${name[0].toUpperCase()+name.slice(1)} view, ${this.radius.toFixed(2)} metres from target. Inspection camera.`;}
+ cameraChanged(emit=true){
+  this.canvas.dataset.camera=JSON.stringify(this.getCamera());this.canvas.dataset.cameraView=this.getView();
+  if(emit)this.canvas.dispatchEvent(new CustomEvent('camerachange',{detail:this.getCamera(),bubbles:true}));
+ }
+ resetCamera(){const focus=this.mechanics?'mechanism':'assembly',b=CAMERA_BASE[focus];
+  return this.setCamera({schema_version:CAMERA_SCHEMA,focus,yaw_rad:b.yaw,elevation_rad:b.elevation,distance_m:b.distance,target_m:[...b.target],vertical_fov_deg:43});
+ }
+ setView(name){
+  const b=CAMERA_BASE[this.mechanics?'mechanism':'assembly'];
+  const views={isometric:[b.yaw,b.elevation],front:[0,0],side:[PI/2,0],top:[0,PI/2]};
+  if(typeof name!=='string'||!Object.hasOwn(views,name))throw new TypeError('Unknown inspection camera view.');
+  return this.setCamera({...this.getCamera(),yaw_rad:views[name][0],elevation_rad:views[name][1]});
+ }
+ setFocus(mode){
+  if(typeof mode!=='string'||!Object.hasOwn(CAMERA_BASE,mode))throw new TypeError('Unknown camera focus.');
+  this.mechanics=mode==='mechanism';return this.resetCamera();
+ }
+ panCamera(dx,dy,base=this.getCamera()){
+  const z=[Math.cos(base.elevation_rad)*Math.cos(base.yaw_rad),Math.cos(base.elevation_rad)*Math.sin(base.yaw_rad),Math.sin(base.elevation_rad)];
+  const worldUp=Math.abs(z[2])>.99999?[0,1,0]:[0,0,1],right=V.norm(V.cross(worldUp,z)),up=V.cross(z,right);
+  const scale=2*base.distance_m*Math.tan((base.vertical_fov_deg+(this.compare?4:0))*PI/360)/Math.max(1,this.canvas.clientHeight);
+  return {...base,target_m:base.target_m.map((v,i)=>bounded(v+(-dx*right[i]+dy*up[i])*scale,CAMERA_LIMITS.target[i]))};
+ }
+ beginGesture(){
+  const points=[...this.pointers.values()];
+  if(points.length>=2){const [a,b]=points;this.gesture={mode:'pinch',ids:[a.id,b.id],x:(a.x+b.x)/2,y:(a.y+b.y)/2,distance:Math.max(1,Math.hypot(a.x-b.x,a.y-b.y)),base:this.getCamera()};}
+  else if(points.length){const p=points[0];this.gesture={mode:p.pan?'pan':'orbit',ids:[p.id],x:p.x,y:p.y,base:this.getCamera()};}
+  else this.gesture=null;
+  this.canvas.style.cursor=points.length?'grabbing':'grab';
+ }
  attachControls(){
   const canvas=this.canvas;
-  canvas.addEventListener('pointerdown',e=>{this.drag={x:e.clientX,y:e.clientY,yaw:this.yaw,elev:this.elev};canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing';});
-  canvas.addEventListener('pointermove',e=>{if(!this.drag)return;this.yaw=this.drag.yaw+(e.clientX-this.drag.x)*.006;
-   this.elev=Math.max(-.05,Math.min(1.18,this.drag.elev+(e.clientY-this.drag.y)*.004));this.draw();});
-  const stop=()=>{this.drag=null;canvas.style.cursor='grab';};canvas.addEventListener('pointerup',stop);canvas.addEventListener('pointercancel',stop);
-  canvas.addEventListener('wheel',e=>{e.preventDefault();this.radius=P.clamp(this.radius*Math.exp(e.deltaY*.0008),2.65,11);this.draw();},{passive:false});
-  canvas.addEventListener('dblclick',()=>{this.yaw=.73;this.elev=.34;this.radius=3.45;this.draw();});
-  window.addEventListener('resize',()=>this.resize());
+  if(canvas.tabIndex<0)canvas.tabIndex=0;
+  canvas.style.touchAction='none';
+  canvas.setAttribute('aria-keyshortcuts','ArrowLeft ArrowRight ArrowUp ArrowDown + - Home 1 2 3 4');
+  canvas.addEventListener('pointerdown',e=>{
+   if(e.pointerType==='mouse'&&e.button!==0&&e.button!==1)return;
+   e.preventDefault();canvas.focus({preventScroll:true});
+   this.pointers.set(e.pointerId,{id:e.pointerId,x:e.clientX,y:e.clientY,pan:e.shiftKey||e.button===1});
+   canvas.setPointerCapture(e.pointerId);this.beginGesture();
+  });
+  canvas.addEventListener('pointermove',e=>{
+   const p=this.pointers.get(e.pointerId);if(!p)return;e.preventDefault();p.x=e.clientX;p.y=e.clientY;
+   const g=this.gesture;if(!g)return;
+   if(g.mode==='pinch'){
+    const a=this.pointers.get(g.ids[0]),b=this.pointers.get(g.ids[1]);if(!a||!b)return;
+    const distance=Math.max(1,Math.hypot(a.x-b.x,a.y-b.y));
+    const c=this.panCamera((a.x+b.x)/2-g.x,(a.y+b.y)/2-g.y,g.base);
+    c.distance_m=bounded(g.base.distance_m*g.distance/distance,CAMERA_LIMITS.distance);this.setCamera(c);
+   }else if(g.mode==='pan')this.setCamera(this.panCamera(p.x-g.x,p.y-g.y,g.base));
+   else this.setCamera({...g.base,yaw_rad:wrapAngle(g.base.yaw_rad+(p.x-g.x)*.006),elevation_rad:bounded(g.base.elevation_rad+(p.y-g.y)*.004,CAMERA_LIMITS.elevation)});
+  });
+  const stop=e=>{if(!this.pointers.delete(e.pointerId))return;
+   if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);this.beginGesture();};
+  canvas.addEventListener('pointerup',stop);canvas.addEventListener('pointercancel',stop);canvas.addEventListener('lostpointercapture',stop);
+  canvas.addEventListener('wheel',e=>{
+   e.preventDefault();const unit=e.deltaMode===1?16:e.deltaMode===2?canvas.clientHeight:1;
+   const delta=bounded(e.deltaY*unit,[-1000,1000]);
+   this.setCamera({...this.getCamera(),distance_m:bounded(this.radius*Math.exp(delta*.0008),CAMERA_LIMITS.distance)});
+  },{passive:false});
+  canvas.addEventListener('dblclick',()=>this.resetCamera());
+  canvas.addEventListener('keydown',e=>{
+   if(e.altKey||e.ctrlKey||e.metaKey)return;
+   const arrows={ArrowLeft:[-24,0],ArrowRight:[24,0],ArrowUp:[0,-24],ArrowDown:[0,24]},k=e.key;
+   if(Object.hasOwn(arrows,k)){
+    e.preventDefault();const [dx,dy]=arrows[k],base=this.getCamera();
+    this.setCamera(e.shiftKey?this.panCamera(dx,dy,base):{...base,yaw_rad:wrapAngle(base.yaw_rad+dx*.006),elevation_rad:bounded(base.elevation_rad+dy*.004,CAMERA_LIMITS.elevation)});
+   }else if(['+','=','-','_'].includes(k)){
+    e.preventDefault();this.setCamera({...this.getCamera(),distance_m:bounded(this.radius*(['+','='].includes(k)?.9:1/.9),CAMERA_LIMITS.distance)});
+   }else if(k==='Home'||k==='0'){e.preventDefault();this.resetCamera();}
+   else if(['1','2','3','4'].includes(k)){e.preventDefault();this.setView(['isometric','front','side','top'][Number(k)-1]);}
+  });
+  window.addEventListener('blur',()=>{this.pointers.clear();this.beginGesture();});
+  window.addEventListener('resize',()=>this.resize());this.cameraChanged(false);
  }
- setFocus(mode){if(mode==='mechanism'){this.mechanics=true;this.target=[-.18,0,1.32];this.radius=2.75;this.yaw=.78;this.elev=.25;}
-  else{this.mechanics=false;this.target=[-.12,0,1.27];this.radius=3.45;this.yaw=.73;this.elev=.34;}this.draw();}
- resize(){let w=this.canvas.clientWidth,h=this.canvas.clientHeight,dpr=Math.min(devicePixelRatio||1,1.8);let W=Math.max(1,Math.floor(w*dpr)),H=Math.max(1,Math.floor(h*dpr));if(this.canvas.width!==W||this.canvas.height!==H){this.canvas.width=W;this.canvas.height=H;}this.draw();}
+ cameraMatrix(width,height,compare=this.compare){return M.mul(M.persp((this.fovDeg+(compare?4:0))*PI/180,width/height,.06,55),M.lookAt(this.eye(),this.target));}
+ resize(){let w=this.canvas.clientWidth,h=this.canvas.clientHeight;if(w<2||h<2)return;let dpr=Math.min(devicePixelRatio||1,1.8);let W=Math.max(1,Math.floor(w*dpr)),H=Math.max(1,Math.floor(h*dpr));if(this.canvas.width!==W||this.canvas.height!==H){this.canvas.width=W;this.canvas.height=H;}this.draw();}
  eye(){return [this.target[0]+this.radius*Math.cos(this.elev)*Math.cos(this.yaw),this.target[1]+this.radius*Math.cos(this.elev)*Math.sin(this.yaw),this.target[2]+this.radius*Math.sin(this.elev)];}
  draw(q=this.q,q2=this.q2,compare=this.compare){
   this.q=q;this.q2=q2;this.compare=compare;
   if(this.software){this.drawSoftware(q,q2,compare);return;}
   const gl=this.gl;
   if(!gl)return;
-  gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.clearColor(.047,.067,.091,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+  const background=this.light?[.946,.949,.925,1]:[.047,.067,.091,1];
+  gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.clearColor(...background);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
   const eye=this.eye();gl.useProgram(this.p);
-  gl.uniform3fv(this.u.uEye,new Float32Array(eye));gl.uniform1f(this.u.uFog,1);
+  gl.uniform3fv(this.u.uEye,new Float32Array(eye));gl.uniform1f(this.u.uFog,this.light?0:1);
   let views=compare?[{left:0,width:Math.floor(this.canvas.width/2),q},{left:Math.floor(this.canvas.width/2),width:this.canvas.width-Math.floor(this.canvas.width/2),q:q2}]:[{left:0,width:this.canvas.width,q}];
   gl.enable(gl.SCISSOR_TEST);
   for(const view of views){
    gl.viewport(view.left,0,view.width,this.canvas.height);gl.scissor(view.left,0,view.width,this.canvas.height);
-   gl.clearColor(.047,.067,.091,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-   const proj=M.persp((compare?47:43)*PI/180,view.width/this.canvas.height,.06,55);
-   const pv=M.mul(proj,M.lookAt(eye,this.target));
+   gl.clearColor(...background);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+   const pv=this.cameraMatrix(view.width,this.canvas.height,compare);
    gl.uniformMatrix4fv(this.u.uPV,false,new Float32Array(pv));
    // Draw opaque meshes first, then transparent shadow and grid overlays.
    for(const pass of [0,1])for(const part of this.parts){
@@ -186,12 +288,25 @@ class PhysicalRenderer {
     const geom=typeof part.geo==='string'?this.G[part.geo]:part.geo;
     gl.bindVertexArray(geom.vao);
     gl.uniformMatrix4fv(this.u.uModel,false,new Float32Array(mat));
-    gl.uniform4fv(this.u.uColor,new Float32Array([...color(part.material.c),alpha]));
+    const selected=this.light&&part.side===this.selected&&part.material.metal<.8;
+    gl.uniform4fv(this.u.uColor,new Float32Array([...color(selected?'#db782e':part.material.c),alpha]));
     gl.uniform1f(this.u.uMetal,part.material.metal||0);
     gl.uniform1f(this.u.uEmissive,part.material.emit||0);
     if(isTransparent)gl.depthMask(false);
     gl.drawArrays(gl.TRIANGLES,0,geom.count);
     if(isTransparent)gl.depthMask(true);
+   }
+   if(!compare&&Number.isFinite(this.trailAngle)&&Math.abs(this.trailAngle-q)>.007){
+    gl.depthMask(false);
+    for(const part of this.parts.filter(p=>p.group==='hatch')){
+     const geom=typeof part.geo==='string'?this.G[part.geo]:part.geo;
+     const mat=typeof part.model==='function'?part.model(this.trailAngle):part.model;
+     gl.bindVertexArray(geom.vao);gl.uniformMatrix4fv(this.u.uModel,false,new Float32Array(mat));
+     gl.uniform4fv(this.u.uColor,new Float32Array([.55,.59,.51,.11]));
+     gl.uniform1f(this.u.uMetal,0);gl.uniform1f(this.u.uEmissive,0);
+     gl.drawArrays(gl.TRIANGLES,0,geom.count);
+    }
+    gl.depthMask(true);
    }
    gl.bindVertexArray(null);
   }
@@ -202,11 +317,10 @@ class PhysicalRenderer {
   // Perspective mesh renderer for restricted browsers without WebGL. The exact
   // same 3D meshes, camera, hinge transforms and strut positions are used.
   const ctx=this.ctx,w=this.canvas.width,h=this.canvas.height;
-  ctx.clearRect(0,0,w,h);ctx.fillStyle='#0b1421';ctx.fillRect(0,0,w,h);
+  ctx.clearRect(0,0,w,h);ctx.fillStyle=this.light?'#f1f2ec':'#0b1421';ctx.fillRect(0,0,w,h);
   const views=compare?[{left:0,width:Math.floor(w/2),q},{left:Math.floor(w/2),width:w-Math.floor(w/2),q:q2}]:[{left:0,width:w,q}];
   for(const view of views){
-   const eye=this.eye(),proj=M.persp((compare?47:43)*PI/180,view.width/h,.06,55);
-   const pv=M.mul(proj,M.lookAt(eye,this.target));
+   const eye=this.eye(),pv=this.cameraMatrix(view.width,h,compare);
    const light1=V.norm([-.6,-.48,1.8]),light2=V.norm([.7,.85,1.1]);
    const polys=[];
    for(const part of this.parts){
@@ -218,7 +332,8 @@ class PhysicalRenderer {
     if(alpha<.01)continue;
     const mat=typeof part.model==='function'?part.model(view.q):part.model;
     const geo=typeof part.geo==='string'?this.G[part.geo]:part.geo;
-    let xyz=geo.positions;const rawColor=color(part.material.c);
+    let xyz=geo.positions;const selected=this.light&&part.side===this.selected&&part.material.metal<.8;
+    const rawColor=color(selected?'#db782e':part.material.c);
     const stride=part.geo==='cylinder'?2:part.geo==='sphere'?3:1;
     for(let i=0;i<xyz.length;i+=9*stride){
       const points=[],worldPoints=[];let d=0,clipped=false;
@@ -247,8 +362,8 @@ class PhysicalRenderer {
    ctx.restore();
   }
  }
- projectPoint(p,side=0){const eye=this.eye(),split=this.compare,half=split?this.canvas.clientWidth/2:this.canvas.clientWidth;
-  const pv=M.mul(M.persp((split?47:43)*PI/180,half/this.canvas.clientHeight,.06,55),M.lookAt(eye,this.target));
+ projectPoint(p,side=0){const split=this.compare,half=split?this.canvas.clientWidth/2:this.canvas.clientWidth;
+  const pv=this.cameraMatrix(half,this.canvas.clientHeight,split);
   const v=[p[0],p[1],p[2],1],clip=[0,0,0,0];for(let r=0;r<4;r++)for(let c=0;c<4;c++)clip[r]+=pv[c*4+r]*v[c];
   const x=(clip[0]/clip[3]*.5+.5)*half+(split?side*half:0),y=(1-(clip[1]/clip[3]*.5+.5))*this.canvas.clientHeight;
   return {x,y,visible:clip[3]>0};

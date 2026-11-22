@@ -1,5 +1,7 @@
 # Verify the environment before evaluating the investigator
 
+This record covers the shared version 2 rigid-body kernel. The [research-rig readiness record](SIMULATOR_READINESS.md) and [version 3 audit](../research/releases/research-rig-v3/validation.json) add coupled DC-drive comparisons, sensor timing, brake behavior and physical RL checks. Measured-hardware validation remains open.
+
 The current milestone is a trustworthy, inspectable simulator of a declared mechanism. A policy score is useful only after the environment's equations, numerical behaviour and observation contract are understood.
 
 This work updates the SI model to `recursivecal.si-liftgate/2` and the persistent rig to `recursivecal.physical-rig/2`. Both call `advance_mechanics()` in `recursivecal_lab/physics.py`. The earlier normalized RL benchmark remains a different model. The Bayesian investigator is an integration check here; no new policy-performance claim is made.

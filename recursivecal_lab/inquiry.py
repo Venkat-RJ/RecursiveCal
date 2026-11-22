@@ -89,12 +89,16 @@ def entropy(weights: np.ndarray) -> float:
     return float(-np.dot(positive, np.log(positive)))
 
 
+def public_measurement(row: dict[str, Any]) -> dict[str, Any]:
+    """One allowlist for initial, start-of-test and acquired measurements."""
+    return {key: row[key] for key in ("time_s", "sample_time_s", "sensor_sample_time_s", "sensor_age_s",
+                                     "ambient_temperature_C", *OBSERVATION_FIELDS) if key in row}
+
+
 def public_result(result: dict[str, Any]) -> dict[str, Any]:
     """A strict allowlist excludes truth, inferred quality and hidden parameters."""
-    def sample(row: dict[str, Any]) -> dict[str, Any]:
-        return {key: row[key] for key in ("time_s", "sample_time_s", "ambient_temperature_C", *OBSERVATION_FIELDS) if key in row}
-    return {"observations": [sample(row) for row in result["observations"]],
-            "final_observation": sample(result["final_observation"]),
+    return {"observations": [public_measurement(row) for row in result["observations"]],
+            "final_observation": public_measurement(result["final_observation"]),
             "termination": result["metrics"]["termination"],
             "elapsed_s": result["metrics"]["completed_duration_s"],
             "events": [{"time_s": event["time_s"], "type": event["type"]} for event in result["events"]]}
@@ -109,19 +113,20 @@ class InquirySession:
 
     def __init__(self, rig: PhysicalRig, *, max_tests: int = MAX_TESTS, budget: float = BUDGET):
         self.__rig = rig
+        self.model_id = getattr(rig, "model_id", MODEL_ID)
         self.max_tests = integer(max_tests, "max_tests", 0, 6)
         self.budget = finite(budget, "budget", 0, 12)
         self.__cost = 0.0
         self.__history: list[dict[str, Any]] = []
         self.__records: list[dict[str, Any]] = []
-        self.__observation = rig.observe()
+        self.__observation = public_measurement(rig.observe())
         self.__committed: dict[str, Any] | None = None
         self.__aborted = False
 
     def observe(self) -> dict[str, Any]:
         actions = [] if self.__committed is not None or self.__aborted or len(self.__history) >= self.max_tests else [
             name for name, action in CATALOG.items() if action.cost <= self.budget - self.__cost + 1e-10]
-        return deepcopy({"schema_version": "recursivecal.agent-observation/1", "model_id": MODEL_ID,
+        return deepcopy({"schema_version": "recursivecal.agent-observation/1", "model_id": self.model_id,
                          "measurement": self.__observation, "history": self.__history,
                          "catalog": catalog(), "legal_actions": actions, "can_commit": self.__committed is None,
                          "tests_remaining": self.max_tests - len(self.__history),
@@ -147,6 +152,8 @@ class InquirySession:
         estimate = Calibration.from_dict(calibration)
         if disposition not in ("candidate", "abstain") or not isinstance(reason, str) or not 1 <= len(reason) <= 1000:
             raise ValueError("invalid calibration disposition or reason")
+        if disposition == "abstain" and estimate != Calibration():
+            raise ValueError("abstention must retain the nominal calibration")
         if self.__aborted and disposition != "abstain":
             raise ValueError("a limit-aborted diagnostic session must abstain")
         self.__committed = {"estimates": asdict(estimate), "disposition": disposition,
@@ -163,11 +170,13 @@ class InquirySession:
 class BayesianInvestigator:
     """72 public hypotheses, persistent per-hypothesis states and likelihood checks."""
 
-    def __init__(self, initial_observation: dict[str, float], *, seed: int = 0):
+    def __init__(self, initial_observation: dict[str, float], *, seed: int = 0,
+                 rig_factory: Callable[..., PhysicalRig] = PhysicalRig):
         self.seed = integer(seed, "seed", 0, 2**31 - 1)
         self.estimates = [Calibration(mass, motor, gas, friction, bias) for mass, motor, gas, friction, bias in
                           itertools.product((25., 30.), (0.65, 0.82, 1.), (0.75, 1.), (6., 14.), (-0.025, 0., 0.025))]
-        self.rigs = [PhysicalRig(estimate.model()) for estimate in self.estimates]
+        temperature = initial_observation.get("ambient_temperature_C", 20.0)
+        self.rigs = [rig_factory(replace(estimate.model(), temperature_C=temperature)) for estimate in self.estimates]
         self.weights = np.ones(len(self.rigs)) / len(self.rigs)
         self._squared_errors = np.zeros(len(self.rigs))
         self._max_standardized_residual = np.zeros(len(self.rigs))
@@ -325,7 +334,8 @@ def _accepted(run: dict[str, Any]) -> bool:
             and m["saturation_fraction"] <= ACCEPTANCE["saturation_fraction_max"])
 
 
-def verify_calibration(parameters: ModelParameters, closing_extra: float, calibration: Calibration, *, seed: int) -> dict[str, Any]:
+def verify_calibration(parameters: ModelParameters, closing_extra: float, calibration: Calibration, *, seed: int,
+                       rig_factory: Callable[..., PhysicalRig] = PhysicalRig) -> dict[str, Any]:
     """Post-commit evaluator with new trajectories, temperatures and sensor seeds."""
     profiles = (
         ("full_open", 0.0, 78.0, 4.8, 5.8, 20.0),
@@ -337,7 +347,7 @@ def verify_calibration(parameters: ModelParameters, closing_extra: float, calibr
     for index, (name, start, target, profile, duration, temperature) in enumerate(profiles):
         pair = {}
         for label, estimate in (("before", Calibration()), ("after", calibration)):
-            rig = PhysicalRig(replace(parameters, temperature_C=temperature), seed=seed + 10000 + index,
+            rig = rig_factory(replace(parameters, temperature_C=temperature), seed=seed + 10000 + index,
                               state=RigState(angle_rad=math.radians(start)), closing_friction_extra_Nm=closing_extra)
             run = run_motion(rig, start_angle_rad=math.radians(start), target_angle_rad=math.radians(target),
                              duration_s=duration, profile_s=profile, calibration=estimate, include_truth=True)
@@ -345,21 +355,22 @@ def verify_calibration(parameters: ModelParameters, closing_extra: float, calibr
             pair[label] = run
         comparisons.append({"name": name, "temperature_C": temperature, "profile_duration_s": profile, **pair})
     # Controller tuning cannot repair an unsupported unpowered mechanism.
-    hold = PhysicalRig(parameters, seed=seed + 20001, state=RigState(angle_rad=parameters.max_angle_rad),
+    hold = rig_factory(parameters, seed=seed + 20001, state=RigState(angle_rad=parameters.max_angle_rad),
                        closing_friction_extra_Nm=closing_extra)
     passive = run_motion(hold, start_angle_rad=parameters.max_angle_rad, target_angle_rad=parameters.max_angle_rad,
                          duration_s=0.8, powered=False, include_truth=True)
-    loss = PhysicalRig(parameters, seed=seed + 20002, state=RigState(angle_rad=math.radians(55)),
+    loss = rig_factory(parameters, seed=seed + 20002, state=RigState(angle_rad=math.radians(55)),
                       closing_friction_extra_Nm=closing_extra)
     power_loss = run_motion(loss, start_angle_rad=math.radians(55), target_angle_rad=math.radians(70),
                             duration_s=2.2, profile_s=1.7, calibration=calibration,
                             power_loss_s=0.8, include_truth=True)
-    static = passive_hold(replace(parameters, friction_static_Nm=parameters.friction_static_Nm + closing_extra,
-                                  friction_coulomb_Nm=parameters.friction_coulomb_Nm + closing_extra))
+    static = passive_hold(replace(hold.parameters, friction_static_Nm=hold.parameters.friction_static_Nm + closing_extra,
+                                  friction_coulomb_Nm=hold.parameters.friction_coulomb_Nm + closing_extra))
     passed = all(pair["after"]["accepted"] for pair in comparisons)
     before_rmse = sum(pair["before"]["metrics"]["tracking_rmse_deg"] for pair in comparisons) / len(comparisons)
     after_rmse = sum(pair["after"]["metrics"]["tracking_rmse_deg"] for pair in comparisons) / len(comparisons)
-    return {"protocol": "fresh physical states, four held-out motion profiles, paired sensor seeds; no return to policy",
+    return {"model_id": getattr(hold, "model_id", MODEL_ID),
+            "protocol": "fresh physical states, four held-out motion profiles, paired sensor seeds; no return to policy",
             "acceptance_limits": dict(ACCEPTANCE), "comparisons": comparisons,
             "before_mean_rmse_deg": before_rmse, "after_mean_rmse_deg": after_rmse,
             "all_motion_profiles_passed": passed, "passive_hold": {"static": static, "run": passive},
@@ -373,20 +384,37 @@ def capabilities() -> dict[str, Any]:
             "experiments": catalog(), "default_budget": BUDGET, "default_max_tests": MAX_TESTS,
             "policies": ["bayes", "fixed", "no_probe"], "sensor_sigma": dict(zip(OBSERVATION_FIELDS, SENSOR_SIGMA)),
             "inference_sigma": dict(zip(OBSERVATION_FIELDS, INFERENCE_SIGMA.tolist())),
-            "acceptance_limits": ACCEPTANCE, "hardware_connected": False, "source_kind": "synthetic"}
+            "acceptance_limits": ACCEPTANCE, "hardware_connected": False, "source_kind": "synthetic",
+            "supported_rig_versions": [2, 3], "workbench_default_rig_version": 3}
 
 
 def run_study(*, case: str = "compound", seed: int = 7, policy: str = "bayes", max_tests: int = MAX_TESTS,
-              budget: float = BUDGET, progress: Callable[[str], None] | None = None) -> dict[str, Any]:
+              budget: float = BUDGET, progress: Callable[[str], None] | None = None,
+              on_event: Callable[[dict[str, Any]], None] | None = None,
+              rig_version: int = 2) -> dict[str, Any]:
     integer(seed, "seed", 0, 2**31 - 30000)
     if policy not in ("bayes", "fixed", "no_probe"):
         raise ValueError("policy must be bayes, fixed, or no_probe")
+    integer(rig_version, "rig_version", 2, 3)
+    rig_factory = PhysicalRig
+    if rig_version == 3:
+        from .research_rig import ResearchRig
+        rig_factory = ResearchRig
     parameters, closing_extra = make_case(case)
-    session = InquirySession(PhysicalRig(parameters, seed=seed, closing_friction_extra_Nm=closing_extra),
+    plant = rig_factory(parameters, seed=seed, closing_friction_extra_Nm=closing_extra)
+    session = InquirySession(plant,
                              max_tests=max_tests, budget=budget)
     initial = session.observe()
-    investigator = BayesianInvestigator(initial["measurement"], seed=seed)
+    def emit(kind: str, **data: Any) -> None:
+        # The monitor is observational. It never supplies actions to the policy.
+        # No evaluator records or plant truth are emitted before commitment.
+        if on_event is not None:
+            on_event(deepcopy({"type": kind, **data}))
+
+    emit("started", observation=initial)
+    investigator = BayesianInvestigator(initial["measurement"], seed=seed, rig_factory=rig_factory)
     decisions = []
+    prediction_history = []
     fixed = iter(("high_sweep", "low_sweep", "mid_sweep"))
     reason = "no diagnostic tests requested"
     while policy != "no_probe":
@@ -404,8 +432,25 @@ def run_study(*, case: str = "compound", seed: int = 7, policy: str = "bayes", m
             break
         if progress:
             progress(f"Test {len(view['history']) + 1}: {action}; cost {CATALOG[action].cost:g}; budget remaining {view['budget_remaining']:g}")
+        # Record candidate predictions BEFORE acquiring the experiment. These
+        # are public model-bank estimates, not the hidden plant parameters.
+        _, predictions = investigator.predict(action, view["measurement"])
+        candidates = []
+        for index in np.argsort(-investigator.weights, kind="stable")[:3]:
+            prediction = predictions[int(index)]
+            fields = ("time_s", "angle_rad", "velocity_rad_s", "strut_force_N_each")
+            candidates.append({"parameters": asdict(investigator.estimates[int(index)]),
+                               "prior_weight": float(investigator.weights[int(index)]),
+                               "trace": [{key: row[key] for key in fields} for row in prediction["trace"]],
+                               "observations": public_result(prediction)["observations"],
+                               "termination": prediction["metrics"]["termination"]})
+        predicted = {"step": len(view["history"]) + 1, "action": action, "candidates": candidates}
+        prediction_history.append(predicted)
+        emit("experiment_selected", decision=decisions[-1], prediction=predicted, observation=view)
         observation = session.step(action)
+        emit("experiment_completed", record=observation["history"][-1], observation=observation)
         summary = investigator.update(observation["history"][-1])
+        emit("belief_updated", belief=investigator.history[-1], summary=summary)
         if progress:
             progress(f"  posterior entropy {summary['entropy_nats']:.4f} nats; normalized residual {summary['best_normalized_residual']:.3f}; model mismatch {summary['model_mismatch']}")
     final_view = session.observe()
@@ -422,14 +467,18 @@ def run_study(*, case: str = "compound", seed: int = 7, policy: str = "bayes", m
         reason = ("model mismatch: no declared hypothesis explains the measurements" if investigator.model_mismatch else
                   "diagnostic limit event" if aborted else "insufficient identification or direction coverage")
     commitment = session.commit(asdict(estimate), disposition=disposition, reason=reason)
+    emit("committed", commitment=commitment, final_belief=investigator.summary())
     if progress:
         progress(f"Commit: {disposition}. Running independent motion, passive-hold and power-loss verification.")
-    verification = verify_calibration(parameters, closing_extra, estimate, seed=seed)
+    verification = verify_calibration(parameters, closing_extra, estimate, seed=seed, rig_factory=rig_factory)
     records = session.sealed_records()
     source_hashes = {name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
                      for name in ("physics.py", "physical_rig.py", "inquiry.py")}
-    report = {"schema_version": PROTOCOL_ID, "model_id": MODEL_ID,
-              "configuration": {"case": case, "seed": seed, "policy": policy, "max_tests": max_tests, "budget": budget},
+    if rig_version == 3:
+        source_hashes["research_rig.py"] = hashlib.sha256(Path(__file__).with_name("research_rig.py").read_bytes()).hexdigest()
+    report = {"schema_version": PROTOCOL_ID, "model_id": session.model_id,
+              "configuration": {"case": case, "seed": seed, "policy": policy, "max_tests": max_tests, "budget": budget,
+                                "rig_version": rig_version},
               "provenance": {"source_kind": "synthetic", "measured_data_used": False, "hardware_validated": False,
                              "python": platform.python_version(), "numpy": np.__version__, "source_sha256": source_hashes,
                              "control_sensor": "ideal filtered biased encoder/rate; independent logging noise",
@@ -438,16 +487,21 @@ def run_study(*, case: str = "compound", seed: int = 7, policy: str = "bayes", m
                              "inference": "72 finite hypotheses; approximate Gaussian likelihood; 48 Monte Carlo fantasies per action",
                              "cost_units": "declared test-cost units including setup; not elapsed time or a financial cost"},
               "initial_observation": initial, "decisions": decisions, "belief_history": investigator.history,
+              "prediction_history": prediction_history,
               "final_belief": investigator.summary(), **records,
               "verification": verification,
               "outcome": "verified_in_simulation" if disposition == "candidate" and verification["all_motion_profiles_passed"]
                          else "verification_failed" if disposition == "candidate" else "abstained",
-              "evaluator_only_truth": {"parameters": asdict(parameters), "closing_friction_extra_Nm": closing_extra},
+              "evaluator_only_truth": {"parameters": asdict(plant.parameters), "closing_friction_extra_Nm": closing_extra},
               "limitations": ["All scenarios are synthetic engineering fixtures, not population-level research results.",
                               "Finite model bank and an engineering residual threshold; no calibrated coverage guarantee.",
                               "No learned RL policy, autonomous model-structure revision or real-vehicle validation.",
                               "One rigid rotational DOF; no electrical current, flexible bodies, backlash or pinch/contact model.",
                               "A simulator stop is not a hardware emergency-stop guarantee."]}
+    if rig_version == 3:
+        report["rig_specification"] = plant.metadata()
+        report["provenance"]["control_sensor"] = "sampled, delayed, quantized instrumentation shared with the controller"
+        report["limitations"][3] = "One rigid hinge; no flexible bodies, torsional coupling, backlash, latch or obstacle contact."
     report["report_sha256"] = digest(report)
     return report
 
@@ -497,7 +551,8 @@ def verify_report(report: Any) -> dict[str, Any]:
             errors.append("outcome disagrees with independent verification")
         for entry in report["agent_history"]:
             for sample in entry["observations"]:
-                if set(sample) - {"sample_time_s", "time_s", "ambient_temperature_C", *OBSERVATION_FIELDS}:
+                if set(sample) - {"sample_time_s", "time_s", "sensor_sample_time_s", "sensor_age_s",
+                                  "ambient_temperature_C", *OBSERVATION_FIELDS}:
                     errors.append("unexpected agent observation field")
     except (KeyError, IndexError, TypeError, ValueError, OverflowError) as exc:
         errors.append(f"invalid report content: {exc}")

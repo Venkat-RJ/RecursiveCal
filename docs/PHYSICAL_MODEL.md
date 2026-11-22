@@ -1,4 +1,6 @@
-# SI liftgate model
+# Force-domain SI liftgate model, version 2
+
+The default CLI and workspace now use [research rig 3](RESEARCH_RIG.md), which adds two DC drives, winding heat, sampled instruments and an explicit holding brake. This document specifies the retained version 2 force-domain model and the shared rigid-body kernel. Run it explicitly with `--rig-version 2`.
 
 `recursivecal_lab.physics` supplies a single-axis software-in-the-loop model. Its current identifier is `recursivecal.si-liftgate/2`. The persistent rig calls the same mechanical kernel. Archived `/1` results remain tied to their original source revision; the frozen normalized benchmark is another separate model. Scores across these definitions are not interchangeable. See the [physics validation record](PHYSICS_VALIDATION.md).
 

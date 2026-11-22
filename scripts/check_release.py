@@ -72,6 +72,32 @@ if validation['model_id'] != MODEL_ID or not validation['passed'] or not all(val
 for name, expected in validation['source_sha256'].items():
     if hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != expected:
         errors.append(f'current physics validation source drifted: {name}')
+from recursivecal_lab.io import MAX_REPORT_BYTES, read_json
+from scripts.package_rig_evidence import full_report_metadata, validation_summary
+evidence_root = ROOT / 'research/releases/research-rig-v3'
+research_validation = read_json(evidence_root / 'validation.json.gz', max_bytes=MAX_REPORT_BYTES)
+with gzip.open(evidence_root / 'validation.json.gz', 'rb') as handle:
+    research_validation_raw = handle.read(MAX_REPORT_BYTES + 1)
+research_validation_gzip = (evidence_root / 'validation.json.gz').read_bytes()
+if read_json(evidence_root / 'validation.json') != validation_summary(
+        research_validation, full_report_metadata(research_validation_raw, research_validation_gzip)):
+    errors.append('research rig summary differs from complete compressed evidence')
+from recursivecal_lab.research_rig import MODEL_ID as RESEARCH_MODEL_ID
+if (research_validation['model_id'] != RESEARCH_MODEL_ID or not research_validation['passed']
+        or not all(research_validation['gates'].values())):
+    errors.append('research rig numerical validation does not pass for this model')
+if research_validation['source_sha256'] != research_validation['source_sha256_after_audit']:
+    errors.append('research rig source changed during the recorded audit')
+for name, expected in research_validation['source_sha256'].items():
+    if hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != expected:
+        errors.append(f'research rig validation source drifted: {name}')
+from recursivecal_lab.rl_environment import verify_episode_report
+rl_smoke = read_json(evidence_root / 'rl-smoke.json.gz', max_bytes=MAX_REPORT_BYTES)
+if not verify_episode_report(rl_smoke)['valid']:
+    errors.append('recorded physical RL smoke episode failed integrity or protocol checks')
+for name, expected in rl_smoke['source_sha256'].items():
+    if hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != expected:
+        errors.append(f'physical RL smoke source drifted: {name}')
 if (ROOT / "docs/EXPERIMENT_PROTOCOL.md").read_bytes() != (ROOT / "recursivecal_lab/data/EXPERIMENT_PROTOCOL.md").read_bytes():
     errors.append("installed experiment protocol differs from documentation")
 from recursivecal_lab.inquiry import verify_report
@@ -86,6 +112,21 @@ else:
     for name, expected in inquiry_report["provenance"]["source_sha256"].items():
         if historical['historical_source_sha256'].get(name) != expected:
             errors.append(f"historical inquiry recorded source drifted: {name}")
+workspace_asset = (ROOT / "recursivecal_lab/web/workspace-reference.js").read_text()
+workspace_match = re.search(r'window\.RecursiveWorkspaceReference = "([A-Za-z0-9+/=]+)";', workspace_asset)
+if not workspace_match:
+    errors.append("current workspace recorded evidence is missing")
+else:
+    workspace = json.loads(gzip.decompress(base64.b64decode(workspace_match.group(1))))
+    if workspace['simulation']['model_id'] != 'recursivecal.si-liftgate/3':
+        errors.append('current workspace simulation must use research rig 3')
+    if (workspace['investigation']['model_id'] != RESEARCH_MODEL_ID
+            or not verify_report(workspace['investigation'])['valid']):
+        errors.append('current workspace investigation is invalid or uses an older rig')
+    for kind in ('simulation', 'investigation'):
+        for name, expected in workspace[kind]['provenance']['source_sha256'].items():
+            if hashlib.sha256((ROOT / 'recursivecal_lab' / name).read_bytes()).hexdigest() != expected:
+                errors.append(f'current workspace {kind} source drifted: {name}')
 for authored, bundled in (("cad_mesh.js", "inquiry-cad.js"), ("cad_renderer.js", "inquiry-renderer.js")):
     if (ROOT / "mechanics/cad_v1/viewer" / authored).read_bytes() != (ROOT / "recursivecal_lab/web" / bundled).read_bytes():
         errors.append(f"physical inquiry CAD asset drifted from authored source: {authored}")

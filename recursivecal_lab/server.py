@@ -9,7 +9,7 @@ import threading
 from urllib.parse import unquote, urlsplit
 
 from . import __version__
-from .api import capabilities, dispatch
+from .api import _allowed, _object, capabilities, dispatch
 from .io import MAX_INPUT_BYTES, loads
 
 _CONTENT_TYPES = {".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8",
@@ -108,18 +108,52 @@ class Handler(BaseHTTPRequestHandler):
         if not _WORKERS.acquire(blocking=False):
             self._json(429, {"error": "two calculations are already running; try again after they finish"})
             return
+        self._stream_started = False
         try:
             payload = loads(self.rfile.read(length).decode("utf-8"))
+            if urlsplit(self.path).path == "/api/inquiry/stream":
+                from .inquiry import run_study
+                body = _object(payload, "request")
+                _allowed(body, {"case", "seed", "policy", "max_tests", "budget", "rig_version"})
+                report = run_study(**body, on_event=self._stream_event)
+                self._stream_event({"type": "complete", "report": report})
+                return
             result = dispatch(urlsplit(self.path).path, payload)
             self._json(200, result)
         except (ValueError, TypeError, KeyError, UnicodeError) as exc:
-            self._json(400, {"error": str(exc)})
+            if self._stream_started:
+                self._stream_event({"type": "error", "error": str(exc)})
+            else:
+                self._json(400, {"error": str(exc)})
+        except (BrokenPipeError, ConnectionResetError, TimeoutError):
+            # A closed monitor cancels this foreground request at an event
+            # boundary. It does not leave a detached calculation running.
+            self.close_connection = True
         except Exception:
-            self._json(500, {"error": "calculation failed; inspect the foreground terminal for details"})
+            error = "calculation failed; inspect the foreground terminal for details"
+            if self._stream_started:
+                self._stream_event({"type": "error", "error": error})
+            else:
+                self._json(500, {"error": error})
             import traceback
             traceback.print_exc(file=sys.stderr)
         finally:
             _WORKERS.release()
+
+    def _stream_event(self, event: dict) -> None:
+        if not self._stream_started:
+            self.send_response(200)
+            self.send_header("Content-Type", "application/x-ndjson; charset=utf-8")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.send_header("Referrer-Policy", "no-referrer")
+            self.send_header("Connection", "close")
+            self.send_header("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'")
+            self.end_headers()
+            self._stream_started = True
+            self.close_connection = True
+        self.wfile.write((json.dumps(event, allow_nan=False, separators=(",", ":")) + "\n").encode())
+        self.wfile.flush()
 
 
 def serve(*, host: str = "127.0.0.1", port: int = 8765) -> None:

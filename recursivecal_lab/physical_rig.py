@@ -124,6 +124,8 @@ class PhysicalRig:
     distinction is explicit: this is not a model of a particular ECU filter.
     """
 
+    model_id = MODEL_ID
+
     def __init__(self, parameters: ModelParameters | None = None, *, seed: int = 0,
                  state: RigState | None = None, closing_friction_extra_Nm: float = 0.0):
         self.parameters = (parameters or ModelParameters()).validate()
@@ -225,7 +227,8 @@ def run_motion(rig: PhysicalRig, *, start_angle_rad: float, target_angle_rad: fl
     finite(dt_s, "dt_s", 0.001, 0.02)
     if not isinstance(powered, bool) or not isinstance(noisy, bool) or not isinstance(include_truth, bool):
         raise ValueError("powered, noisy and include_truth must be boolean")
-    profile_s = duration_s if profile_s is None else finite(profile_s, "profile_s", 0.001, duration_s)
+    # A shorter recording may stop partway through a longer reference motion.
+    profile_s = duration_s if profile_s is None else finite(profile_s, "profile_s", 0.001, 15)
     if power_loss_s is not None:
         finite(power_loss_s, "power_loss_s", 0, duration_s)
     estimate = (calibration or Calibration()).validate()
@@ -237,14 +240,19 @@ def run_motion(rig: PhysicalRig, *, start_angle_rad: float, target_angle_rad: fl
     peak_speed, termination = abs(rig.state.velocity_rad_s), "completed"
     initial_state = asdict(rig.state) if include_truth else None
 
-    def record(t: float, command: float, target: float, measured: dict[str, float]) -> None:
+    def record(t: float, command: float, target: float, measured: dict[str, float], saturated: bool = False) -> None:
         row = {"time_s": t, "absolute_time_s": rig.state.time_s,
                "target_angle_rad": target, "command_N_each": command, **measured}
         row["time_s"] = t
         if include_truth:
             row.update({"true_angle_rad": rig.state.angle_rad,
                         "true_velocity_rad_s": rig.state.velocity_rad_s,
-                        "true_motor_force_N_each": rig.state.motor_force_N_each})
+                        "true_motor_force_N_each": rig.state.motor_force_N_each,
+                        "force_saturated": bool(saturated)})
+            # Optional drive telemetry belongs to the evaluator/inspection trace.
+            # It is never passed through public_result to the investigator.
+            if hasattr(rig, "telemetry"):
+                row.update(rig.telemetry())
         rows.append(row)
 
     initial = rig.observe(noisy=noisy)
@@ -255,14 +263,16 @@ def run_motion(rig: PhysicalRig, *, start_angle_rad: float, target_angle_rad: fl
         power_loss_recorded = True
     while elapsed < duration_s:
         target = smooth_reference(elapsed, start_angle_rad, target_angle_rad, profile_s)
-        # An explicitly ideal filtered control signal, distinct from logged noise.
-        control_reading = rig.observe(noisy=False)
+        # Version 2 retains its declared ideal filtered signal. Version 3
+        # supplies sampled, delayed instrumentation through the same hook.
+        control_reading = rig.control_observation(noisy=noisy) if hasattr(rig, "control_observation") else rig.observe(noisy=False)
         enabled = powered and (power_loss_s is None or elapsed < power_loss_s)
         command = controller_command(control_reading, target, estimate) if enabled else 0.0
         boundary = min(elapsed + dt_s, duration_s, samples[sample_index])
         if power_loss_s is not None and elapsed < power_loss_s < boundary:
             boundary = power_loss_s
-        h = boundary - elapsed
+        # Subtraction at later timestamps can exceed dt by a rounding ulp.
+        h = min(dt_s, boundary - elapsed)
         error_sum += h * (target[0] - rig.state.angle_rad)**2
         before_step = elapsed
         step = rig.advance(command, h, powered=enabled)
@@ -274,12 +284,15 @@ def run_motion(rig: PhysicalRig, *, start_angle_rad: float, target_angle_rad: fl
         work_signed += step["mechanical_work_signed_J"]
         measured = rig.observe(noisy=noisy)
         new_target = smooth_reference(elapsed, start_angle_rad, target_angle_rad, profile_s)[0]
-        record(elapsed, step["command_N_each"], new_target, measured)
+        record(elapsed, step["command_N_each"], new_target, measured, step["saturated"])
         for contact in step["contacts"]:
             events.append({"time_s": before_step + contact["time_offset_s"], **contact})
         if power_loss_s is not None and not power_loss_recorded and elapsed >= power_loss_s:
             events.append({"time_s": elapsed, "type": "power_loss"})
             power_loss_recorded = True
+        if step.get("drive_trip"):
+            events.append({"time_s": elapsed, "type": "drive_trip"})
+            termination = "aborted_drive_trip"
         if step["speed_breach"]:
             events.append({"time_s": elapsed, "type": "speed_limit"})
             termination = "aborted_speed_limit"

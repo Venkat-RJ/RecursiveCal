@@ -1,6 +1,20 @@
 # Changelog
 
-## Unreleased: mechanics foundation v2
+## 0.5.0 - 2026-11-22
+
+The physical workspace, CLI, investigator and physical RL task now run the same version 3 research rig by default. The declared healthy mechanism opens, closes, reverses and holds without power using an explicit spring-applied brake.
+
+Added independent left and right DC drives with reciprocal motor constants, signed electrical and shaft work, winding heat, voltage and current limits, thermal derating, latched trips, a power-loss dump circuit and delayed brake engagement. Added sampled, delayed and quantized instruments, command transport delay, seeded noise, sample age and optional acquisition drops.
+
+Added an independent coupled-equation numerical audit with refinement and energy checks, four healthy motion profiles, power-loss and zero-brake checks, and twelve retained fault conditions. The tested synthetic mechanism is explicitly specified; measured-hardware accuracy remains unestablished.
+
+Added a physical reset/step RL task with disjoint parameter cells, bounded diagnostics, sealed commitment, terminal reward, evidence verification and a separate Verifiers plugin. Terminal actions, commitments and completion reasons must agree when reports are verified. Scripted SDK tests use real Verifiers types without calling a model; this release makes no learned-policy performance claim.
+
+Added camera presets, orbit, pan, zoom, keyboard and touch controls, synchronized per-side drive telemetry, and native Chromium/WebKit acceptance gates. The camera is for human inspection and is not a policy observation channel.
+
+Added installed-wheel physical RL checks, source-bound release evidence, an explicit simulator readiness record, and updated citation metadata. Historical models, reports and normalized benchmark results remain preserved.
+
+### Shared mechanics foundation
 
 - Both SI simulation interfaces now use the same mechanical kernel and model identifiers ending in `/2`.
 - Resolve sliding stops, directional static friction, motor-lag displacement and inelastic contact within a step. Preserve incoming impact speed and post-impact elapsed time.

@@ -1,0 +1,533 @@
+{
+  "acceptance_limits": {
+    "final_error_deg_max": 2.0,
+    "peak_speed_rad_s_max": 1.15,
+    "saturation_fraction_max": 0.35,
+    "tracking_rmse_deg_max": 3.0
+  },
+  "condition_counts": {
+    "accepted": 0,
+    "distinct_sweep_conditions": 12,
+    "unhandled_errors": 0
+  },
+  "convergence_scope": "PI voltage is held between internal updates. State accuracy is measured by refinement; global second-order convergence is not asserted.",
+  "full_report": {
+    "path": "validation.json.gz",
+    "sha256": "a9f905e030eb1d2ac6d23b797fbe757c9bb527236d7a2a80b7fae5fd9b1efe04",
+    "size_bytes": 633489,
+    "uncompressed_sha256": "4c4b6798a834a2d906281e7887002fd0c666f2454c74df066588d1769d49d947",
+    "uncompressed_size_bytes": 3720179
+  },
+  "gates": {
+    "all_motion_electrical_energy_identities_hold": true,
+    "all_recorded_motion_states_finite": true,
+    "all_sensor_observations_are_causal": true,
+    "all_trace_timestamps_increase": true,
+    "brake_engagement_respects_declared_delay": true,
+    "coupled_state_error_improves_under_refinement": true,
+    "default_coupled_state_errors_within_limits": true,
+    "default_total_energy_defect_within_limits": true,
+    "energy_defect_improves_under_refinement": true,
+    "healthy_brake_holds_without_power": true,
+    "healthy_power_loss_settles_within_guard": true,
+    "healthy_reference_passes_all_four_motion_profiles": true,
+    "independent_reference_energy_identity": true,
+    "independent_reference_stays_in_declared_smooth_scope": true,
+    "power_loss_is_recorded_once_at_requested_time": true,
+    "removing_brake_exposes_support_failure": true,
+    "smooth_production_has_no_unexpected_contact_or_trip": true,
+    "source_files_unchanged_during_audit": true,
+    "stratified_conditions_have_no_unhandled_errors": true
+  },
+  "gates_fixed_before_run": {
+    "angle_error_deg": 0.05,
+    "current_error_A": 0.05,
+    "electrical_identity_relative": 1e-08,
+    "energy_absolute_J": 0.002,
+    "energy_relative": 0.002,
+    "minimum_finest_refinement": 1.3,
+    "reference_energy_relative": 1e-08,
+    "temperature_error_C": 0.05,
+    "velocity_error_rad_s": 0.005
+  },
+  "hardware_validated": false,
+  "limitations": [
+    "Engineering development cases are not population-level independent experiments.",
+    "The ideal transmission excludes backlash, rotor inertia and efficiency losses.",
+    "No panel torsion, latch, obstacle contact, battery chemistry or physical I/O is modeled.",
+    "Physical accuracy requires independent measured trajectories from a matched mechanism."
+  ],
+  "measured_data_used": false,
+  "model_id": "recursivecal.physical-rig/3",
+  "motion_outcomes": {
+    "healthy_profiles": [
+      {
+        "accepted": true,
+        "checks": {
+          "electrical_identity_passed": true,
+          "electrical_identity_relative_max": 1.9107039330805493e-15,
+          "finite": true,
+          "sensor_causal": true,
+          "timestamps_increase": true
+        },
+        "metrics": {
+          "completed_duration_s": 5.8,
+          "final_error_deg": 0.2708824117948724,
+          "mechanical_work_abs_J": 54.939291120349765,
+          "mechanical_work_signed_J": -4.414994066178117,
+          "peak_speed_rad_s": 0.5296476304695549,
+          "saturation_fraction": 0.0,
+          "termination": "completed",
+          "tracking_rmse_deg": 0.2670448640974005
+        },
+        "name": "full_open"
+      },
+      {
+        "accepted": true,
+        "checks": {
+          "electrical_identity_passed": true,
+          "electrical_identity_relative_max": 1.4018667915195877e-15,
+          "finite": true,
+          "sensor_causal": true,
+          "timestamps_increase": true
+        },
+        "metrics": {
+          "completed_duration_s": 6.6,
+          "final_error_deg": -0.25351195382537806,
+          "mechanical_work_abs_J": 58.44697383285047,
+          "mechanical_work_signed_J": 26.030743136948974,
+          "peak_speed_rad_s": 0.45534772858966605,
+          "saturation_fraction": 0.0,
+          "termination": "completed",
+          "tracking_rmse_deg": 0.23993629075887948
+        },
+        "name": "full_close"
+      },
+      {
+        "accepted": true,
+        "checks": {
+          "electrical_identity_passed": true,
+          "electrical_identity_relative_max": 3.971829025096916e-15,
+          "finite": true,
+          "sensor_causal": true,
+          "timestamps_increase": true
+        },
+        "metrics": {
+          "completed_duration_s": 4.1,
+          "final_error_deg": -0.30152363624699247,
+          "mechanical_work_abs_J": 11.512486585735356,
+          "mechanical_work_signed_J": 1.7625697327678087,
+          "peak_speed_rad_s": 0.38922918144689367,
+          "saturation_fraction": 0.0,
+          "termination": "completed",
+          "tracking_rmse_deg": 0.2261317287487885
+        },
+        "name": "partial_reverse"
+      },
+      {
+        "accepted": true,
+        "checks": {
+          "electrical_identity_passed": true,
+          "electrical_identity_relative_max": 3.912063282718619e-15,
+          "finite": true,
+          "sensor_causal": true,
+          "timestamps_increase": true
+        },
+        "metrics": {
+          "completed_duration_s": 6.2,
+          "final_error_deg": 0.25581694418614653,
+          "mechanical_work_abs_J": 54.40221307168922,
+          "mechanical_work_signed_J": 9.740243843278824,
+          "peak_speed_rad_s": 0.4902318749085774,
+          "saturation_fraction": 0.0,
+          "termination": "completed",
+          "tracking_rmse_deg": 0.2007095007590583
+        },
+        "name": "cold_open"
+      }
+    ],
+    "passive_support": [
+      {
+        "accepted": true,
+        "checks": {
+          "electrical_identity_passed": true,
+          "electrical_identity_relative_max": 0.0,
+          "finite": true,
+          "sensor_causal": true,
+          "timestamps_increase": true
+        },
+        "metrics": {
+          "completed_duration_s": 0.8,
+          "final_error_deg": 0.0,
+          "mechanical_work_abs_J": 0.0,
+          "mechanical_work_signed_J": 0.0,
+          "peak_speed_rad_s": 0.0,
+          "saturation_fraction": 0.0,
+          "termination": "completed",
+          "tracking_rmse_deg": 0.0
+        },
+        "name": "healthy_brake"
+      },
+      {
+        "accepted": false,
+        "checks": {
+          "electrical_identity_passed": true,
+          "electrical_identity_relative_max": 9.769694573153877e-16,
+          "finite": true,
+          "sensor_causal": true,
+          "timestamps_increase": true
+        },
+        "metrics": {
+          "completed_duration_s": 0.8,
+          "final_error_deg": 16.52971435776274,
+          "mechanical_work_abs_J": 12.624176913032219,
+          "mechanical_work_signed_J": -12.624176913032224,
+          "peak_speed_rad_s": 0.47078970305585605,
+          "saturation_fraction": 0.0,
+          "termination": "completed",
+          "tracking_rmse_deg": 9.766455827842334
+        },
+        "name": "brake_removed"
+      }
+    ],
+    "power_loss": [
+      {
+        "accepted": false,
+        "checks": {
+          "electrical_identity_passed": true,
+          "electrical_identity_relative_max": 5.527314507073934e-16,
+          "finite": true,
+          "sensor_causal": true,
+          "timestamps_increase": true
+        },
+        "metrics": {
+          "completed_duration_s": 2.2,
+          "final_error_deg": 8.110911800761974,
+          "mechanical_work_abs_J": 5.306745979782717,
+          "mechanical_work_signed_J": 5.009350617859693,
+          "peak_speed_rad_s": 0.2875468060504466,
+          "saturation_fraction": 0.0,
+          "termination": "completed",
+          "tracking_rmse_deg": 5.451286462235552
+        }
+      }
+    ],
+    "stratified_conditions": [
+      {
+        "accepted": false,
+        "case": 0,
+        "checks": {
+          "electrical_identity_passed": true,
+          "electrical_identity_relative_max": 2.7536900092776574e-15,
+          "finite": true,
+          "sensor_causal": true,
+          "timestamps_increase": true
+        },
+        "error": null,
+        "metrics": {
+          "completed_duration_s": 5.8,
+          "final_error_deg": 31.468170454204422,
+          "mechanical_work_abs_J": 17.217254742886897,
+          "mechanical_work_signed_J": 13.350673043634792,
+          "peak_speed_rad_s": 0.370514163365206,
+          "saturation_fraction": 0.0,
+          "termination": "completed",
+          "tracking_rmse_deg": 22.521259342787403
+        }
+      },
+      {
+        "accepted": false,
+        "case": 1,
+        "checks": {
+          "electrical_identity_passed": true,
+          "electrical_identity_relative_max": 4.290399358065115e-15,
+          "finite": true,
+          "sensor_causal": true,
+          "timestamps_increase": true
+        },
+        "error": null,
+        "metrics": {
+          "completed_duration_s": 5.8,
+          "final_error_deg": 9.910516675784564,
+          "mechanical_work_abs_J": 44.47065150749512,
+          "mechanical_work_signed_J": 26.063067380166107,
+          "peak_speed_rad_s": 0.5113831787177923,
+          "saturation_fraction": 0.0,
+          "termination": "completed",
+          "tracking_rmse_deg": 9.543448483389856
+        }
+      },
+      {
+        "accepted": false,
+        "case": 2,
+        "checks": {
+          "electrical_identity_passed": true,
+          "electrical_identity_relative_max": 4.60038373653771e-15,
+          "finite": true,
+          "sensor_causal": true,
+          "timestamps_increase": true
+        },
+        "error": null,
+        "metrics": {
+          "completed_duration_s": 5.8,
+          "final_error_deg": 21.78248890434256,
+          "mechanical_work_abs_J": 37.25039400551918,
+          "mechanical_work_signed_J": 2.3195756292197305,
+          "peak_speed_rad_s": 0.39222723477082333,
+          "saturation_fraction": 0.1793103448275824,
+          "termination": "completed",
+          "tracking_rmse_deg": 15.399937701296228
+        }
+      },
+      {
+        "accepted": false,
+        "case": 3,
+        "checks": {
+          "electrical_identity_passed": true,
+          "electrical_identity_relative_max": 4.2566658027062755e-15,
+          "finite": true,
+          "sensor_causal": true,
+          "timestamps_increase": true
+        },
+        "error": null,
+        "metrics": {
+          "completed_duration_s": 5.8,
+          "final_error_deg": 30.10954731796545,
+          "mechanical_work_abs_J": 43.17340980698107,
+          "mechanical_work_signed_J": -12.792844505230777,
+          "peak_speed_rad_s": 0.7085872274300311,
+          "saturation_fraction": 0.0,
+          "termination": "completed",
+          "tracking_rmse_deg": 19.924889916128873
+        }
+      },
+      {
+        "accepted": false,
+        "case": 4,
+        "checks": {
+          "electrical_identity_passed": true,
+          "electrical_identity_relative_max": 1.8512853795814333e-16,
+          "finite": true,
+          "sensor_causal": true,
+          "timestamps_increase": true
+        },
+        "error": null,
+        "metrics": {
+          "completed_duration_s": 0.22000000000000006,
+          "final_error_deg": 69.33031038149997,
+          "mechanical_work_abs_J": 2.0761424215662543,
+          "mechanical_work_signed_J": -1.653666132318412,
+          "peak_speed_rad_s": 1.1558424806394318,
+          "saturation_fraction": 0.0,
+          "termination": "aborted_speed_limit",
+          "tracking_rmse_deg": 3.845921622509606
+        }
+      },
+      {
+        "accepted": false,
+        "case": 5,
+        "checks": {
+          "electrical_identity_passed": true,
+          "electrical_identity_relative_max": 3.1479454768645057e-15,
+          "finite": true,
+          "sensor_causal": true,
+          "timestamps_increase": true
+        },
+        "error": null,
+        "metrics": {
+          "completed_duration_s": 5.8,
+          "final_error_deg": 0.0,
+          "mechanical_work_abs_J": 57.46564327751794,
+          "mechanical_work_signed_J": -6.722388064877779,
+          "peak_speed_rad_s": 0.6195912403970364,
+          "saturation_fraction": 0.0,
+          "termination": "completed",
+          "tracking_rmse_deg": 4.856444281163695
+        }
+      },
+      {
+        "accepted": false,
+        "case": 6,
+        "checks": {
+          "electrical_identity_passed": true,
+          "electrical_identity_relative_max": 1.1397701438062504e-14,
+          "finite": true,
+          "sensor_causal": true,
+          "timestamps_increase": true
+        },
+        "error": null,
+        "metrics": {
+          "completed_duration_s": 5.8,
+          "final_error_deg": 12.528852891544144,
+          "mechanical_work_abs_J": 52.3225018919897,
+          "mechanical_work_signed_J": -2.2340142771485345,
+          "peak_speed_rad_s": 0.37587910760068577,
+          "saturation_fraction": 0.12931034482758347,
+          "termination": "completed",
+          "tracking_rmse_deg": 8.746698779814755
+        }
+      },
+      {
+        "accepted": false,
+        "case": 7,
+        "checks": {
+          "electrical_identity_passed": true,
+          "electrical_identity_relative_max": 2.0211191399534416e-15,
+          "finite": true,
+          "sensor_causal": true,
+          "timestamps_increase": true
+        },
+        "error": null,
+        "metrics": {
+          "completed_duration_s": 5.8,
+          "final_error_deg": 57.95482144415413,
+          "mechanical_work_abs_J": 13.444503432414962,
+          "mechanical_work_signed_J": 10.820992031474946,
+          "peak_speed_rad_s": 0.29772142696977594,
+          "saturation_fraction": 0.0,
+          "termination": "completed",
+          "tracking_rmse_deg": 40.66671360581452
+        }
+      },
+      {
+        "accepted": false,
+        "case": 8,
+        "checks": {
+          "electrical_identity_passed": true,
+          "electrical_identity_relative_max": 1.180132064513796e-16,
+          "finite": true,
+          "sensor_causal": true,
+          "timestamps_increase": true
+        },
+        "error": null,
+        "metrics": {
+          "completed_duration_s": 0.09999999999999999,
+          "final_error_deg": 74.47483800174443,
+          "mechanical_work_abs_J": 1.3306720252974806,
+          "mechanical_work_signed_J": 1.3306720252974809,
+          "peak_speed_rad_s": 1.2213299532421429,
+          "saturation_fraction": 0.09999999999999996,
+          "termination": "aborted_speed_limit",
+          "tracking_rmse_deg": 1.3709470816241347
+        }
+      },
+      {
+        "accepted": false,
+        "case": 9,
+        "checks": {
+          "electrical_identity_passed": true,
+          "electrical_identity_relative_max": 1.3648462425584907e-15,
+          "finite": true,
+          "sensor_causal": true,
+          "timestamps_increase": true
+        },
+        "error": null,
+        "metrics": {
+          "completed_duration_s": 3.5433333333333006,
+          "final_error_deg": 0.0,
+          "mechanical_work_abs_J": 63.080353155656375,
+          "mechanical_work_signed_J": -28.411520235786433,
+          "peak_speed_rad_s": 0.5805808323495725,
+          "saturation_fraction": 0.0,
+          "termination": "aborted_stop_impact",
+          "tracking_rmse_deg": 6.6283724433551505
+        }
+      },
+      {
+        "accepted": false,
+        "case": 10,
+        "checks": {
+          "electrical_identity_passed": true,
+          "electrical_identity_relative_max": 2.9310291999932674e-15,
+          "finite": true,
+          "sensor_causal": true,
+          "timestamps_increase": true
+        },
+        "error": null,
+        "metrics": {
+          "completed_duration_s": 5.8,
+          "final_error_deg": 49.31758703003961,
+          "mechanical_work_abs_J": 22.920638646531973,
+          "mechanical_work_signed_J": 22.920638646531927,
+          "peak_speed_rad_s": 0.35240556464936384,
+          "saturation_fraction": 0.04310344827586115,
+          "termination": "completed",
+          "tracking_rmse_deg": 36.532576239913745
+        }
+      },
+      {
+        "accepted": false,
+        "case": 11,
+        "checks": {
+          "electrical_identity_passed": true,
+          "electrical_identity_relative_max": 1.96237771747196e-15,
+          "finite": true,
+          "sensor_causal": true,
+          "timestamps_increase": true
+        },
+        "error": null,
+        "metrics": {
+          "completed_duration_s": 5.8,
+          "final_error_deg": 45.029086431786,
+          "mechanical_work_abs_J": 20.186277308831123,
+          "mechanical_work_signed_J": 3.072215176840046,
+          "peak_speed_rad_s": 0.24925775002330325,
+          "saturation_fraction": 0.0,
+          "termination": "completed",
+          "tracking_rmse_deg": 30.8396681585588
+        }
+      }
+    ]
+  },
+  "passed": true,
+  "reference_method": "Independent geometry/force/DC-current/continuous-PI/heat RHS; SciPy DOP853 rtol2e-11, atol2e-12. Smooth comparisons exclude voltage/current limits, contact and dry friction; complete motion checks exercise the hybrid application separately.",
+  "report_schema_version": "recursivecal.research-rig-validation/1",
+  "runtime": {
+    "numpy": "2.3.5",
+    "python": "3.12.14",
+    "scipy": "1.17.0",
+    "wall_time_s": 17.038055163000536
+  },
+  "schema_version": "recursivecal.research-rig-validation-summary/1",
+  "scope": "Numerical verification of specified synthetic DC-drive equations and finite development conditions. No measured hardware validation or worst-case bound over all accepted inputs.",
+  "smooth_case_count": 7,
+  "smooth_maxima": [
+    {
+      "angle_deg": 0.01521342224978592,
+      "current_A": 0.018053722564776997,
+      "refinement": 1,
+      "temperature_C": 0.00023041648825739003,
+      "velocity_rad_s": 0.002075201383871173
+    },
+    {
+      "angle_deg": 0.00876540489082091,
+      "current_A": 0.009009594889436201,
+      "refinement": 2,
+      "temperature_C": 0.00012689948563604503,
+      "velocity_rad_s": 0.001131633528349869
+    },
+    {
+      "angle_deg": 0.004739855048569789,
+      "current_A": 0.004506565258488582,
+      "refinement": 4,
+      "temperature_C": 6.641429244780284e-05,
+      "velocity_rad_s": 0.0005894894275463563
+    }
+  ],
+  "source_sha256": {
+    "recursivecal_lab/inquiry.py": "54ce5d04ebab38d9a50f92f7ae90eeed29defe1939870a3e724ba6660ffc850f",
+    "recursivecal_lab/physical_rig.py": "b1964498dc1aace4fb1f0dfe49336d47c20f16956fce0059835df7549651e984",
+    "recursivecal_lab/physics.py": "0aaa356e6d7dfb794f74a46097b7b06c7ab116a731b632cec7ce48f2e9302ec8",
+    "recursivecal_lab/research_rig.py": "a5490484df5c8f11debf22e4497640c09eed735eb277ed46c26c0dd35a46643c",
+    "recursivecal_lab/research_simulation.py": "f00f8136d2c81f562513cc6588b98037d676187ad7d2e90c4b502a445a8db5ff",
+    "scripts/validate_research_rig.py": "66f43f31c8283311d898f763df80b7fa7a51b4ce839737591f92dc592c91b992"
+  },
+  "source_sha256_after_audit": {
+    "recursivecal_lab/inquiry.py": "54ce5d04ebab38d9a50f92f7ae90eeed29defe1939870a3e724ba6660ffc850f",
+    "recursivecal_lab/physical_rig.py": "b1964498dc1aace4fb1f0dfe49336d47c20f16956fce0059835df7549651e984",
+    "recursivecal_lab/physics.py": "0aaa356e6d7dfb794f74a46097b7b06c7ab116a731b632cec7ce48f2e9302ec8",
+    "recursivecal_lab/research_rig.py": "a5490484df5c8f11debf22e4497640c09eed735eb277ed46c26c0dd35a46643c",
+    "recursivecal_lab/research_simulation.py": "f00f8136d2c81f562513cc6588b98037d676187ad7d2e90c4b502a445a8db5ff",
+    "scripts/validate_research_rig.py": "66f43f31c8283311d898f763df80b7fa7a51b4ce839737591f92dc592c91b992"
+  }
+}
