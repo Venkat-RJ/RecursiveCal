@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.1 - 2026-11-22
+
+Strengthened inquiry report verification and browser imports so acceptance and outcomes are checked against the recorded motion and the prescribed verification profiles. Changing a summary metric and recomputing a report digest cannot promote an unchanged failing trajectory to success.
+
+Strengthened physical RL evidence verification to check policy observations against the public contract, diagnostic history, remaining budget and episode progression. Rehashed transcripts with undeclared evaluator fields or inconsistent observations are rejected.
+
+Added regressions for both evidence-consistency gaps and regenerated the current source-bound rig, workspace and RL evidence. Original 0.5.0 artifacts remain addressable through their immutable source commit and the evidence-history manifest. Report verification checks recorded consistency; it does not authenticate an author or independently rerun physical trajectories.
+
 ## 0.5.0 - 2026-11-22
 
 The physical workspace, CLI, investigator and physical RL task now run the same version 3 research rig by default. The declared healthy mechanism opens, closes, reverses and holds without power using an explicit spring-applied brake.

@@ -1,5 +1,7 @@
 # Research rig 3 numerical evidence
 
+The current files are regenerated for release 0.5.1 after strengthening report-consistency verification. The [0.5.0 history manifest](history/v0.5.0.json) records the original file hashes, sizes and immutable source-commit links. Historical evidence is preserved as produced; it is not relabeled with newer source hashes.
+
 `validation.json` is a browsable summary linked by compressed and uncompressed SHA-256 hashes to `validation.json.gz`. The gzip file preserves the complete original audit bytes, including declared inputs, reference trajectories, three integration refinements, error limits fixed before the run, energy checks, four healthy motion profiles, passive-support and power-loss tests, twelve stratified extreme conditions, and source hashes before and after execution. No trajectories are rounded or discarded.
 
 Regenerate from the matching source revision:

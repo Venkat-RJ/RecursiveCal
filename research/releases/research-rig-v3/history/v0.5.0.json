@@ -1,0 +1,33 @@
+{
+  "schema_version": "recursivecal.evidence-history/1",
+  "release_version": "0.5.0",
+  "source_commit": "fa0bec4f45be2f1f01c36f76e24936ee7c190e1d",
+  "source_tree": "76b3b8ffd0e85a8db7aeca9045726a2b9ebed89b",
+  "scope": "Original source-bound evidence before the 0.5.1 report-consistency fixes. The files remain unchanged at the pinned commit; this manifest does not assert that the older verifier detected all inconsistent reports.",
+  "artifacts": [
+    {
+      "path": "research/releases/research-rig-v3/validation.json",
+      "bytes": 19464,
+      "sha256": "d404fc914a081f3d3b2878832b3fcb8b381caed967379f2f9c8f3cdc844510e1",
+      "url": "https://github.com/Venkat-RJ/RecursiveCal/blob/fa0bec4f45be2f1f01c36f76e24936ee7c190e1d/research/releases/research-rig-v3/validation.json"
+    },
+    {
+      "path": "research/releases/research-rig-v3/validation.json.gz",
+      "bytes": 633489,
+      "sha256": "a9f905e030eb1d2ac6d23b797fbe757c9bb527236d7a2a80b7fae5fd9b1efe04",
+      "url": "https://github.com/Venkat-RJ/RecursiveCal/blob/fa0bec4f45be2f1f01c36f76e24936ee7c190e1d/research/releases/research-rig-v3/validation.json.gz"
+    },
+    {
+      "path": "research/releases/research-rig-v3/rl-smoke.json.gz",
+      "bytes": 1344139,
+      "sha256": "b90cc1f7b9042969b8e73147ec1180fdf19dfa88e9c0dc1f26ee055eb69fb129",
+      "url": "https://github.com/Venkat-RJ/RecursiveCal/blob/fa0bec4f45be2f1f01c36f76e24936ee7c190e1d/research/releases/research-rig-v3/rl-smoke.json.gz"
+    },
+    {
+      "path": "recursivecal_lab/web/workspace-reference.js",
+      "bytes": 2016359,
+      "sha256": "1d341c63ada002944610b26a2a6fca82535ae584c9b319722eae513678ba2b28",
+      "url": "https://github.com/Venkat-RJ/RecursiveCal/blob/fa0bec4f45be2f1f01c36f76e24936ee7c190e1d/recursivecal_lab/web/workspace-reference.js"
+    }
+  ]
+}

@@ -33,7 +33,7 @@ The commands run in the current terminal. An existing output path is protected u
 
 Each report contains the observation-only policy transcript, the exact sampled world, frozen commitment, complete verification traces, reward components and source hashes. The sampled world and verifier evidence are evaluator-only records, available after the terminal decision.
 
-`verify-rl` checks the digest and protocol consistency, including the sampled split, diagnostic cost, committed history, terminal reward and tracking metrics recomputed from sealed traces. It does not rerun the physical simulator or authenticate the report's author. A report with valid integrity can still contain a failed calibration.
+`verify-rl` checks the digest and protocol consistency, including the sampled split, diagnostic cost, committed history, terminal reward and motion metrics checked against sealed traces. It also checks every policy observation against the public contract and the corresponding experiment history, remaining budget and episode progression. Undeclared evaluator fields and inconsistent transcript observations are rejected even when the report digest has been recomputed. It does not rerun the physical simulator or authenticate the report's author. A report with valid integrity can still contain a failed calibration.
 
 ## Python episode interface
 

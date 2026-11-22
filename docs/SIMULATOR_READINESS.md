@@ -40,7 +40,7 @@ The product workflow runs these gates on the review branch:
 2. Independent mechanical and complete-rig numerical audits.
 3. Real Verifiers 0.4.0 and 0.4.1 plugin tests using scripted policy replies and actual SDK types. The strict CI environment fails if the SDK is missing.
 4. Native Chromium and WebKit camera interactions, plus the complete workbench browser flow. Chromium also tests native multi-touch; WebKit multi-touch is explicitly untested because the harness cannot inject native touch there.
-5. Evidence integrity, documentation links, archive contents and source hashes. Both the recorded workspace and current numerical evidence must match the model source.
+5. Evidence integrity, documentation links, archive contents and source hashes. Both the recorded workspace and current numerical evidence must match the model source. Rehashed reports must still satisfy trace-derived motion acceptance and the public policy-observation contract; a matching digest alone does not establish consistency.
 
 The required result is a passing workflow for the exact reviewed commit. A previous commit's green checks do not qualify a later revision. Scripted SDK tests establish integration behavior; they do not establish that an RL policy has learned the task.
 

@@ -1,12 +1,13 @@
 """Physical RL protocol regressions, with separate real-engine integration checks."""
 from copy import deepcopy
-from dataclasses import asdict
+from dataclasses import asdict, replace
 import json
 import math
 import unittest
 
-from recursivecal_lab.inquiry import digest
-from recursivecal_lab.physical_rig import Calibration, PhysicalRig
+from recursivecal_lab.inquiry import ACCEPTANCE, VERIFICATION_PROFILES, digest
+from recursivecal_lab.physical_rig import Calibration, PhysicalRig, smooth_reference
+from recursivecal_lab.physics import passive_hold
 from recursivecal_lab.rl_environment import (
     MODEL_ID, PARAMETER_BOUNDS, PROFILE_NAMES, PROFILE_TARGET_DEGREES, PhysicalCalibrationEnv, cell_split,
     parameter_cell, protocol, reward_components, sample_episode, verify_episode_report,
@@ -20,6 +21,9 @@ class ContractRig(PhysicalRig):
 
     def __init__(self, parameters, *, side_effectiveness=(1., 1.), **kwargs):
         super().__init__(parameters, **kwargs)
+
+    def observe(self, **kwargs):
+        return {**super().observe(**kwargs), "sensor_sample_time_s": self.state.time_s, "sensor_age_s": 0.0}
 
 
 class AbortingContractRig(ContractRig):
@@ -38,18 +42,54 @@ def contract_evaluator(parameters, closing_extra, calibration, *, seed, rig_fact
     """Deterministic verifier fixture that makes nominal abstention exactly paired."""
     def run(estimate, name="full_open"):
         residual = abs(estimate.mass_kg - parameters.mass_kg)
+        _, start, target, profile_s, duration, temperature = next(row for row in VERIFICATION_PROFILES if row[0] == name)
         metrics = {"termination": "completed", "tracking_rmse_deg": 0.3 + residual * .15,
                    "final_error_deg": residual * .08, "peak_speed_rad_s": .4, "saturation_fraction": .02,
-                   "completed_duration_s": 1.}
-        trace = [{"time_s": 0., "target_angle_rad": .3,
-                  "true_angle_rad": .3 - math.radians(metrics["tracking_rmse_deg"]), "true_velocity_rad_s": 0.},
-                 {"time_s": 1., "target_angle_rad": math.radians(PROFILE_TARGET_DEGREES[name]),
-                  "true_angle_rad": math.radians(PROFILE_TARGET_DEGREES[name] - metrics["final_error_deg"]),
-                  "true_velocity_rad_s": 0.}]
-        return {"metrics": metrics, "trace": trace, "accepted": metrics["tracking_rmse_deg"] <= 3
+                   "completed_duration_s": duration, "mechanical_work_abs_J": 0., "mechanical_work_signed_J": 0.}
+        trace = []
+        for index, t in enumerate((0.0, duration / 2, duration * .98, duration)):
+            reference = smooth_reference(t, math.radians(start), math.radians(target), profile_s)[0]
+            error = (0 if index == 0 else math.radians(metrics["final_error_deg"]) if index == 3
+                     else math.radians(metrics["tracking_rmse_deg"] * math.sqrt(2)))
+            trace.append({"time_s": t, "absolute_time_s": t, "ambient_temperature_C": temperature,
+                          "target_angle_rad": reference, "true_angle_rad": reference - error,
+                          "true_velocity_rad_s": 0., "true_motor_force_N_each": 0., "command_N_each": 0.,
+                          "force_saturated": index == 3})
+        def state(row):
+            return {"time_s": row["time_s"], "angle_rad": row["true_angle_rad"], "velocity_rad_s": 0.,
+                    "motor_force_N_each": 0., "mechanical_work_abs_J": 0.}
+        return {"metrics": metrics, "trace": trace, "duration_s": duration, "events": [],
+                "initial_state": state(trace[0]), "final_state": state(trace[-1]),
+                "accepted": metrics["tracking_rmse_deg"] <= 3
                 and metrics["final_error_deg"] <= 2}
-    return {"comparisons": [{"name": name, "before": run(Calibration(), name), "after": run(calibration, name)}
-                            for name in PROFILE_NAMES], "hardware_validated": False,
+
+    def auxiliary(start, target, profile_s, duration, loss=None):
+        trace = []
+        for t in (0.0, duration):
+            reference = smooth_reference(t, math.radians(start), math.radians(target), profile_s)[0]
+            trace.append({"time_s": t, "absolute_time_s": t, "ambient_temperature_C": parameters.temperature_C,
+                          "target_angle_rad": reference, "true_angle_rad": reference, "true_velocity_rad_s": 0.,
+                          "true_motor_force_N_each": 0., "command_N_each": 0., "force_saturated": False})
+        return {"metrics": {"termination": "completed", "tracking_rmse_deg": 0., "final_error_deg": 0.,
+                            "peak_speed_rad_s": 0., "saturation_fraction": 0., "completed_duration_s": duration,
+                            "mechanical_work_abs_J": 0., "mechanical_work_signed_J": 0.},
+                "trace": trace, "duration_s": duration,
+                "events": [] if loss is None else [{"time_s": loss, "type": "power_loss"}],
+                "initial_state": {"time_s": 0., "angle_rad": trace[0]["true_angle_rad"], "velocity_rad_s": 0.,
+                                  "motor_force_N_each": 0., "mechanical_work_abs_J": 0.},
+                "final_state": {"time_s": duration, "angle_rad": trace[-1]["true_angle_rad"], "velocity_rad_s": 0.,
+                                "motor_force_N_each": 0., "mechanical_work_abs_J": 0.}}
+    comparisons = [{"name": name, "profile_duration_s": profile, "temperature_C": temperature,
+                    "before": run(Calibration(), name), "after": run(calibration, name)}
+                   for name, _, _, profile, _, temperature in VERIFICATION_PROFILES]
+    return {"comparisons": comparisons, "hardware_validated": False, "system_ready_for_hardware": False,
+            "acceptance_limits": dict(ACCEPTANCE), "before_mean_rmse_deg": run(Calibration())["metrics"]["tracking_rmse_deg"],
+            "after_mean_rmse_deg": run(calibration)["metrics"]["tracking_rmse_deg"],
+            "passive_hold": {"run": auxiliary(78., 78., .8, .8),
+                             "static": passive_hold(replace(parameters,
+                                friction_static_Nm=parameters.friction_static_Nm + closing_extra,
+                                friction_coulomb_Nm=parameters.friction_coulomb_Nm + closing_extra))},
+            "power_loss": auxiliary(55., 70., 1.7, 2.2, .8),
             "model_id": MODEL_ID, "all_motion_profiles_passed": run(calibration)["accepted"]}
 
 
@@ -246,6 +286,65 @@ class EpisodeContractTests(unittest.TestCase):
                 env.step(action)
                 report = env.host_report()
                 self.assertTrue(verify_episode_report(report)["valid"], verify_episode_report(report))
+
+    def test_rehashed_policy_transcript_rejects_private_or_contradictory_views(self):
+        env = self.env()
+        env.step({"experiment": "hold"})
+        env.step({"abstain": True})
+        report = env.host_report()
+        mutations = {
+            "private_reset": lambda r: r["policy_transcript"][0]["observation"].update(evaluator_only_truth=r["episode"]["parameters"]),
+            "private_instrument": lambda r: r["policy_transcript"][0]["observation"]["measurement"].update(true_angle_rad=.3),
+            "private_info": lambda r: r["policy_transcript"][0]["info"].update(sensor_seed=r["episode"]["sensor_seed"]),
+            "free_budget": lambda r: r["policy_transcript"][0]["observation"].update(budget_remaining=999),
+            "future_history": lambda r: r["policy_transcript"][0]["observation"].update(history=r["session"]["agent_history"]),
+            "legal_actions": lambda r: r["policy_transcript"][1]["observation"].update(legal_actions=[]),
+            "wrong_measurement": lambda r: r["policy_transcript"][1]["observation"]["measurement"].update(angle_rad=1.2),
+            "future_sample": lambda r: r["policy_transcript"][0]["observation"]["measurement"].update(sensor_sample_time_s=1),
+            "private_clock": lambda r: r["session"]["diagnostics"][0]["initial_state"].update(time_s=1),
+        }
+        for name, mutate in mutations.items():
+            with self.subTest(name=name):
+                altered = deepcopy(report)
+                mutate(altered)
+                altered["report_sha256"] = digest({k: v for k, v in altered.items() if k != "report_sha256"})
+                self.assertFalse(verify_episode_report(altered)["valid"])
+
+    def test_rehashed_start_measurement_must_follow_previous_observation(self):
+        env = self.env()
+        env.step({"experiment": "hold"})
+        env.step({"abstain": True})
+        report = env.host_report()
+        history = report["session"]["agent_history"]
+        history[0]["start_observation"]["angle_rad"] += .1
+        report["commitment"]["history_sha256"] = digest(history)
+        report["session"]["commitment"] = deepcopy(report["commitment"])
+        for item in report["policy_transcript"]:
+            count = len(item["observation"]["history"])
+            item["observation"]["history"] = deepcopy(history[:count])
+        report["report_sha256"] = digest({k: v for k, v in report.items() if k != "report_sha256"})
+        self.assertIn("policy_measurement_continuity", verify_episode_report(report)["failures"])
+
+    def test_current_rig_cannot_omit_saturation_or_auxiliary_evidence(self):
+        env = self.env()
+        env.step({"abstain": True})
+        report = env.host_report()
+        for name in ("saturation", "passive", "power_loss", "static", "peak_guard"):
+            with self.subTest(name=name):
+                altered = deepcopy(report)
+                if name == "saturation":
+                    for row in altered["verification"]["comparisons"][0]["before"]["trace"]:
+                        del row["force_saturated"]
+                elif name in ("passive", "power_loss"):
+                    del altered["verification"]["passive_hold" if name == "passive" else name]
+                elif name == "static":
+                    altered["verification"]["passive_hold"]["static"]["holding_margin_Nm"] = -999
+                else:
+                    before = altered["verification"]["comparisons"][0]["before"]
+                    before["metrics"]["peak_speed_rad_s"] = 1.2
+                    before["accepted"] = False
+                altered["report_sha256"] = digest({k: v for k, v in altered.items() if k != "report_sha256"})
+                self.assertFalse(verify_episode_report(altered)["valid"])
 
     def test_forced_terminal_reports_match_their_recorded_trigger(self):
         cases = []
