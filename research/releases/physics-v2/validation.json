@@ -12,7 +12,7 @@
   },
   "source_sha256": {
     "recursivecal_lab/physics.py": "0aaa356e6d7dfb794f74a46097b7b06c7ab116a731b632cec7ce48f2e9302ec8",
-    "recursivecal_lab/physical_rig.py": "b086c7326699eb2139a62112800114c387d7415167dfabfaf4674e9095ae0e04",
+    "recursivecal_lab/physical_rig.py": "b1964498dc1aace4fb1f0dfe49336d47c20f16956fce0059835df7549651e984",
     "scripts/validate_physics.py": "d27aeba5ea7e3eab24a556e16b04c861c373132d1692b02b7befab886edca573",
     "tests/test_mechanics_foundation_v2.py": "71787f821a5945417cd9defb0b427acefc3616f900fc3de125e4ac6f3487299c"
   },

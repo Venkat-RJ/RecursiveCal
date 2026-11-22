@@ -13,6 +13,45 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  physical-rl-adapter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        verifiers: ['0.4.0', '0.4.1']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install real supported Verifiers SDK
+        run: python -m pip install -e '.[verifiers]' 'verifiers==${{ matrix.verifiers }}'
+      - name: Exercise physical plugin with scripted replies and real SDK types
+        env:
+          RECURSIVECAL_REQUIRE_VERIFIERS: '1'
+        run: python -m unittest discover -s tests -p 'test_physical_adapter.py' -v
+
+  research-rig-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install independent reference solver
+        run: python -m pip install '.[validation]'
+      - name: Audit coupled drives, sensors, faults and healthy reference
+        run: python scripts/validate_research_rig.py --output artifacts/research-rig-validation.json
+      - name: Preserve complete model evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: recursivecal-research-rig-validation
+          path: artifacts/research-rig-validation.json
+          retention-days: 30
+
   physics-validation:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -76,19 +115,21 @@ jobs:
           recursivecal simulate --output installed-run.json --csv installed-trace.csv
           recursivecal inquire --case weak_motor --output installed-inquiry.json
           recursivecal verify-inquiry installed-inquiry.json
+          recursivecal rl-rollout --policy no_probe --split test --seed 7 --output installed-physical-rl.json
+          recursivecal verify-rl installed-physical-rl.json
           recursivecal experiment --quick --output installed-experiment
           recursivecal verify installed-experiment
       - name: Preserve package artifacts
         if: matrix.python == '3.12'
         uses: actions/upload-artifact@v4
         with:
-          name: recursivecal-v0.4-packages
+          name: recursivecal-v0.5-packages
           path: dist/
           retention-days: 30
 
   browser:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -100,7 +141,11 @@ jobs:
       - name: Install workbench and browser test tools
         run: |
           python -m pip install . playwright
-          python -m playwright install --with-deps chromium
+          python -m playwright install --with-deps chromium webkit
+      - name: Check native camera interactions in Chromium and WebKit
+        run: |
+          node tests/camera_contracts.cjs
+          python tests/camera_smoke.py --all --output artifacts/camera-browser
       - name: Exercise real HTTP workbench, CSV import, exports and mobile layout
         run: |
           node tests/workbench_contracts.cjs
@@ -118,6 +163,7 @@ jobs:
           path: |
             artifacts/workbench/
             artifacts/inquiry-browser/
+            artifacts/camera-browser/
           retention-days: 30
 
   source-contract:

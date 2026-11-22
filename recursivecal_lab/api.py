@@ -13,6 +13,7 @@ from .physics import MODEL_ID, SCENARIOS, ModelParameters, passive_hold, simulat
 
 def capabilities() -> dict[str, Any]:
     from . import physics
+    from .research_simulation import capabilities as research_capabilities
     parameters = asdict(ModelParameters())
     schema = physics.parameter_schema() if hasattr(physics, "parameter_schema") else {}
     return {
@@ -27,6 +28,7 @@ def capabilities() -> dict[str, Any]:
         "passive_hold": passive_hold(),
         "scope": "Local software-in-the-loop research. Default parameters and observations are synthetic.",
         "hardware_connected": False,
+        "research_rig": research_capabilities(),
     }
 
 
@@ -46,7 +48,7 @@ def dispatch(path: str, payload: Any) -> dict[str, Any]:
     body = _object(payload, "request")
     if path == "/api/inquiry":
         from .inquiry import run_study
-        _allowed(body, {"case", "seed", "policy", "max_tests", "budget"})
+        _allowed(body, {"case", "seed", "policy", "max_tests", "budget", "rig_version"})
         return run_study(**body)
     if path == "/api/verify-inquiry":
         from .inquiry import verify_report
@@ -54,7 +56,17 @@ def dispatch(path: str, payload: Any) -> dict[str, Any]:
         return verify_report(body.get("report"))
     if path == "/api/simulate":
         _allowed(body, {"parameters", "duration_s", "dt_s", "seed", "scenario", "controller",
-                        "initial_angle_rad", "initial_velocity_rad_s", "abort_on_limit", "controller_parameters", "parameter_provenance"})
+                        "initial_angle_rad", "initial_velocity_rad_s", "abort_on_limit", "controller_parameters", "parameter_provenance",
+                        "rig_version", "drive", "sensors", "side_effectiveness"})
+        body = dict(body)
+        version = body.pop("rig_version", 2)
+        if type(version) is not int or version not in (2, 3):
+            raise ValueError("rig_version must be 2 or 3")
+        if version == 3:
+            from .research_simulation import simulate as research_simulate
+            return research_simulate(**body)
+        if any(key in body for key in ("drive", "sensors", "side_effectiveness")):
+            raise ValueError("drive, sensors and per-side faults require rig_version 3")
         duration, dt = body.get("duration_s", 6.5), body.get("dt_s", 0.01)
         if isinstance(duration, (int, float)) and isinstance(dt, (int, float)) and dt > 0 and duration / dt > 50000:
             raise ValueError("browser simulation is limited to 50000 integration steps; use the CLI for longer runs")

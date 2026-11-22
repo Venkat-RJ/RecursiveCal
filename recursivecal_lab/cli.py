@@ -11,7 +11,7 @@ import platform
 import sys
 
 from . import __version__
-from .io import read_json, write_json
+from .io import MAX_REPORT_BYTES, read_json, write_json
 
 
 def _output(parser: argparse.ArgumentParser) -> None:
@@ -26,7 +26,10 @@ def parser() -> argparse.ArgumentParser:
     commands.add_parser("doctor", help="check installed dependencies, assets, and one SI run")
     model = commands.add_parser("model", help="print model defaults and physical support calculation")
     model.add_argument("--parameters", type=Path)
+    model.add_argument("--rig-version", type=int, choices=[2, 3], default=3)
     sim = commands.add_parser("simulate", help="run the SI liftgate simulator")
+    sim.add_argument("--rig-version", type=int, choices=[2, 3], default=3,
+                     help="3: electromechanical research rig; 2: archived force-domain model")
     sim.add_argument("--parameters", type=Path, help="JSON ModelParameters object")
     sim.add_argument("--controller-parameters", type=Path, help="separate calibrated controller model")
     sim.add_argument("--scenario", choices=["open", "close", "passive_hold", "power_loss"], default="open")
@@ -66,7 +69,16 @@ def parser() -> argparse.ArgumentParser:
     inquiry.add_argument("--seed", type=int, default=7)
     inquiry.add_argument("--max-tests", type=int, default=5)
     inquiry.add_argument("--budget", type=float, default=8.0)
+    inquiry.add_argument("--rig-version", type=int, choices=[2, 3], default=3)
     _output(inquiry)
+    rollout = commands.add_parser("rl-rollout", help="run a reproducible baseline episode of the physical RL task")
+    rollout.add_argument("--split", choices=["train", "validation", "test", "ood"], default="test")
+    rollout.add_argument("--seed", type=int, default=7)
+    rollout.add_argument("--policy", choices=["fixed", "no_probe"], default="fixed")
+    _output(rollout)
+    check_rl = commands.add_parser("verify-rl", help="verify a sealed physical RL episode and its terminal reward")
+    check_rl.add_argument("report", type=Path)
+    commands.add_parser("rl-schema", help="print the versioned physical observation/action/reward contract")
     check = commands.add_parser("verify-inquiry", help="check a physical inquiry report's integrity and protocol")
     check.add_argument("report", type=Path)
     web = commands.add_parser("serve", help="serve the workbench in the foreground on loopback")
@@ -91,7 +103,7 @@ def _parameter_input(path: Path | None) -> tuple[dict | None, dict | None]:
 def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
     try:
-        if args.command in ("simulate", "fit-force", "replay", "inquire"):
+        if args.command in ("simulate", "fit-force", "replay", "inquire", "rl-rollout"):
             paths = [args.output] + [value for value in (getattr(args, "csv", None) if args.command == "simulate" else None,
                                                        getattr(args, "parameters_output", None)) if value is not None]
             resolved = [path.resolve() for path in paths]
@@ -102,11 +114,15 @@ def main(argv: list[str] | None = None) -> int:
                     raise FileExistsError(f"{path} exists; choose another output or pass --overwrite")
         if args.command == "doctor":
             from .physics import simulate
+            from .research_simulation import simulate as research_simulate
             trial = simulate(duration_s=0.1)
+            research = research_simulate(duration_s=0.1)
             assets = files("recursivecal_lab").joinpath("web", "index.html").is_file()
             report = {"version": __version__, "python": platform.python_version(),
                       "numpy": importlib.metadata.version("numpy"), "workbench_assets": assets,
                       "simulation_samples": len(trial["trace"]), "hardware_connected": False,
+                      "research_model_id": research["model_id"],
+                      "research_rig_passive_support": research["metrics"]["passive_hold"]["can_hold_open_without_motor"],
                       "status": "ok" if assets else "missing workbench assets"}
             print(json.dumps(report, indent=2))
             return 0 if assets else 1
@@ -117,7 +133,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "inquire":
             from .inquiry import run_study
             result = run_study(case=args.case, policy=args.policy, seed=args.seed,
-                               max_tests=args.max_tests, budget=args.budget,
+                               max_tests=args.max_tests, budget=args.budget, rig_version=args.rig_version,
                                progress=lambda message: print(message, file=sys.stderr, flush=True))
             saved = write_json(args.output, result, overwrite=args.overwrite)
             print(json.dumps({"output": str(saved), "outcome": result["outcome"],
@@ -126,19 +142,45 @@ def main(argv: list[str] | None = None) -> int:
                               "after_mean_rmse_deg": result["verification"]["after_mean_rmse_deg"],
                               "hardware_validated": False}, indent=2, allow_nan=False))
             return 0
+        if args.command == "rl-rollout":
+            from .rl_environment import run_smoke_rollout
+            print(f"Running physical RL baseline in this terminal: {args.policy}, {args.split}, seed {args.seed}", file=sys.stderr, flush=True)
+            result = run_smoke_rollout(seed=args.seed, split=args.split, policy=args.policy)
+            saved = write_json(args.output, result, overwrite=args.overwrite)
+            print(json.dumps({"output": str(saved), "protocol": result.get("protocol_id", result.get("schema_version")),
+                              "reward": result.get("score", {}).get("reward"), "hardware_validated": False}, indent=2, allow_nan=False))
+            return 0
         if args.command == "verify-inquiry":
             from .inquiry import verify_report
-            result = verify_report(read_json(args.report))
+            result = verify_report(read_json(args.report, max_bytes=MAX_REPORT_BYTES))
             print(json.dumps(result, indent=2, allow_nan=False))
             return 0 if result["valid"] else 1
+        if args.command == "verify-rl":
+            from .rl_environment import verify_episode_report
+            result = verify_episode_report(read_json(args.report, max_bytes=MAX_REPORT_BYTES))
+            print(json.dumps(result, indent=2, allow_nan=False))
+            return 0 if result["valid"] else 1
+        if args.command == "rl-schema":
+            from .rl_environment import protocol
+            print(json.dumps(protocol(), indent=2, allow_nan=False))
+            return 0
         if args.command == "model":
             from .physics import ModelParameters, passive_hold
             parameters, provenance = _parameter_input(args.parameters)
-            parameters = parameters or asdict(ModelParameters())
-            print(json.dumps({"parameters": parameters, "passive_hold": passive_hold(parameters)}, indent=2))
+            if args.rig_version == 3:
+                from .research_rig import ResearchRig
+                rig = ResearchRig(ModelParameters(**parameters) if parameters else None)
+                print(json.dumps({"specification": rig.metadata(), "parameters": asdict(rig.parameters),
+                                  "passive_hold": passive_hold(rig.parameters)}, indent=2))
+            else:
+                parameters = parameters or asdict(ModelParameters())
+                print(json.dumps({"parameters": parameters, "passive_hold": passive_hold(parameters)}, indent=2))
             return 0
         if args.command == "simulate":
-            from .physics import simulate
+            if args.rig_version == 3:
+                from .research_simulation import simulate
+            else:
+                from .physics import simulate
             from .measurements import export_trace_csv
             if args.csv and args.csv.exists() and not args.overwrite:
                 raise FileExistsError(f"{args.csv} exists; choose another output or pass --overwrite")
@@ -172,7 +214,7 @@ def main(argv: list[str] | None = None) -> int:
                 limits["angle_rmse_rad"] = args.angle_rmse_max
             if args.velocity_rmse_max is not None:
                 limits["velocity_rmse_rad_s"] = args.velocity_rmse_max
-            result = compare_trajectory(args.csv, read_json(args.simulation), metadata_path=args.metadata, acceptance_limits=limits or None)
+            result = compare_trajectory(args.csv, read_json(args.simulation, max_bytes=MAX_REPORT_BYTES), metadata_path=args.metadata, acceptance_limits=limits or None)
         elif args.command == "experiment":
             from .experiments import run_experiment
             print(f"Running experiment in foreground: {args.output}", flush=True)

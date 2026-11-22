@@ -9,11 +9,11 @@
 [![Research numerical audit](https://github.com/Venkat-RJ/RecursiveCal/actions/workflows/research-audit.yml/badge.svg)](https://github.com/Venkat-RJ/RecursiveCal/actions/workflows/research-audit.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-RecursiveCal connects a physical simulator to an investigator that chooses experiments, observes the response, updates its belief and commits a calibration. An independent verifier then tests that commitment on new motion profiles. The core is a dimensioned, persistent liftgate rig with CAD replay, instrument observations, bounded tests and an auditable Bayesian baseline.
+RecursiveCal connects a physical simulator to an investigator that chooses experiments, observes the response, updates its belief and commits a calibration. An independent verifier then tests that commitment on new motion profiles. The core is a dimensioned, persistent liftgate rig with independent DC drives, sampled instruments, bounded tests and an auditable Bayesian baseline.
 
-The [physical inquiry foundation](docs/PHYSICAL_INQUIRY.md) is the main development path. The earlier normalized benchmark, learned-policy pilots, v0.3 release evidence and manuscript remain reproducible research records. The connected physical investigator currently uses Bayesian inference, not a learned RL policy.
+The [physical inquiry foundation](docs/PHYSICAL_INQUIRY.md) is the main development path. The earlier normalized benchmark, learned-policy pilots, v0.3 release evidence and manuscript remain reproducible research records. The connected physical investigator uses Bayesian inference. The new observation-only physical RL task and Verifiers plugin use the same rig; a learned policy has not yet been trained on it.
 
-**Current focus: verify the environment first.** The SI simulator and persistent rig now share the version 2 mechanical kernel. The [physics validation record](docs/PHYSICS_VALIDATION.md) separates analytical checks, independent numerical comparisons and the measured-hardware evidence still needed. Saved version 1 replays retain their original source hashes and are labelled as archived evidence.
+**Current environment: research rig 3.** The [declared mechanism](docs/RESEARCH_RIG.md) has a healthy spring-applied brake, two DC drives, current and heat accounting, and sampled, delayed instrumentation. The workbench, investigator and [physical RL task](docs/PHYSICAL_RL.md) use this same rig. Its rigid-body equations still use the verified version 2 kernel. The [readiness record](docs/SIMULATOR_READINESS.md) separates implemented behavior, numerical evidence, supported scope and the measured-hardware evidence still needed. Older model versions remain explicitly selectable.
 
 [Open recorded workbench](https://venkat-rj.github.io/recursivecal-lab/) · [User guide](docs/USER_GUIDE.md) · [Experiment protocol](docs/EXPERIMENT_PROTOCOL.md) · [Paper draft](paper/README.md) · [Citation](#citation) · [Legacy 3D CAD explorer](https://venkat-rj.github.io/recursivecal/)
 
@@ -35,7 +35,7 @@ recursivecal serve
 
 Open `http://127.0.0.1:8765`. The server runs in the current terminal; Ctrl+C stops it. NumPy is the only required third-party runtime dependency. The new suite needs no GPU, API key, paid service, or CAD installation.
 
-The root page opens the physical workspace with **Rig & data**, **Investigate**, **Calibrate**, and **Verify**. The rig, actuator extension, traces and readouts share one replay clock. The actuator cutaway illustrates the internal assembly; electrical current, rotor speed and temperature are not modeled. The older `inquiry.html` address redirects to the investigation tab.
+The root page opens the physical workspace with **Rig & data**, **Investigate**, **Calibrate**, and **Verify**. The rig, actuator extension, traces and readouts share one replay clock. The actuator cutaway illustrates the internal assembly. Version 3 displays recorded per-side current, voltage, shaft speed and winding temperature. Camera controls support presets, orbit, pan, keyboard input and touch pinch. The older `inquiry.html` address redirects to the investigation tab.
 
 To run the physical investigation from the terminal:
 
@@ -52,7 +52,8 @@ The workspace streams actual experiment-selection, observation and belief-update
 | --- | --- |
 | Physical inquiry | Persistent SI plant, observation-only session, adaptive Bayesian tests, fixed/no-probe comparisons, calibration commitment and independent verification |
 | Physical workspace | Four connected views, articulated CAD, actuator cutaway, synchronized replay, pre-test model predictions, sealed estimates and exact verification limits |
-| SI liftgate simulation | Explicit geometry, gravity, force lag, gas assistance, friction and stiction, stops, sensor assumptions, power loss, and holding architecture |
+| SI liftgate simulation | Shared rigid-body kernel; independent DC drives; gas assistance, friction, stops, delayed brake, electrical and thermal state, sampled sensors and power loss |
+| Physical RL task | Seeded reset/step/commit episodes, disjoint continuous parameter cells, terminal reward, sealed evaluator evidence, JSON dialogue and a separate Verifiers plugin |
 | Workbench | Configure and run the model, inspect signals, replay time, pin comparisons, import results, export complete JSON and CSV |
 | Force fitting | Read SI CSVs with provenance, fit training rows, report held-out residuals, apply a curve only within its measured-length support |
 | Trajectory comparison | Compare declared observations against a saved simulation without refitting, time shifting, or extrapolation |
@@ -64,6 +65,8 @@ The connected physical rig, original SI model and normalized diagnostic benchmar
 
 ## Run the workflows
 
+The CLI and physical workspace select research rig 3 by default. Use `--rig-version 2` for the earlier force-domain simulator and inquiry fixtures. The preserved normalized benchmark remains a separate task.
+
 ### Simulate and export
 
 ```bash
@@ -72,7 +75,7 @@ recursivecal simulate --scenario open --duration 6.5 --dt 0.01 \
 recursivecal simulate --scenario passive_hold --output runs/hold.json
 ```
 
-The default passive-hold test fails by design: the assumed gas support and hinge stiction cannot hold the hatch open. The run records its speed-limit event and actual early stop. An explicit brake parameter can change the modeled architecture; it is not evidence that a real brake exists or is adequate.
+The version 3 reference has an explicit 120 N·m spring-applied brake and passes its modeled unpowered-hold check. Set the brake to zero in the workspace to test that failure. The earlier unbraked force model remains available with `--rig-version 2`; it fails passive hold by design. These are synthetic architecture calculations, not evidence about a real brake.
 
 ### Fit data and compare a trace
 
@@ -81,7 +84,7 @@ recursivecal fit-force examples/measurements/synthetic_force.csv \
   --metadata examples/measurements/synthetic_force.metadata.json \
   --output runs/fit.json --parameters-output runs/fitted-parameters.json
 
-recursivecal simulate --parameters runs/fitted-parameters.json \
+recursivecal simulate --rig-version 2 --parameters runs/fitted-parameters.json \
   --controller-parameters runs/fitted-parameters.json \
   --output runs/fitted-open.json
 
@@ -92,7 +95,17 @@ recursivecal replay examples/measurements/synthetic_trajectory.csv \
 
 The example files are labeled synthetic. The same contracts accept actual measurements with declared units and source metadata. A source declaration is retained, not independently authenticated. See [data contracts](docs/DATA_CONTRACT.md) and [physical model assumptions](docs/PHYSICAL_MODEL.md).
 
-### Train, evaluate, and verify
+### Run the physical RL contract
+
+```bash
+recursivecal rl-schema
+recursivecal rl-rollout --policy fixed --split test --seed 7 --output runs/physical-episode.json
+recursivecal verify-rl runs/physical-episode.json
+```
+
+This is a deterministic baseline rollout of the physical task. It does not train a policy. The [physical RL guide](docs/PHYSICAL_RL.md) defines observation boundaries, continuous train/validation/test cells, OOD cases, reward and the `recursivecal-physical` Verifiers plugin.
+
+### Train, evaluate, and verify the preserved normalized benchmark
 
 ```bash
 recursivecal experiment --output runs/smoke --quick
@@ -127,7 +140,7 @@ The learned policy is a small NumPy contextual bandit with a fixed first test, o
 
 ## Physical verification and its limits
 
-The [current mechanics audit](research/releases/physics-v2/validation.json) includes independent trajectory and contact comparisons, timestep refinement and long conservative-motion checks. The [archived version 1 audit](research/releases/physical-v1/audit.json) retains its original geometry, force-fitting and failure demonstrations; its approximately 1.07-degree opening RMSE belongs to that earlier model. The default unpowered support balance still lacks about 57.75 Nm after assumed static friction. Passing numerical gates does not turn that failure into a hardware pass.
+The [research-rig audit](research/releases/research-rig-v3/validation.json) compares the coupled electrical/mechanical equations with an independent DOP853 implementation, checks refinement and energy accounting, and retains healthy and fault-condition outcomes. The [underlying mechanics audit](research/releases/physics-v2/validation.json) separately covers contact, friction and long conservative motion. The [archived version 1 audit](research/releases/physical-v1/audit.json) retains its original geometry, force-fitting and failure demonstrations; its approximately 1.07-degree opening RMSE belongs to that earlier model. The earlier unbraked mechanism lacks about 57.75 N·m after assumed static friction. The explicit version 3 brake changes that architecture; it does not establish hardware accuracy.
 
 No OEM model or real actuator dataset was used to train or validate this release. A public NHTSA report motivates the architecture-dependent hold test and is documented in [provenance](docs/PROVENANCE.md); its vehicle measurements are not transferred to this geometry. The [physical measurement protocol](docs/HARDWARE_PROTOCOL.md) specifies the independent evidence needed for a later physical claim.
 
@@ -166,7 +179,7 @@ If you use RecursiveCal in your research or build on the code, please cite it:
 @software{Jambula_RecursiveCal_2026,
   author = {Jambula, Venkateshwar Reddy},
   title = {{RecursiveCal: Reproducible Active Calibration and a Software-in-the-Loop Workbench}},
-  version = {0.4.0},
+  version = {0.5.0},
   year = {2026},
   month = nov,
   url = {https://github.com/Venkat-RJ/RecursiveCal},

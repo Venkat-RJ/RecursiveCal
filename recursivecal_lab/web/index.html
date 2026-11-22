@@ -69,7 +69,7 @@
         <div id="cadUnavailable" class="cad-unavailable" hidden><strong>3D view unavailable</strong><span>The recorded measurements and playback remain available.</span></div>
         <div class="viewport-corner"><span class="axis-mark" aria-hidden="true">↗</span><span id="poseSource">Simulator pose</span></div>
         <div id="comparisonLabels" class="comparison-labels" hidden><span>Baseline <b id="beforePose"></b></span><span>Candidate <b id="afterPose"></b></span></div>
-        <div class="view-controls"><span>Drag to orbit · Scroll to zoom</span><button id="resetCamera" title="Reset camera" aria-label="Reset camera">⌖</button><button id="focusMechanism" title="Inspect mounting geometry" aria-label="Inspect mounting geometry" aria-pressed="false">◇</button></div>
+        <div class="view-controls"><span>Drag to orbit · Shift-drag to pan · Pinch or scroll to zoom</span><select id="cameraView" aria-label="Camera view"><option value="isometric">Isometric</option><option value="front">Front</option><option value="side">Side</option><option value="top">Top</option><option value="custom" disabled>Custom</option></select><button id="resetCamera" title="Reset current camera view" aria-label="Reset camera">⌖</button><button id="focusMechanism" title="Inspect mounting geometry" aria-label="Inspect mounting geometry" aria-pressed="false">◇</button></div>
       </div>
       <div id="actuatorPane" class="actuator-pane">
         <div class="strip-heading"><h2 id="actuatorTitle">Left actuator</h2><span>Illustrative internal assembly</span><span id="extensionLabel" class="mono"></span></div>
@@ -136,6 +136,14 @@
 <dialog id="settingsDialog" class="settings-dialog">
   <div class="dialog-heading"><div><span class="eyebrow">Next run</span><h2 id="settingsTitle">Simulation configuration</h2></div><button class="close-dialog" aria-label="Close settings" data-close="settingsDialog">×</button></div>
   <form id="simulationForm" class="settings-form">
+    <label>Physical model<select id="simulationModel"><option value="3">Research rig 3 · motors, sensors and brake</option><option value="2">Force model 2 · earlier unbraked rig</option></select></label>
+    <details id="researchSettings"><summary>Drives, brake and sampled instruments</summary>
+      <div class="form-pair"><label>Supply voltage <span>V</span><input data-drive="supply_voltage_V" type="number" min="6" max="16" step=".1" value="12" required></label><label>Unpowered brake <span>N·m</span><input data-drive="brake_capacity_Nm" type="number" min="0" max="200" step="1" value="120" required></label></div>
+      <div class="form-pair"><label>Left drive effectiveness<input data-side="0" type="number" min=".4" max="1.2" step=".01" value="1" required></label><label>Right drive effectiveness<input data-side="1" type="number" min=".4" max="1.2" step=".01" value="1" required></label></div>
+      <div class="form-pair"><label>Sensor sample period <span>s</span><input data-sensor="sample_period_s" type="number" min=".005" max=".05" step=".001" value=".01" required></label><label>Sensor delay <span>s</span><input data-sensor="latency_s" type="number" min="0" max=".1" step=".001" value=".01" required></label></div>
+      <div class="form-pair"><label>Command delay <span>s</span><input data-sensor="command_delay_s" type="number" min="0" max=".1" step=".001" value=".01" required></label><label>Angle noise σ <span>rad</span><input data-sensor="angle_noise_std_rad" type="number" min="0" max=".02" step=".0005" value=".002" required></label></div>
+      <p class="form-note">Synthetic, declared assumptions. A zero brake tests the unbraked fault. Both drives act on one rigid hinge; body twist and backlash are outside this model.</p>
+    </details>
     <div class="form-pair"><label>Scenario<select id="scenario"><option value="open">Full opening</option><option value="close">Full closing</option><option value="passive_hold">Passive hold</option><option value="power_loss">Power loss</option></select></label><label>Controller<select id="controller"><option value="nominal">Nominal controller</option><option value="disabled">Motor disabled</option></select></label></div>
     <div class="form-pair"><label>Duration <span>s</span><input id="duration" type="number" min=".1" max="60" step=".1" value="6.5" required></label><label>Time step <span>s</span><input id="dt" type="number" min=".0001" max=".05" step=".0001" value=".01" required></label></div>
     <div class="form-pair"><label>Hatch mass <span>kg</span><input data-param="mass_kg" type="number" min="1" max="100" step=".1" value="25" required></label><label>Hinge inertia <span>kg·m²</span><input data-param="inertia_kg_m2" type="number" min=".1" max="100" step=".01" value="12" required></label></div>
@@ -153,6 +161,7 @@
     <button class="primary-button dialog-run" type="submit">Run simulation</button>
   </form>
   <form id="investigationForm" class="settings-form" hidden>
+    <label>Physical model<select id="studyModel"><option value="3">Research rig 3 · motors, sensors and brake</option><option value="2">Force model 2 · earlier unbraked rig</option></select></label>
     <label>Hidden condition<select id="condition"><option value="weak_motor">Reduced drive effectiveness</option><option value="nominal">Nominal mechanism</option><option value="payload">Additional hatch mass</option><option value="friction">Increased hinge friction</option><option value="gas_loss">Reduced gas assistance</option><option value="sensor_bias">Encoder offset</option><option value="compound">Combined changes</option><option value="directional_friction">Unmodeled closing friction</option><option value="overload">Mass outside the model bank</option></select></label>
     <p class="form-note">Evaluator setup. The investigator receives instrument observations, not the condition name or hidden plant parameters.</p>
     <label>Investigator<select id="policy"><option value="bayes">Bayesian adaptive tests</option><option value="fixed">Fixed high / low / mid schedule</option><option value="no_probe">Nominal controller, no tests</option></select></label>

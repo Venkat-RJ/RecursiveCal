@@ -109,7 +109,7 @@
       details.append(el("h2","Current run"));
       signals(details,[["Scenario",scenarios[S.run?.configuration?.scenario]||"No run"],["Engine",S.run?"Physics "+S.run.model_id.split("/").at(-1):"2"],
         ["Source","Synthetic"],["Hardware","None"]]);
-      text("viewScope","Evaluator view");text("scopeDetail","One hinge. Two struts. Shared actuator dynamics.");
+      text("viewScope","Evaluator view");text("scopeDetail",S.run?.model_id.endsWith("/3")?"One rigid hinge. Two independent DC drives. Sampled sensors.":"One hinge. Two struts. Shared force dynamics.");
     } else if(S.view==="verify") {
       text("navTitle","Test profiles");text("navCount","04 tests");
       for(const [index,pair] of (r?.verification.comparisons||[]).entries()) {
@@ -209,16 +209,26 @@
           ["Temperature",fmt(parameters.temperature_C,1),"°C"]]);
       } else if(S.component==="sensor") {
         p=section("Angle sensor model");
-        signals(p,[["Encoder bias",fmt(parameters.sensor_bias_rad,4),"rad"],["Logging noise σ",fmt(parameters.sensor_noise_std_rad,4),"rad"]]);
+        const spec=S.run?.rig_specification?.sensors;
+        signals(p,[["Encoder bias",fmt(parameters.sensor_bias_rad,4),"rad"],["Logging noise σ",fmt(spec?.angle_noise_std_rad??parameters.sensor_noise_std_rad,4),"rad"]]);
+        if(spec)signals(p,[["Sample period",fmt(spec.sample_period_s*1000,1),"ms"],["Sensor delay",fmt(spec.latency_s*1000,1),"ms"],
+          ["Command delay",fmt(spec.command_delay_s*1000,1),"ms"],["Angle resolution",fmt(spec.angle_resolution_rad,4),"rad"]]);
         p.append(el("p","The simulation pose shows model state. The investigator view uses the recorded sensor angle.","description"));
       } else {
         p=section(S.component==="right"?"Right actuator":"Left actuator");
         signals(p,[["Command","n/a","N / strut","readingCommand"],["Delivered force","n/a","N / strut","readingDrive"],
-          ["Gas assistance","n/a","N / strut","readingGas"],["Command limit",fmt(parameters.motor_force_max_N_each,0),"N / strut"],
+          ["Gas assistance","n/a","N / strut","readingGas"],["Command limit",fmt(S.run?.model_id.endsWith("/3")?Math.min(330,parameters.motor_force_max_N_each):parameters.motor_force_max_N_each,0),"N / strut"],
           ["Saturated","n/a","","readingSaturated"]]);
       }
+      if(S.run?.model_id.endsWith("/3")&&["left","right"].includes(S.component)) {
+        p=section("Electrical & thermal state");
+        signals(p,[["Current","n/a","A","readingCurrent"],["Voltage","n/a","V","readingVoltage"],
+          ["Motor speed","n/a","rpm","readingRpm"],["Winding temperature","n/a","°C","readingTemperature"],
+          ["Sensor age","n/a","ms","readingSensorAge"],["Holding brake","n/a","","readingBrake"]]);
+      }
       p=section("Model coverage");
-      signals(p,[["Force response","Simulated"],["Motor current","Not modeled"],["Rotor speed","Not modeled"],["Motor heating","Not modeled"]]);
+      if(S.run?.model_id.endsWith("/3"))signals(p,[["DC drives","Two independent states"],["Heat model","Lumped winding"],["Holding architecture",parameters.holding_brake_Nm>0?"Spring-applied brake":"Unbraked fault"],["Hardware evidence","Unavailable"]]);
+      else signals(p,[["Force response","Simulated"],["Motor current","Not modeled"],["Rotor speed","Not modeled"],["Motor heating","Not modeled"]]);
       p=section("Run events");appendEvents(p,S.data?.events||[]);
       if(S.run)p.append(el("p","Termination: "+human(S.run.metrics.termination)+".","meta-label"));
     } else if(S.view==="verify"&&r) {
@@ -314,7 +324,12 @@
       "The investigator abstained. Inferred values are shown for inspection; the nominal calibration was retained for verification.","calibration-note"));
     panel.append(el("h2","Fixed & derived"));
     const fixed=el("div",null,"fixed-table");
-    for(const [name,status] of [["Hinge geometry","Fixed"],["Hinge inertia","Derived from mass"],["Static friction","Coulomb + 2 N·m"],["Feedback gains","Fixed"],["Electrical motor","Not modeled"],["Left / right drives","Shared model"]]) {
+    const research=r.model_id.endsWith("/3");
+    const mechanism=[["Hinge geometry","Fixed"],["Hinge inertia","Derived from mass"],["Static friction","Coulomb + 2 N·m"],["Feedback gains","Fixed"],
+      ["Electrical motor",research?"DC current and winding heat":"Not modeled"],
+      ["Left / right drives",research?"Independent states, one rigid hinge":"Shared model"]];
+    if(research)mechanism.push(["Holding brake","Declared spring-applied architecture"],["Instruments","Sampled, delayed and quantized"]);
+    for(const [name,status] of mechanism) {
       const row=el("div",name);row.append(el("span",status));fixed.append(row);
     }panel.append(fixed);
     panel.append(el("p","The plots below show the selected recorded experiment. They are not an independently fitted calibration-response curve.","calibration-note"));
@@ -426,9 +441,21 @@
     $("movingActuator").setAttribute("transform","translate("+fmt(C.clamp(extension/Math.max(maxStroke,.001),0,1)*164,3)+" 0)");
     $("actuatorSvg").dataset.strokeM=String(extension);$("rigCanvas").dataset.angleRad=String(current.q);
     text("extensionLabel",fmt(extension*1000,1)+" mm extension");
+    const side=S.component==="right"?"right":"left",currentAmps=current[side+"_current_A"];
+    const hasDrive=Number.isFinite(currentAmps);
+    text("actuatorCaption",hasDrive?"Electrical state and shaft speed follow the recorded drive model · illustrative internal assembly":
+      d.kind==="investigate"&&d.model?.endsWith("/3")?"Pose follows the instrument angle · hidden drive telemetry is withheld from the investigator":
+      "Extension follows rig geometry · motor rotation and electrical behavior are not modeled");
+    $("actuatorSvg").setAttribute("aria-label",hasDrive?"Illustrative actuator cutaway with modeled electrical and shaft-speed readings.":"Illustrative actuator cutaway following the recorded geometric extension.");
+    if(hasDrive)$("actuatorSvg").dataset.currentA=String(currentAmps);else delete $("actuatorSvg").dataset.currentA;
+    reading("readingCurrent",currentAmps,"A",2);reading("readingVoltage",current[side+"_voltage_V"],"V",2);
+    reading("readingRpm",Number.isFinite(current[side+"_motor_speed_rad_s"])?current[side+"_motor_speed_rad_s"]*60/(2*Math.PI):undefined,"rpm",0);
+    reading("readingTemperature",current[side+"_temperature_C"],"°C",2);
+    reading("readingSensorAge",Number.isFinite(current.sensor_age_s)?current.sensor_age_s*1000:undefined,"ms",1);
+    reading("readingBrake",current.brake_engaged===undefined?"n/a":current.brake_engaged?"Engaged":"Released");
     reading("readingAngle",deg(current.q),"deg",2);reading("readingTarget",deg(current.target),"deg",2);
     reading("readingSpeed",current.velocity,"rad/s",3);reading("readingStroke",extension*1000,"mm",1);
-    reading("readingCommand",current.command,"N / strut",1);reading("readingDrive",current.drive,"N / strut",1);
+    reading("readingCommand",current.command,"N / strut",1);reading("readingDrive",current[side+"_force_N"]??current.drive,"N / strut",1);
     reading("readingGas",current.gas,"N / strut",1);reading("readingForce",current.force,"N / strut",1);
     reading("readingSaturated",current.saturated===undefined?"n/a":current.saturated?"Yes":"No");
     reading("readingBefore",deg(before?.q),"deg",2);
@@ -455,13 +482,14 @@
     overlay.setAttribute("viewBox","0 0 "+w+" "+h);
     const defs=svg("defs"),marker=svg("marker",{id:"forceArrow",markerWidth:6,markerHeight:6,refX:5,refY:3,orient:"auto"});
     marker.append(svg("path",{d:"M0 0L6 3L0 6",fill:"#d96b28"}));defs.append(marker);overlay.append(defs);
-    const p=S.data.parameters,g=C.geometry(current.q,p),sign=Math.sign(current.drive);
-    if(!sign)return;
+    const p=S.data.parameters,g=C.geometry(current.q,p);
     for(const side of [-1,1]) {
+      const force=current[(side===1?"left":"right")+"_force_N"]??current.drive,sign=Math.sign(force);
+      if(!sign)continue;
       const a=S.renderer.projectPoint([p.body_anchor_x_m??-.47,side*window.RecursiveCAD.strut_y,p.body_anchor_z_m??1.17]);
       const b=S.renderer.projectPoint([g.x,side*window.RecursiveCAD.strut_y,g.z]);
       if(!a.visible||!b.visible)continue;
-      const dx=b.x-a.x,dy=b.y-a.y,length=Math.hypot(dx,dy)||1,scale=C.clamp(Math.abs(current.drive)/330,.12,.8);
+      const dx=b.x-a.x,dy=b.y-a.y,length=Math.hypot(dx,dy)||1,scale=C.clamp(Math.abs(force)/330,.12,.8);
       const x=(a.x+b.x)/2+12,y=(a.y+b.y)/2;
       overlay.append(svg("line",{x1:x-dx/length*18*sign,y1:y-dy/length*18*sign,x2:x+dx/length*55*scale*sign,y2:y+dy/length*55*scale*sign,
         stroke:"#d96b28","stroke-width":2,"marker-end":"url(#forceArrow)"}));
@@ -496,13 +524,30 @@
   }
   function syncSimulationForm(run) {
     S.baseParameters={...run.parameters};
+    $("simulationModel").value=run.model_id.endsWith("/3")?"3":"2";
     for(const input of document.querySelectorAll("[data-param]"))if(Number.isFinite(run.parameters[input.dataset.param]))input.value=run.parameters[input.dataset.param];
     const cfg=run.configuration;
+    const spec=run.rig_specification;
+    if(spec) {
+      for(const input of document.querySelectorAll("[data-drive]"))if(Number.isFinite(spec.drive?.[input.dataset.drive]))input.value=spec.drive[input.dataset.drive];
+      for(const input of document.querySelectorAll("[data-sensor]"))if(Number.isFinite(spec.sensors?.[input.dataset.sensor]))input.value=spec.sensors[input.dataset.sensor];
+      for(const input of document.querySelectorAll("[data-side]"))if(Number.isFinite(spec.side_effectiveness?.[Number(input.dataset.side)]))input.value=spec.side_effectiveness[Number(input.dataset.side)];
+    }
     for(const [key,id] of [["scenario","scenario"],["controller","controller"],["duration_s","duration"],["dt_s","dt"],["seed","simulationSeed"]])
       if(cfg?.[key]!==undefined)$(id).value=cfg[key];
     $("abortOnLimit").checked=cfg?.abort_on_limit!==false;
+    modelLimits();
+  }
+  function modelLimits() {
+    const research=$("simulationModel").value==="3";
+    $("researchSettings").hidden=!research;
+    for(const input of $("researchSettings").querySelectorAll("input"))input.disabled=!research;
+    $("duration").max=research?"15":"60";$("dt").min=research?".001":".0001";$("dt").max=research?".02":".05";
+    $("abortOnLimit").disabled=research;if(research)$("abortOnLimit").checked=true;
+    for(const key of ["actuator_time_constant_s","sensor_noise_std_rad","holding_brake_Nm"]){const input=document.querySelector('[data-param="'+key+'"]');if(input){input.closest("label").hidden=research;input.disabled=research;}}
   }
   function syncStudyForm(report) {
+    $("studyModel").value=report.model_id.endsWith("/3")?"3":"2";
     for(const [key,id] of [["case","condition"],["policy","policy"],["seed","studySeed"],["budget","budget"],["max_tests","maxTests"]])
       if(report.configuration[key]!==undefined)$(id).value=report.configuration[key];
   }
@@ -529,8 +574,8 @@
     if(S.busy)return;hideNotice();
     try {
       const ref=await decodeReference();
-      if(S.view==="simulation")await loadRun(ref.simulation,"Recorded example · physics 2");
-      else await loadStudy(ref.investigation,"Recorded example · physics 2",S.view);
+      if(S.view==="simulation")await loadRun(ref.simulation,"Recorded example · physics "+ref.simulation.model_id.split("/").at(-1));
+      else await loadStudy(ref.investigation,"Recorded example · physics "+ref.investigation.model_id.split("/").at(-1),S.view);
       notice("Recorded synthetic evidence. Run the local engine to compute a new result.");
     }catch(error){notice(error.message,"error");}
   }
@@ -542,8 +587,14 @@
     event?.preventDefault();if(S.busy||!S.connected||!$("simulationForm").reportValidity())return;
     const parameters={...S.baseParameters};
     for(const input of document.querySelectorAll("[data-param]"))parameters[input.dataset.param]=Number(input.value);
-    const payload={parameters,scenario:$("scenario").value,controller:$("controller").value,
+    const payload={parameters,rig_version:Number($("simulationModel").value),scenario:$("scenario").value,controller:$("controller").value,
       duration_s:Number($("duration").value),dt_s:Number($("dt").value),seed:Number($("simulationSeed").value),abort_on_limit:$("abortOnLimit").checked};
+    if(payload.rig_version===3) {
+      payload.drive={...(S.run?.rig_specification?.drive||{})};payload.sensors={...(S.run?.rig_specification?.sensors||{})};
+      for(const input of document.querySelectorAll("[data-drive]"))payload.drive[input.dataset.drive]=Number(input.value);
+      for(const input of document.querySelectorAll("[data-sensor]"))payload.sensors[input.dataset.sensor]=Number(input.value);
+      payload.side_effectiveness=[...document.querySelectorAll("[data-side]")].map(input=>Number(input.value));
+    }
     stop();hideNotice();$("settingsDialog").close();S.abort=new AbortController();setBusy(true,"Computing");
     try {
       const response=await fetch("api/simulate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),signal:S.abort.signal});
@@ -571,7 +622,7 @@
   async function runInvestigation(event) {
     event?.preventDefault();if(S.busy||!S.connected||!$("investigationForm").reportValidity())return;
     const previous={study:S.study,origin:S.studyOrigin,diag:S.diag,profile:S.profile};
-    const payload={case:$("condition").value,policy:$("policy").value,seed:Number($("studySeed").value),
+    const payload={case:$("condition").value,rig_version:Number($("studyModel").value),policy:$("policy").value,seed:Number($("studySeed").value),
       budget:Number($("budget").value),max_tests:Number($("maxTests").value)};
     stop();hideNotice();$("settingsDialog").close();S.view="investigate";document.body.dataset.view="investigate";
     history.replaceState(null,"","#investigate");S.abort=new AbortController();setBusy(true,"Starting");
@@ -615,7 +666,7 @@
     else {
       summary.append(el("p",(S.view==="simulation"?S.runOrigin:S.studyOrigin)+". "+value.model_id+". All displayed model outputs are synthetic."));
       const list=el("ul");
-      for(const note of value.limitations||["One rigid hinge with two identical struts.","The actuator cutaway illustrates the assembly; it is not manufacturing CAD.","No motor electrical model, independent left/right dynamics or hardware validation."])list.append(el("li",note));
+      for(const note of value.limitations||(value.model_id.endsWith("/3")?["One rigid hinge with independent DC drive states; no body torsion.","The actuator cutaway is illustrative, not manufacturing CAD.","Synthetic coefficients; no backlash, latch, obstacle contact or hardware validation."]:["One rigid hinge with two identical struts.","The actuator cutaway illustrates the assembly; it is not manufacturing CAD.","No motor electrical model, independent left/right dynamics or hardware validation."]))list.append(el("li",note));
       summary.append(list);
       text("provenanceJson",JSON.stringify({model_id:value.model_id,configuration:value.configuration,
         parameters:S.view==="simulation"?value.parameters:undefined,commitment:value.commitment,provenance:value.provenance,
@@ -657,7 +708,10 @@
     });
     $(id).addEventListener("keydown",event=>{if(event.key==="ArrowRight"||event.key==="ArrowLeft"){event.preventDefault();stop();setTime(C.stepTime(S.data?.rows,S.time,event.key==="ArrowRight"?1:-1));}});
   }
-  $("resetCamera").addEventListener("click",()=>{S.renderer?.setFocus("assembly");$("focusMechanism").setAttribute("aria-pressed","false");setTime(S.time);});
+  $("resetCamera").addEventListener("click",()=>{S.renderer?.resetCamera();setTime(S.time);});
+  $("cameraView").addEventListener("change",()=>S.renderer?.setView($("cameraView").value));
+  $("simulationModel").addEventListener("change",modelLimits);
+  $("rigCanvas").addEventListener("camerachange",()=>{if(S.renderer)$("cameraView").value=S.renderer.getView();if(S.data)drawVectors(C.sample(S.data.rows,S.time));});
   $("focusMechanism").addEventListener("click",()=>{const active=$("focusMechanism").getAttribute("aria-pressed")!=="true";
     $("focusMechanism").setAttribute("aria-pressed",String(active));S.renderer?.setFocus(active?"mechanism":"assembly");setTime(S.time);});
   $("rigCanvas").addEventListener("pointermove",()=>{if(S.data)drawVectors(C.sample(S.data.rows,S.time));});
@@ -680,7 +734,7 @@
     $("engineStatus").className="engine-status"+(S.connected?" connected":"");document.body.dataset.ready=S.connected?"connected":"offline";
     try {
       const ref=await decodeReference();S.run=ref.simulation;S.study=ref.investigation;
-      S.runOrigin=S.studyOrigin="Recorded example · physics 2";syncSimulationForm(S.run);syncStudyForm(S.study);
+      S.runOrigin="Recorded example · physics "+S.run.model_id.split("/").at(-1);S.studyOrigin="Recorded example · physics "+S.study.model_id.split("/").at(-1);syncSimulationForm(S.run);syncStudyForm(S.study);
       S.profile=Math.max(0,S.study.verification.comparisons.findIndex(pair=>!C.accepted(pair.after)));
     }catch(error){notice(error.message,"error");}
     render(S.view==="simulation"?(S.run?.trace.at(-1).time_s||0)*.42:0);

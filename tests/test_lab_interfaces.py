@@ -1,6 +1,7 @@
 """Exercise actual CLI and HTTP boundaries, including untrusted local inputs."""
 from __future__ import annotations
 
+import gzip
 import http.client
 import json
 import os
@@ -12,12 +13,43 @@ import threading
 import unittest
 
 from recursivecal_lab.api import capabilities, dispatch
-from recursivecal_lab.io import loads, write_json
+from recursivecal_lab.io import loads, read_json, write_json
 from recursivecal_lab.inquiry import verify_report
 from recursivecal_lab.server import Handler, WorkbenchServer
 
 
 class InputTests(unittest.TestCase):
+    def test_gzip_reports_round_trip_and_preserve_existing_output(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            value = {"trace": [0.1, 0.2], "outcome": "rejected"}
+            plain = write_json(root / "report.json", value)
+            packed = write_json(root / "report.json.gz", value)
+            second = write_json(root / "other-name.json.gz", value)
+            self.assertEqual(gzip.decompress(packed.read_bytes()), plain.read_bytes())
+            self.assertEqual(read_json(packed), value)
+            self.assertEqual(packed.read_bytes(), second.read_bytes())
+            with self.assertRaises(FileExistsError):
+                write_json(packed, {"changed": True})
+            self.assertEqual(read_json(packed), value)
+
+    def test_gzip_reports_bound_decompressed_size(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "large.json.gz"
+            path.write_bytes(gzip.compress(b'{"x":"' + b'a' * 4096 + b'"}'))
+            self.assertLess(path.stat().st_size, 128)
+            with self.assertRaisesRegex(ValueError, "decompressed JSON input"):
+                read_json(path, max_bytes=128)
+
+    def test_gzip_reports_reject_corruption_and_invalid_json(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "bad.json.gz"
+            for raw in (b'not gzip', gzip.compress(b'{}')[:-3],
+                        gzip.compress(b'{"x":1,"x":2}'), gzip.compress(b'{"x":NaN}')):
+                path.write_bytes(raw)
+                with self.assertRaises(ValueError):
+                    read_json(path)
+
     def test_nonfinite_duplicate_and_unknown_inputs_rejected(self):
         for text in ('{"mass":NaN}', '{"x":1,"x":2}', '{"mass":Infinity}'):
             with self.assertRaises(ValueError):

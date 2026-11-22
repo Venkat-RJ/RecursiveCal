@@ -50,7 +50,7 @@
   }
   function validateRun(run) {
     if (run?.schema_version !== "recursivecal.run/1" ||
-        !["recursivecal.si-liftgate/1","recursivecal.si-liftgate/2"].includes(run.model_id))
+        !["recursivecal.si-liftgate/1","recursivecal.si-liftgate/2","recursivecal.si-liftgate/3"].includes(run.model_id))
       throw new Error("Expected an SI liftgate simulation report.");
     validateRows(run.trace, ["angle_rad","target_angle_rad","velocity_rad_s","motor_force_N_each","gas_force_N_each","stroke_m"]);
     if (!run.parameters || typeof run.parameters !== "object" || !run.provenance || !run.metrics)
@@ -65,7 +65,7 @@
   }
   async function validateReport(report) {
     if (report?.schema_version !== "recursivecal.physical-inquiry/1" ||
-        !["recursivecal.physical-rig/1","recursivecal.physical-rig/2"].includes(report.model_id))
+        !["recursivecal.physical-rig/1","recursivecal.physical-rig/2","recursivecal.physical-rig/3"].includes(report.model_id))
       throw new Error("Expected a physical investigation report.");
     if (!Array.isArray(report.agent_history) || report.agent_history.length > 6 ||
         !Array.isArray(report.diagnostics) || report.diagnostics.length !== report.agent_history.length ||
@@ -120,7 +120,9 @@
   function normalized(row, mode, p = {}) {
     // Investigation views never read true_* values, even from a sealed report.
     const q = mode === "simulation" ? row.angle_rad : mode === "verify" ? row.true_angle_rad : row.angle_rad;
-    return {t:row.time_s, q, angle:mode === "simulation" ? row.observed_angle_rad : row.angle_rad, target:row.target_angle_rad,
+    const telemetry = mode === "investigate" ? {} : Object.fromEntries(Object.entries(row).filter(([key,value]) =>
+      (/^(left_|right_)/.test(key) || ["brake_engaged","sensor_age_s"].includes(key)) && (finite(value)||typeof value==="boolean")));
+    return {...telemetry,t:row.time_s, q, angle:mode === "simulation" ? row.observed_angle_rad : row.angle_rad, target:row.target_angle_rad,
       velocity:mode === "verify" ? (row.true_velocity_rad_s ?? row.velocity_rad_s) : row.velocity_rad_s,
       drive:mode === "simulation" ? row.motor_force_N_each : undefined,
       command:mode === "simulation" ? row.requested_motor_force_N_each : undefined,
@@ -161,6 +163,8 @@
     const fields = [["t","time_s"],["angle","observed_angle_rad"],["q","display_angle_rad"],["target","target_angle_rad"],
       ["velocity","velocity_rad_s"],["drive","modeled_drive_force_N_each"],["command","command_N_each"],
       ["gas","gas_force_N_each"],["force","observed_strut_force_N_each"],["stroke","derived_stroke_m"]];
+    for (const side of ["left","right"]) for (const suffix of ["current_A","voltage_V","motor_speed_rad_s","temperature_C","force_N","rotor_angle_rad","electrical_energy_J"]) fields.push([side+"_"+suffix,side+"_"+suffix]);
+    fields.push(["sensor_age_s","sensor_age_s"]);
     const present = fields.filter(([key]) => rows.some(row => finite(row[key])));
     return present.map(([,label]) => label).join(",") + "\n" +
       rows.map(row => present.map(([key]) => csvCell(row[key])).join(",")).join("\n") + "\n";

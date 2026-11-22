@@ -114,7 +114,7 @@ class Handler(BaseHTTPRequestHandler):
             if urlsplit(self.path).path == "/api/inquiry/stream":
                 from .inquiry import run_study
                 body = _object(payload, "request")
-                _allowed(body, {"case", "seed", "policy", "max_tests", "budget"})
+                _allowed(body, {"case", "seed", "policy", "max_tests", "budget", "rig_version"})
                 report = run_study(**body, on_event=self._stream_event)
                 self._stream_event({"type": "complete", "report": report})
                 return

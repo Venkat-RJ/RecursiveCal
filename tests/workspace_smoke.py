@@ -62,7 +62,7 @@ def run(output: Path, browser_path: str | None = None, visual_only: bool = False
                     expect(page.locator("body")).to_have_attribute("data-ready", "connected")
                     expect(page.locator("#runButton")).to_be_enabled()
                     assert not page.locator("#cadUnavailable").is_visible()
-                    checked("Local API, verified physics-2 example and articulated CAD load without page errors")
+                    checked("Local API, verified research-rig-3 example and articulated CAD load without page errors")
 
                     def download_current(name: str) -> dict:
                         with page.expect_download() as download:
@@ -72,6 +72,7 @@ def run(output: Path, browser_path: str | None = None, visual_only: bool = False
                         return json.loads(target.read_text())
 
                     simulation = download_current("simulation.json")
+                    assert simulation["model_id"] == "recursivecal.si-liftgate/3"
                     page.locator("#timeline").fill("4200")
                     page.locator("#timeline").dispatch_event("input")
                     expected_t = simulation["trace"][-1]["time_s"] * .42
@@ -84,6 +85,12 @@ def run(output: Path, browser_path: str | None = None, visual_only: bool = False
                     assert math.isclose(float(page.locator("#rigCanvas").get_attribute("data-angle-rad")), expected_q, abs_tol=1e-9)
                     expected_stroke = before["stroke_m"] + (after["stroke_m"] - before["stroke_m"]) * weight
                     assert math.isclose(float(page.locator("#actuatorSvg").get_attribute("data-stroke-m")), expected_stroke, abs_tol=1e-9)
+                    expected_current = before["left_current_A"] + (after["left_current_A"] - before["left_current_A"])*weight
+                    assert math.isclose(float(page.locator("#actuatorSvg").get_attribute("data-current-a")), expected_current, abs_tol=1e-9)
+                    expect(page.locator("#readingCurrent")).not_to_contain_text("n/a")
+                    page.locator("#cameraView").select_option("side")
+                    assert page.locator("#cameraView").input_value() == "side"
+                    page.locator("#resetCamera").click()
                     page.locator("#stepForward").click()
                     assert float(page.locator("#workspace").get_attribute("data-time")) > expected_t
                     page.locator("#stepBack").click()
@@ -155,6 +162,9 @@ def run(output: Path, browser_path: str | None = None, visual_only: bool = False
                     page.get_by_role("button", name="Calibrate", exact=True).click()
                     assert page.locator(".parameter-table tbody tr").count() == 5
                     assert "Committed" in page.locator(".parameter-table").inner_text()
+                    expect(page.locator(".fixed-table")).to_contain_text("DC current and winding heat")
+                    expect(page.locator(".fixed-table")).to_contain_text("Independent states, one rigid hinge")
+                    expect(page.locator(".fixed-table")).not_to_contain_text("Not modeled")
                     expect(page.locator("#runState")).to_have_text("Sealed")
                     page.screenshot(path=str(output / "calibration-desktop.png"), full_page=True)
                     page.get_by_role("button", name="Verify", exact=True).click()
@@ -180,13 +190,14 @@ def run(output: Path, browser_path: str | None = None, visual_only: bool = False
                         page.get_by_role("button", name="Rig & data", exact=True).click()
                         page.locator("#openSettings").click()
                         page.locator("#scenario").select_option("power_loss")
-                        page.locator("#simulationForm summary").click()
+                        page.locator("#simulationForm summary").filter(has_text="Actuator, friction and motion limits").click()
                         page.locator('[data-param="sensor_bias_rad"]').fill("0.02")
                         page.locator("#simulationForm .dialog-run").click()
                         expect(page.locator("body")).to_have_attribute("data-busy", "false", timeout=60000)
                         expect(page.locator("#runOrigin")).to_have_text("Computed locally")
                         fresh = download_current("computed-simulation.json")
-                        assert fresh["model_id"].endswith("/2")
+                        assert fresh["model_id"].endswith("/3")
+                        assert fresh["rig_specification"]["drive"]["brake_capacity_Nm"] == 120
                         loss = next(e for e in fresh["events"] if e["type"] == "power_loss")
                         page.locator("#inspector").get_by_role("button", name="Power loss", exact=True).click()
                         assert math.isclose(float(page.locator("#workspace").get_attribute("data-time")), loss["time_s"], abs_tol=1e-9)
@@ -199,10 +210,31 @@ def run(output: Path, browser_path: str | None = None, visual_only: bool = False
                         assert float(first["observed_angle_rad"]) == fresh["trace"][0]["observed_angle_rad"]
                         assert float(first["display_angle_rad"]) == fresh["trace"][0]["angle_rad"]
                         assert float(first["observed_angle_rad"]) != float(first["display_angle_rad"])
+                        assert float(first["left_current_A"]) == fresh["trace"][0]["left_current_A"]
                         checked("A real new simulation computes, exposes its power-loss event and exports every CSV sample")
 
                         page.get_by_role("button", name="Investigate", exact=True).click()
                         page.locator("#openSettings").click()
+                        page.locator("#studyModel").select_option("3")
+                        page.locator("#condition").select_option("weak_motor")
+                        page.locator("#policy").select_option("fixed")
+                        page.locator("#investigationForm .dialog-run").click()
+                        expect(page.locator("body")).to_have_attribute("data-busy", "true")
+                        page.wait_for_function("""() => document.body.dataset.busy === 'true' &&
+                            document.querySelectorAll('#sideNav .nav-item').length > 0 &&
+                            document.querySelectorAll('#anglePlot path').length >= 4""", timeout=120000)
+                        page.screenshot(path=str(output / "research-investigation-computing.png"), full_page=True)
+                        expect(page.locator("body")).to_have_attribute("data-busy", "false", timeout=180000)
+                        research = download_current("computed-research-investigation.json")
+                        assert research["model_id"] == "recursivecal.physical-rig/3"
+                        assert verify_report(research)["valid"]
+                        assert research["verification"]["passive_hold"]["static"]["can_hold_open_without_motor"]
+                        assert all("left_current_A" not in row for record in research["agent_history"] for row in record["observations"])
+                        checked("Research-rig investigation uses v3 drives and a healthy brake without exposing drive truth to the agent")
+
+                        page.locator("#openSettings").click()
+                        page.locator("#studyModel").select_option("2")
+                        page.locator("#policy").select_option("bayes")
                         page.locator("#condition").select_option("compound")
                         page.locator("#investigationForm .dialog-run").click()
                         expect(page.locator("body")).to_have_attribute("data-busy", "true")

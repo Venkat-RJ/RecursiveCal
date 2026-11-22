@@ -1,4 +1,4 @@
-"""Build a deterministic, synthetic physics-2 example for the static workspace."""
+"""Build deterministic synthetic research-rig-3 evidence for the static workspace."""
 from __future__ import annotations
 
 import base64
@@ -11,12 +11,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from recursivecal_lab.inquiry import run_study, verify_report
-from recursivecal_lab.physics import simulate
+from recursivecal_lab.research_simulation import simulate
 
 
 def main() -> None:
     simulation = simulate()
-    report = run_study(case="weak_motor", seed=7, progress=lambda message: print(message, flush=True))
+    report = run_study(case="weak_motor", seed=7, rig_version=3, progress=lambda message: print(message, flush=True))
     check = verify_report(report)
     if not check["valid"]:
         raise ValueError(check)
@@ -24,7 +24,7 @@ def main() -> None:
                          separators=(",", ":"), allow_nan=False).encode()
     encoded = base64.b64encode(gzip.compress(payload, mtime=0)).decode()
     target = ROOT / "recursivecal_lab/web/workspace-reference.js"
-    target.write_text('/* Recorded synthetic physics-2 evidence. Regenerate with scripts/build_workspace_reference.py. */\n'
+    target.write_text('/* Recorded synthetic research-rig-3 evidence. Regenerate with scripts/build_workspace_reference.py. */\n'
                       '"use strict";\nwindow.RecursiveWorkspaceReference = "' + encoded + '";\n')
     print(json.dumps({"target": str(target), "simulation_samples": len(simulation["trace"]),
                       "diagnostic_tests": len(report["agent_history"]), "outcome": report["outcome"],
